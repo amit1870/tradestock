@@ -40,8 +40,6 @@ def main(stock_type='0'):
 
     for row in all_stocks:
         stock, price, currency = row
-        stock_length = len(stock)
-        spaces = " " * ( space_length + len(headers[0]) - stock_length)
         row = '{}    {}    {}'.format(stock, price, currency)
         print(row)
 
