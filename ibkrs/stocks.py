@@ -1,6 +1,3 @@
-import sys
-sys.path.append('/home/ec2-user/peace_haven')
-
 from pprint import pprint
 from ibw.client import IBClient
 from utils import helper

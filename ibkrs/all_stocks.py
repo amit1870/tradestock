@@ -1,7 +1,4 @@
-import sys
 import argparse
-
-sys.path.append('/home/ec2-user/peace_haven')
 
 from pprint import pprint
 from ibw.client import IBClient
