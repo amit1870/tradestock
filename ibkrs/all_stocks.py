@@ -35,7 +35,7 @@ def main(stock_type='0'):
     space_length = dash_length - headers_length
 
     print(dash_header)
-    print("{}{}{}    {}".format(headers[0]," " * space_length , headers[1]), headers[2])
+    print("{}{}{}    {}".format(headers[0]," " * space_length , headers[1], headers[2]))
     print(dash_header)
 
     for row in all_stocks:

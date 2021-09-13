@@ -56,7 +56,7 @@ class Stock(object):
                 if key == 'unrealizedPnl':
                     pnl = val
                 if key == 'currency':
-                    currency = currency
+                    currency = val
 
             values = (stock, pnl, currency)
 
