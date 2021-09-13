@@ -19,38 +19,33 @@ def main(stock_type='0'):
         is_server_running=True
     )
 
-    # grab account portfolios
+    # Create an instance of Stock class
     stock = Stock(ib_client)
 
-    all_stocks = stock.get_stock_list(account_id=config.get('main','regular_account'), page_id='0')
+    # Grab stock list by type
+    all_stocks = stock.get_stock_list(
+        account_id=config.get('main','regular_account'),
+        page_id='0',
+        stock_type=stock_type
+    )
 
     headers = ['STOCKS', 'PNL', 'Currency']
 
     dash_length = 35
-    margin_length = 4
-    headers_length = 0
-
     dash_header = "-" * dash_length
 
-    for header in headers[:-1]:
-        headers_length = headers_length + len(header)
-
-    space_length = dash_length - headers_length
-
     print(dash_header)
-    print("{}{}{}    {}".format(headers[0]," " * space_length , headers[1], headers[2]))
+    print("{}    {}    {}  ".format(headers[0], headers[1], headers[2]))
     print(dash_header)
 
     for row in all_stocks:
         stock, price, currency = row
         stock_length = len(stock)
         spaces = " " * ( space_length + len(headers[0]) - stock_length)
-        row = '{}{}{}    {}'.format(stock, spaces, profit, currency)
+        row = '{}    {}    {}'.format(stock, price, currency)
         print(row)
 
     print(dash_header)
-
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Print avaiable stock with Interactive Brokers.')
@@ -59,8 +54,3 @@ if __name__ == '__main__':
 
 
     main(args.stock_type)
-
-
-
-
-
