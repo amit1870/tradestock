@@ -75,3 +75,37 @@ class Stock(object):
         return stock_list
 
        
+
+    def get_stock_details(self, account_id, contract_id):
+        """
+            Returns information about a stock.
+
+            NAME: account_id
+            DESC: The account ID you wish to return stock for.
+            TYPE: String
+
+            NAME: contract_id
+            DESC: The contact you wish to return details.
+            TYPE: String
+        """
+
+        page_id = 0
+        data = {}
+        found = True
+        while found:
+            account_positions = self.session.portfolio_account_positions(
+                account_id=account_id,
+                page_id=page_id
+            )
+            if account_positions != []:
+                for row in account_positions:
+                    for key, val in row.items():
+                        if key == 'conid' and contract_id == val:
+                            return row
+                        elif key == 'conid' and contract_id != val:
+                            break
+                page_id += 1
+            else:
+                found = False
+
+        return data
