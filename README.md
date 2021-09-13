@@ -1,4 +1,5 @@
-# Download Client Portal from https://download2.interactivebrokers.com/portal/clientportal.beta.gw.zip
+# Download Client Portal
+wget https://download2.interactivebrokers.com/portal/clientportal.beta.gw.zip
 You need to unzip the folder and place it in the code repo where this code is stored.
 
 # Run server from Client Portal
@@ -9,8 +10,8 @@ $ ./bin/run.sh root/conf.yaml &
 URL :: https://localhost:5000/sso/Login?forwardTo=22&RL=1&ip2loc=US
 Put Username and Password and authenticate to get message "Client login succeeds"
 
-# Run `write_config.py` script to create config
-$ cd peace_haven; python3 utils/write_config.py
+# Run `write_config.py` script to create config and update values
+$ cd pcv; python3 utils/write_config.py
 
 # Run Scripts
-$ python3 ibkrs/all_stocks.py
+$ cd pcv; python3 ibkrs/all_stocks.py  --stock-type=0
