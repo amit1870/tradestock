@@ -1,48 +1,66 @@
 import sys
+import argparse
+
 sys.path.append('/home/ec2-user/peace_haven')
 
 from pprint import pprint
 from ibw.client import IBClient
+from ibkrs.stocks import Stock
 from utils import helper
 
+def main(stock_type='0'):
 
-config = helper.read_config()
+    config = helper.read_config()
 
-# Create a new session of the IB Web API.
-ib_client = IBClient(
-    username=config.get('main','regular_username'),
-    account=config.get('main','regular_account'),
-    is_server_running=True
-)
+    # Create a new session of the IB Web API.
+    ib_client = IBClient(
+        username=config.get('main','regular_username'),
+        account=config.get('main','regular_account'),
+        is_server_running=True
+    )
 
-# grab account portfolios
-account_positions = ib_client.portfolio_account_positions(
-    account_id=config.get('main','regular_account'),
-    page_id=0
-)
+    # grab account portfolios
+    stock = Stock(ib_client)
 
-dash_length = 25
+    all_stocks = stock.get_stock_list(account_id=config.get('main','regular_account'), page_id='0')
 
-dash_header = "-" * dash_length
+    headers = ['STOCKS', 'PNL', 'Currency']
 
-headers = ['STOCKS', 'PNL']
+    dash_length = 35
+    margin_length = 4
+    headers_length = 0
 
-space_length = dash_length - len(headers[0]) - len(headers[1]) - 6
+    dash_header = "-" * dash_length
 
-print(dash_header)
-print("{}{}{}".format(headers[0]," " * space_length , headers[1]))
-print(dash_header)
+    for header in headers[:-1]:
+        headers_length = headers_length + len(header)
 
-for row in account_positions:
-    for key, val in row.items():
-        if key == 'contractDesc':
-            stock = val
-        if key == 'unrealizedPnl':
-            profit = val
-    stock_length = len(stock)
-    spaces = " " * ( space_length + len(headers[0]) - stock_length)
-    row = '{}{}{}'.format(stock, spaces, profit)
-    print(row)
+    space_length = dash_length - headers_length
 
-print(dash_header)
+    print(dash_header)
+    print("{}{}{}    {}".format(headers[0]," " * space_length , headers[1]), headers[2])
+    print(dash_header)
+
+    for row in all_stocks:
+        stock, price, currency = row
+        stock_length = len(stock)
+        spaces = " " * ( space_length + len(headers[0]) - stock_length)
+        row = '{}{}{}    {}'.format(stock, spaces, profit, currency)
+        print(row)
+
+    print(dash_header)
+
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Print avaiable stock with Interactive Brokers.')
+    parser.add_argument('--stock-type', default='0', help='Stock type (default: 0, Avaiable: 1, -1)')
+    args = parser.parse_args()
+
+
+    main(args.stock_type)
+
+
+
+
 
