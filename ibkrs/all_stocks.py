@@ -5,7 +5,6 @@ import argparse
 
 from pprint import pprint
 from ibw.client import IBClient
-from ibkrs.stocks import Stock
 from utils import helper
 
 def print_stock(stock_type='0'):
