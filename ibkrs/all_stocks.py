@@ -36,8 +36,10 @@ def print_stock(stock_type='0'):
                 currency = val
             if key == 'position':
                 position = val
+            if key == 'conid':
+                contractid = val
 
-        values = (stock, pnl, position, currency)
+        values = (stock, contractid, pnl, position, currency)
 
         stock_list.append(values)
 
@@ -46,13 +48,13 @@ def print_stock(stock_type='0'):
         elif pnl > 0:
             profitable_stock_list.append(values)
 
-    headers = ['STOCKS', 'PNL', 'Position', 'Currency']
+    headers = ['STOCKS', 'ContractID', 'PNL', 'Position', 'Currency']
 
-    dash_length = 40
+    dash_length = 50
     dash_header = "-" * dash_length
 
     print(dash_header)
-    print("{}    {}    {}  {}  ".format(headers[0], headers[1], headers[2], headers[3]))
+    print("{}    {}    {}  {}    {}  ".format(headers[0], headers[1], headers[2], headers[3], headers[4]))
     print(dash_header)
 
     if stock_type == '-1':
@@ -63,8 +65,8 @@ def print_stock(stock_type='0'):
         selected_stock_list = stock_list
 
     for row in selected_stock_list:
-        name, price, position, currency = row
-        row = '{}    {}    {}    {} '.format(name, price, position, currency)
+        name, conid, price, position, currency = row
+        row = '{}    {}    {}    {}    {}  '.format(name, conid, price, position, currency)
         print(row)
 
     print(dash_header)
