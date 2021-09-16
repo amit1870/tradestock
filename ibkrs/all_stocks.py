@@ -54,9 +54,9 @@ def print_stock(args):
     print("{}    {}    {}  {}    {}  ".format(headers[0], headers[1], headers[2], headers[3], headers[4]))
     print(dash_header)
 
-    if stock_type == '-1':
+    if args.stock_type == '-1':
         selected_stock_list = negative_stock_list
-    elif stock_type == '1':
+    elif args.stock_type == '1':
         selected_stock_list = profitable_stock_list
     else:
         selected_stock_list = stock_list

@@ -18,7 +18,7 @@ def print_stock(args):
     # Grab the Specific Postion in a Portfolio.
     portfolio_position = ib_client.portfolio_account_position(
         account_id=args.account_id,
-        conid=args.contact_id
+        conid=args.conid
     )
     pprint(portfolio_position)
 
