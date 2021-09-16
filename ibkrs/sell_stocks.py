@@ -107,6 +107,7 @@ def sell_stock(args):
 
                     print("Place Order Reply Response:")
                     pprint(reply_response)
+                    print()
                     print("Order has been placed successfully.")
                 else:
                     print("Cancelled Place Order Reply.")
