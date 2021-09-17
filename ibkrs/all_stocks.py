@@ -3,6 +3,7 @@ sys.path.append('/home/ec2-user/pcv')
 
 import argparse
 
+from requests.exceptions import HTTPError
 from ibw.client import IBClient
 
 def print_stock(args):
@@ -15,10 +16,13 @@ def print_stock(args):
     )
 
     # grab account portfolios
-    account_positions = ib_client.portfolio_account_positions(
-        account_id=args.account_id,
-        page_id=0
-    )
+    try:    
+        account_positions = ib_client.portfolio_account_positions(
+            account_id=args.account_id,
+            page_id=0
+        )
+    except HTTPError as e:
+        account_positions = []
 
     stock_list = []
     negative_stock_list = []
