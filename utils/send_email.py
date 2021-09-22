@@ -78,7 +78,7 @@ def create_message_with_attachment(
     main_type, sub_type = content_type.split('/', 1)
 
     if main_type == 'text':
-        fp = open(attachment_file_path, 'rb')
+        fp = open(attachment_file_path, 'r')
         attachment_msg = MIMEText(fp.read(), _subtype=sub_type)
         fp.close()
 
