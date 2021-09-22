@@ -1,6 +1,11 @@
 import os
 import base64
+import argparse
+import mimetypes
 
+from email.mime.image import MIMEImage
+from email.mime.audio import MIMEAudio
+from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from requests.exceptions import HTTPError
@@ -96,10 +101,10 @@ def create_message_with_attachment(
     attachment_msg.add_header('Content-Disposition', 'attachment', filename=filename)
     msg.attach(attachment_msg)
 
-    return {'raw': base64.urlsafe_b64encode(msg.as_string())}
+    return {'raw': base64.urlsafe_b64encode(msg.as_bytes()).decode()}
 
 
-def create_service(client_secrets_file_path, api_name, api_version, scopes, email_from):
+def create_service(client_secrets_file_path, api_name, api_version, scopes):
     creds = None
     service = None
 
