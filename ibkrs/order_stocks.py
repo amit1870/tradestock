@@ -1,8 +1,7 @@
 import sys
-sys.path.append('/home/ec2-user/pcv')
-
 import argparse
 import random
+sys.path.append('/home/ec2-user/virenv/pcv')
 
 from pprint import pprint
 from ibw.client import IBClient

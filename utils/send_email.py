@@ -1,7 +1,9 @@
+import sys
 import os
 import base64
 import argparse
 import mimetypes
+sys.path.append('/home/ec2-user/virenv/pcv')
 
 from email.mime.image import MIMEImage
 from email.mime.audio import MIMEAudio
@@ -13,7 +15,6 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-
 
 from email_config import EMAIL, API
 

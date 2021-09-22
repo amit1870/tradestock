@@ -1,7 +1,6 @@
 import sys
-sys.path.append('/home/ec2-user/pcv')
-
 import argparse
+sys.path.append('/home/ec2-user/virenv/pcv')
 
 from requests.exceptions import HTTPError
 from pprint import pprint
