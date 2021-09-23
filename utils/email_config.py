@@ -1,9 +1,9 @@
 # Email configurations
 EMAIL = {
     'from': 'amitxvf@gmail.com',
-    'to': 'sudoxvf@gmail.com',
-    'subject': 'Subject is Fine',
-    'content': 'This message is coming from Python test script.',
+    'to': 'sudoxvf@gmail.com,amitpatel@teckvalley.com,amitxvf@gmail.com',
+    'subject': 'Daily Stock Update',
+    'content': 'Dear Receiver,\nPlease find daily stocks updates.',
     'attachments': ['/home/ec2-user/virenv/stocks.log']
 }
 
