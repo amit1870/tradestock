@@ -4,7 +4,7 @@ EMAIL = {
     'to': 'sudoxvf@gmail.com',
     'subject': 'Subject is Fine',
     'content': 'This message is coming from Python test script.',
-    'attachment': ''
+    'attachments': ['/home/ec2-user/virenv/stocks.log']
 }
 
 # API configurations

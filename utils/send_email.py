@@ -149,25 +149,34 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     service = create_service(args.token_path, API['name'], API['version'], API['scope'])
+
     while True:
-        attachment_file_path = ''
-        if EMAIL['attachment'] != '':
-            attachment_file_path = EMAIL['attachment']
-
+        message_list = []
         if args.email_attach != '':
-            attachment_file_path = args.email_attach
-
-        if attachment_file_path == '':
-            message = create_plain_html_message(EMAIL['from'],
-                EMAIL['to'],
-                EMAIL['subject'],
-                EMAIL['content'])
-        else:
             message = create_message_with_attachment(EMAIL['from'],
                 EMAIL['to'],
                 EMAIL['subject'],
                 EMAIL['content'],
-                attachment_file_path)
-        send_mes_resp = send_message(service, EMAIL['from'], message)
-        print(send_mes_resp)
-        sleep(10)
+                args.email_attach)
+            message_list.append(message)
+
+        elif EMAIL['attachments']:
+            for attachment_file_path in EMAIL['attachments']:
+                message = create_message_with_attachment(EMAIL['from'],
+                    EMAIL['to'],
+                    EMAIL['subject'],
+                    EMAIL['content'],
+                    attachment_file_path)
+                message_list.append(message)
+
+        if not message_list:
+            message = create_plain_html_message(EMAIL['from'],
+                EMAIL['to'],
+                EMAIL['subject'],
+                EMAIL['content'])
+            message_list.append(message)
+
+        for message in message_list:
+            message_response = send_message(service, EMAIL['from'], message)
+            print(message_response)
+        sleep(1200)
