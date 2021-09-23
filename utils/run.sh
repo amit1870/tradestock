@@ -64,6 +64,8 @@ while true; do
     echo "peace77t4 :: U6498436 :: $RUNNING_DATE :: LOSS" >> $LOG_FILE
     python "$CODE_DIR/ibkrs/all_stocks.py" --username peace77t4 --account-id U6498436 --stock-type=-1 >> $LOG_FILE 2>&1
 
+    sleep 600
+
 done
 
 echo "Finished!!"
