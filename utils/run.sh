@@ -27,6 +27,8 @@ while true; do
             mv $LOG_FILE $NEW_LOG_FILE
             touch $LOG_FILE
         fi
+    else
+        touch $LOG_FILE
     fi
 
     RUNNING_DATE=$(date)
