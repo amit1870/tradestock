@@ -5,6 +5,7 @@ import argparse
 import mimetypes
 sys.path.append('/home/ec2-user/virenv/pcv')
 
+from time import sleep
 from email.mime.image import MIMEImage
 from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
@@ -147,25 +148,26 @@ if __name__ == '__main__':
     parser.add_argument('--email-attach', default='', help='EMAIL_ATTACHMENT')
     args = parser.parse_args()
 
-    attachment_file_path = ''
-    if EMAIL['attachment'] != '':
-        attachment_file_path = EMAIL['attachment']
-
-    if args.email_attach != '':
-        attachment_file_path = args.email_attach
-
-    if attachment_file_path == '':
-        message = create_plain_html_message(EMAIL['from'],
-            EMAIL['to'],
-            EMAIL['subject'],
-            EMAIL['content'])
-    else:
-        message = create_message_with_attachment(EMAIL['from'],
-            EMAIL['to'],
-            EMAIL['subject'],
-            EMAIL['content'],
-            attachment_file_path)
-
     service = create_service(args.token_path, API['name'], API['version'], API['scope'])
-    send_mes_resp = send_message(service, EMAIL['from'], message)
-    print(send_mes_resp)
+    while True:
+        attachment_file_path = ''
+        if EMAIL['attachment'] != '':
+            attachment_file_path = EMAIL['attachment']
+
+        if args.email_attach != '':
+            attachment_file_path = args.email_attach
+
+        if attachment_file_path == '':
+            message = create_plain_html_message(EMAIL['from'],
+                EMAIL['to'],
+                EMAIL['subject'],
+                EMAIL['content'])
+        else:
+            message = create_message_with_attachment(EMAIL['from'],
+                EMAIL['to'],
+                EMAIL['subject'],
+                EMAIL['content'],
+                attachment_file_path)
+        send_mes_resp = send_message(service, EMAIL['from'], message)
+        print(send_mes_resp)
+        sleep(10)
