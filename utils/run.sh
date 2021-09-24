@@ -7,11 +7,12 @@ LOG_FILE="/home/ec2-user/virenv/stocks.log"
 NEW_LOG_FILE="/home/ec2-user/virenv/stocks.log.1"
 TOKEN_FILE_PATH="/home/ec2-user/virenv/token.json"
 
-NEW_LINE=$'\n'
 LOG_SIZE=500000 # 5MB
 SLEEP_SECONDS=1200 # Seconds
 NAP_SECONDS=120 # Seconds
 EMAIL_SCHEDULE="H"
+NEW_LINE=$'\n'
+
 declare -a usernames=("peace77t7" "peace77t6" "peace77t5" "peace77t4")
 declare -a accounts=("U5931342" "U6092014" "U6050929" "U6498436")
 
@@ -19,6 +20,11 @@ declare -a accounts=("U5931342" "U6092014" "U6050929" "U6498436")
 cd $BASE_DIR || exit
 source bin/activate
 export PYTHONPATH="$CODE_DIR"
+
+# Remove $LOG_FILE if already found.
+if [ -f "$LOG_FILE" ]; then
+    rm -f "$LOG_FILE"
+fi
 
 # Remove $NEW_LOG_FILE if already found.
 if [ -f "$NEW_LOG_FILE" ]; then
