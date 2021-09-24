@@ -6,6 +6,7 @@ sys.path.append('/home/ec2-user/virenv/pcv')
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from lsr import ACCOUNTS
+from get_lsr import get_context, decrypt_lsr
 
 def auto_mode_on_accounts(accounts):
     LOGIN_URL = 'https://localhost:5000/sso/Login?forwardTo=22&RL=1&ip2loc=US'
@@ -30,15 +31,32 @@ def auto_mode_on_accounts(accounts):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Authenticate Interactive Brokers.')
-    parser.add_argument('--username', default='all', help='For peace77t7. Use only t7')
+    parser.add_argument('--username', default='all', help='Account Number')
+    parser.add_argument('--password', help='Password for accounts like account:password. If all, then enter password comma seperated.')
     args = parser.parse_args()
+    
+    context = get_context()
 
     if args.username == 'all':
+        passwords = args.password.split(',')    
         accounts = [account for key, account in ACCOUNTS.items()]
+        for account in accounts:
+            account_lsr = account.get('lsr')
+            for password in passwords:
+                name, passkey = password.split(":")
+                if account.get('username') == name and decrypt_lsr(context, passkey, account_lsr):
+                    account['lsr'] = passkey
+
     else:
         accounts = [ACCOUNTS.get(args.username)]
+        account = accounts[0]
+        account_lsr = account.get('lsr')
+        passkey = args.password
+        if decrypt_lsr(context, passkey, account_lsr):
+            account['lsr'] = passkey
+
 
     if accounts:
-        print("Authentication started for {}".format(accounts))
+        print("Authentication started : {}".format(accounts.get('username')))
         auto_mode_on_accounts(accounts)
         print("Authentication finished!!")
