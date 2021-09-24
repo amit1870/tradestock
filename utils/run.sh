@@ -24,7 +24,7 @@ export PYTHONPATH="${CODE_DIR}"
 
 # Run server
 cd ${SERVER_DIR}
-bash /bin/run.sh root/conf.yaml &
+bash "${SERVER_DIR}/bin/run.sh" root/conf.yaml &
 
 # Remove $LOG_FILE if already found.
 if [ -f "$LOG_FILE" ]; then
