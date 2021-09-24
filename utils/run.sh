@@ -35,7 +35,7 @@ while true; do
 
     for (( i = 0; i < ${#usernames[@]}; i++ )); do
         RUNNING_DATE=$(date)
-        python "$CODE_DIR/utils/auto_mode.py --username ${usernames[i]}"  >> $LOG_FILE
+        python "$CODE_DIR/utils/auto_mode.py" --username ${usernames[i]}  >> $LOG_FILE
         echo "${usernames[i]} :: ${accounts[i]} :: $RUNNING_DATE :: PROFIT/LOSS" >> $LOG_FILE
         python "$CODE_DIR/ibkrs/all_stocks.py" --username ${usernames[i]} --account-id ${accounts[i]} --stock-type=1 >> $LOG_FILE 2>&1
         python "$CODE_DIR/ibkrs/all_stocks.py" --username ${usernames[i]} --account-id ${accounts[i]} --stock-type=-1 >> $LOG_FILE 2>&1

@@ -5,7 +5,7 @@ sys.path.append('/home/ec2-user/virenv/pcv')
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from lsr import ACCOUNT_LIST
+from lsr import ACCOUNTS
 
 def auto_mode_on_accounts(accounts):
     LOGIN_URL = 'https://localhost:5000/sso/Login?forwardTo=22&RL=1&ip2loc=US'
