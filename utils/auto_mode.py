@@ -1,4 +1,5 @@
 import sys
+import time
 sys.path.append('/home/ec2-user/virenv/pcv')
 
 from lsr import (
@@ -26,5 +27,6 @@ for account in [account_peace77t7, account_peace77t6, account_peace77t5, account
     driver.find_element_by_xpath(user_name_x_path).send_keys(account.get('username'))
     driver.find_element_by_xpath(password_x_path).send_keys(account.get('lsr'))
     driver.find_element_by_xpath(login_button_x_path).click()
+    time.sleep(5)
     driver.quit()
 
