@@ -29,9 +29,10 @@ bash "${SERVER_DIR}/bin/run.sh" root/conf.yaml &
 # Remove $LOG_FILE if already found.
 if [ -f "$LOG_FILE" ]; then
     rm -f "$LOG_FILE"
-else
-    touch $LOG_FILE
 fi
+
+# Add new  $LOG_FILE
+touch $LOG_FILE
 
 # Remove $NEW_LOG_FILE if already found.
 if [ -f "$NEW_LOG_FILE" ]; then
