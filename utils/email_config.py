@@ -1,7 +1,7 @@
 # Email configurations
 EMAIL = {
     'from': 'amitxvf@gmail.com',
-    'to': 'sudoxvf@gmail.com,amitpatel@teckvalley.com,amitxvf@gmail.com',
+    'to': 'amitpatel@teckvalley.com,sunny@peacehaven.co',
     'subject': 'Daily Stock Update',
     'content': 'Dear Receiver,\nPlease find daily stocks updates.',
     'attachments': ['/home/ec2-user/virenv/stocks.log'],
