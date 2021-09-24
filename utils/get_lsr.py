@@ -3,20 +3,21 @@ import base64
 import argparse
 sys.path.append('/home/ec2-user/virenv/pcv')
 
-from cryptography.fernet import Fernet
+from passlib.context import CryptContext
 
-def generate_lsr(key, lsr):
-    print(key)
-    fernet = Fernet(key)
-    encrypted_lsr = fernet.encrypt(lsr.encode('utf-8'))
-    return encrypted_lsr
+def get_context():
+    context = CryptContext(
+        schemes=["pbkdf2_sha256"],
+        default="pbkdf2_sha256",
+        pbkdf2_sha256__default_rounds=50000)
 
-def decrypt_lsr(key, lsr):
-    print(key)
-    fernet = Fernet(key)
-    decrypted_lsr = fernet.decrypt(lsr).decode('utf-8')
-    return decrypted_lsr
+    return context
 
+def generate_lsr(context, key):
+    return context.hash(key)
+
+def decrypt_lsr(context, key, lsr):
+    return context.verify(key, lsr)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Return LSR for string.')
@@ -25,15 +26,8 @@ if __name__ == '__main__':
     parser.add_argument('--decrypt', default=False, help='True/False')
     args = parser.parse_args()
 
-    if args.key:
-        try:
-            key = base64.urlsafe_b64encode(args.key)
-            lsr = args.lsr.encode('utf-8').decode('utf-8')
-        except TypeError as e:
-            print(e)
-            exit(1)
-
+    context = get_context()
     if args.decrypt:
         print(decrypt_lsr(key, lsr))
     else:
-        print(generate_lsr(key, lsr))
+        print(generate_lsr(key))
