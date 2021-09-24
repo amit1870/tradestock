@@ -179,4 +179,4 @@ if __name__ == '__main__':
         for message in message_list:
             message_response = send_message(service, EMAIL['from'], message)
             print(message_response)
-        sleep(1200)
+        sleep(3600)
