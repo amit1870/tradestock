@@ -57,6 +57,6 @@ if __name__ == '__main__':
 
 
     if accounts:
-        print("Authentication started : {}".format(accounts.get('username')))
+        print("Authentication started...")
         auto_mode_on_accounts(accounts)
         print("Authentication finished!!")
