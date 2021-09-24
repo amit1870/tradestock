@@ -21,11 +21,6 @@ cd $BASE_DIR || exit
 source bin/activate
 export PYTHONPATH="$CODE_DIR"
 
-# Remove $LOG_FILE if already found.
-if [ -f "$LOG_FILE" ]; then
-    rm -f "$LOG_FILE"
-fi
-
 # Remove $NEW_LOG_FILE if already found.
 if [ -f "$NEW_LOG_FILE" ]; then
     rm -f "$NEW_LOG_FILE"
