@@ -40,7 +40,7 @@ if [ -f "$NEW_LOG_FILE" ]; then
 fi
 
 # Run Email send command
-python "${CODE_DIR}/utils/send_email.py" --token=${TOKEN_FILE_PATH} --schedule=${EMAIL_SCHEDULE}
+python "${CODE_DIR}/utils/send_email.py" --token=${TOKEN_FILE_PATH} --schedule=${EMAIL_SCHEDULE} & >> $LOG_FILE 2>&1
 
 while true; do
 
