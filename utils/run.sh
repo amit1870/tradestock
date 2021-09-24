@@ -7,6 +7,8 @@ LOG_FILE="/home/ec2-user/virenv/stocks.log"
 NEW_LOG_FILE="/home/ec2-user/virenv/stocks.log.1"
 NEW_LINE=$'\n'
 LOG_SIZE=500000 # 5MB
+declare -a usernames=("peace77t7" "peace77t6" "peace77t5" "peace77t4")
+declare -a accounts=("U5931342" "U6092014" "U6050929" "U6498436")
 
 # Activate vitural env and export PYTHONPATH
 cd $BASE_DIR || exit
@@ -31,38 +33,17 @@ while true; do
         touch $LOG_FILE
     fi
 
-    RUNNING_DATE=$(date)
+    for (( i = 0; i < ${#usernames[@]}; i++ )); do
+        RUNNING_DATE=$(date)
+        python "$CODE_DIR/utils/auto_mode.py --username ${usernames[i]}"  >> $LOG_FILE
+        echo "${usernames[i]} :: ${accounts[i]} :: $RUNNING_DATE :: PROFIT/LOSS" >> $LOG_FILE
+        python "$CODE_DIR/ibkrs/all_stocks.py" --username ${usernames[i]} --account-id ${accounts[i]} --stock-type=1 >> $LOG_FILE 2>&1
+        python "$CODE_DIR/ibkrs/all_stocks.py" --username ${usernames[i]} --account-id ${accounts[i]} --stock-type=-1 >> $LOG_FILE 2>&1
+        echo "$NEW_LINE" >> $LOG_FILE
 
-    echo "peace77t7 :: U5931342 :: $RUNNING_DATE :: PROFIT" >> $LOG_FILE
-    python "$CODE_DIR/ibkrs/all_stocks.py" --username peace77t7 --account-id U5931342 --stock-type=1 >> $LOG_FILE 2>&1
-    echo "$NEW_LINE" >> $LOG_FILE
+        sleep 120
 
-    echo "peace77t6 :: U6092014 :: $RUNNING_DATE :: PROFIT" >> $LOG_FILE
-    python "$CODE_DIR/ibkrs/all_stocks.py" --username peace77t6 --account-id U6092014 --stock-type=1 >> $LOG_FILE 2>&1
-    echo "$NEW_LINE" >> $LOG_FILE
-
-    echo "peace77t5 :: U6050929 :: $RUNNING_DATE :: PROFIT" >> $LOG_FILE
-    python "$CODE_DIR/ibkrs/all_stocks.py" --username peace77t5 --account-id U6050929 --stock-type=1 >> $LOG_FILE 2>&1
-    echo "$NEW_LINE" >> $LOG_FILE
-
-    echo "peace77t4 :: U6498436 :: $RUNNING_DATE :: PROFIT" >> $LOG_FILE
-    python "$CODE_DIR/ibkrs/all_stocks.py" --username peace77t4 --account-id U6498436 --stock-type=1 >> $LOG_FILE 2>&1
-    echo "$NEW_LINE" >> $LOG_FILE
-
-    echo "peace77t7 :: U5931342 :: $RUNNING_DATE :: LOSS" >> $LOG_FILE
-    python "$CODE_DIR/ibkrs/all_stocks.py" --username peace77t7 --account-id U5931342 --stock-type=-1 >> $LOG_FILE 2>&1
-    echo "$NEW_LINE" >> $LOG_FILE
-
-    echo "peace77t6 :: U6092014 :: $RUNNING_DATE :: LOSS" >> $LOG_FILE
-    python "$CODE_DIR/ibkrs/all_stocks.py" --username peace77t6 --account-id U6092014 --stock-type=-1 >> $LOG_FILE 2>&1
-    echo "$NEW_LINE" >> $LOG_FILE
-
-    echo "peace77t5 :: U6050929 :: $RUNNING_DATE :: LOSS" >> $LOG_FILE
-    python "$CODE_DIR/ibkrs/all_stocks.py" --username peace77t5 --account-id U6050929 --stock-type=-1 >> $LOG_FILE 2>&1
-    echo "$NEW_LINE" >> $LOG_FILE
-
-    echo "peace77t4 :: U6498436 :: $RUNNING_DATE :: LOSS" >> $LOG_FILE
-    python "$CODE_DIR/ibkrs/all_stocks.py" --username peace77t4 --account-id U6498436 --stock-type=-1 >> $LOG_FILE 2>&1
+    done
 
     sleep 600
 
