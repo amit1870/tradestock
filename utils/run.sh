@@ -5,8 +5,13 @@ BASE_DIR="/home/ec2-user/virenv"
 CODE_DIR="$BASE_DIR/pcv"
 LOG_FILE="/home/ec2-user/virenv/stocks.log"
 NEW_LOG_FILE="/home/ec2-user/virenv/stocks.log.1"
+TOKEN_FILE_PATH="/home/ec2-user/virenv/token.json"
+
 NEW_LINE=$'\n'
 LOG_SIZE=500000 # 5MB
+SLEEP_SECONDS=1200 # Seconds
+NAP_SECONDS=120 # Seconds
+EMAIL_SCHEDULE="H"
 declare -a usernames=("peace77t7" "peace77t6" "peace77t5" "peace77t4")
 declare -a accounts=("U5931342" "U6092014" "U6050929" "U6498436")
 
@@ -19,6 +24,9 @@ export PYTHONPATH="$CODE_DIR"
 if [ -f "$NEW_LOG_FILE" ]; then
     rm -f "$NEW_LOG_FILE"
 fi
+
+# Run Email send command
+python "$CODE_DIR/utils/send_email.py" --token=${TOKEN_FILE_PATH} --schedule=${EMAIL_SCHEDULE}
 
 while true; do
 
@@ -41,11 +49,12 @@ while true; do
         python "$CODE_DIR/ibkrs/all_stocks.py" --username ${usernames[i]} --account-id ${accounts[i]} --stock-type=-1 >> $LOG_FILE 2>&1
         echo "$NEW_LINE" >> $LOG_FILE
 
-        sleep 120
+        sleep ${NAP_SECONDS}
+        echo "Took nap for ${NAP_SECONDS}sec.."
 
     done
-
-    sleep 600
+    echo "Going to sleep for ${SLEEP_SECONDS}sec..."
+    sleep ${SLEEP_SECONDS}
 
 done
 

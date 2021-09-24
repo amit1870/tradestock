@@ -19,6 +19,15 @@ from google.oauth2.credentials import Credentials
 
 from email_config import EMAIL, API
 
+HOUR = 3600
+
+EMAIL_SCHEDULE = {
+    'H': HOUR,
+    'D': 24 * HOUR,
+    'Q': 24 * 15 * HOUR,
+    'M': 24 * 15 * 30 * HOUR
+}
+
 def create_plain_html_message(sender, to, subject, message_text, html=False):
     """Create a message for an email.
 
@@ -146,6 +155,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Send Email with Gmail API.')
     parser.add_argument('--token-path', help='TOKEN_FILE_PATH')
     parser.add_argument('--email-attach', default='', help='EMAIL_ATTACHMENT')
+    parser.add_argument('--schedule', default='H', help='D:Daily, H:Hourly, Q:Quarterly, M:Monthly')
     args = parser.parse_args()
 
     service = create_service(args.token_path, API['name'], API['version'], API['scope'])
@@ -179,4 +189,15 @@ if __name__ == '__main__':
         for message in message_list:
             message_response = send_message(service, EMAIL['from'], message)
             print(message_response)
-        sleep(3600)
+        
+        email_schedule = 'H'
+        if args.schedule:
+            email_schedule = args.schedule
+        else:
+            for notation, pair in EMAIL['schedule'].items():
+                if pair[0]:
+                    email_schedule = notation
+                    break
+        
+        sleep_time = EMAIL_SCHEDULE.get(email_schedule)
+        sleep(sleep_time)
