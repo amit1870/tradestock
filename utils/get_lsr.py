@@ -28,6 +28,6 @@ if __name__ == '__main__':
 
     context = get_context()
     if args.decrypt:
-        print(decrypt_lsr(args.key, args.lsr))
+        print(decrypt_lsr(context, args.key, args.lsr))
     else:
-        print(generate_lsr(args.key))
+        print(generate_lsr(context, args.key))
