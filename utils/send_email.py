@@ -19,9 +19,10 @@ from google.oauth2.credentials import Credentials
 
 from email_config import EMAIL, API
 
-HOUR = 3600
+HOUR = 3600 # Seconds
 
 EMAIL_SCHEDULE = {
+    'S': HOUR / 10,
     'H': HOUR,
     'D': 24 * HOUR,
     'Q': 24 * 15 * HOUR,

@@ -8,8 +8,12 @@ from selenium.webdriver.chrome.options import Options
 from lsr import ACCOUNTS
 from get_lsr import get_context, decrypt_lsr
 
-def auto_mode_on_accounts(accounts):
-    LOGIN_URL = 'https://localhost:5000/sso/Login?forwardTo=22&RL=1&ip2loc=US'
+def auto_mode_on_accounts(accounts, url=None):
+
+    if url is None:
+        LOGIN_URL = 'https://localhost:5000/sso/Login?forwardTo=22&RL=1&ip2loc=US'
+    else:
+        LOGIN_URL = url
 
     options = Options()
     options.BinaryLocation = "/usr/bin/chromium-browser"
