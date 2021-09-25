@@ -46,7 +46,7 @@ if [ -f "$NEW_LOG_FILE" ]; then
 fi
 
 # Run Email send command
-# python "${CODE_DIR}/utils/send_email.py" --token=${TOKEN_FILE_PATH} --schedule=${EMAIL_SCHEDULE} & >> $OTHER_LOG_FILE 2>&1
+python "${CODE_DIR}/utils/send_email.py" --token=${TOKEN_FILE_PATH} --schedule=${EMAIL_SCHEDULE} & >> $OTHER_LOG_FILE 2>&1
 
 while true; do
 
@@ -62,16 +62,16 @@ while true; do
         password=$1
         echo "Starting auto_mode for --username ${usernames[i]} --password ${password} "
         python "${CODE_DIR}/utils/auto_mode.py" --username ${usernames[i]} --password ${password} >> $OTHER_LOG_FILE
-        echo "${usernames[i]} :: ${accounts[i]} :: $RUNNING_DATE :: PROFIT/LOSS" >> $LOG_FILE
-        python "${CODE_DIR}/ibkrs/all_stocks.py" --username ${usernames[i]} --account-id ${accounts[i]} --stock-type=1 >> ${LOG_FILE} 2>&1
-        python "${CODE_DIR}/ibkrs/all_stocks.py" --username ${usernames[i]} --account-id ${accounts[i]} --stock-type=-1 >> ${LOG_FILE} 2>&1
+        echo "${usernames[i]} :: ${accounts[i]} :: $RUNNING_DATE" >> $LOG_FILE
+        python "${CODE_DIR}/ibkrs/all_stocks.py" --username ${usernames[i]} --account-id ${accounts[i]} --stock-type=0 >> ${LOG_FILE} 2>&1
         echo "$NEW_LINE" >> ${LOG_FILE}
 
+        echo "Going to nap for ${NAP_SECONDS}sec.."
         sleep ${NAP_SECONDS}
-        echo "Took nap for ${NAP_SECONDS}sec.."
-        shift 1
 
+        shift 1
     done
+
     echo "Going to sleep for ${SLEEP_SECONDS}sec..."
     sleep ${SLEEP_SECONDS}
 

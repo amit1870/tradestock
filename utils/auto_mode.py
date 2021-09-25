@@ -40,16 +40,18 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     context = get_context()
-
+    authenticated_accounts = []
     if args.username == 'all':
         passwords = args.password.split(',')    
         accounts = [account for key, account in ACCOUNTS.items()]
+
         for account in accounts:
             account_lsr = account.get('lsr')
             for password in passwords:
                 name, passkey = password.split(":")
                 if account.get('username') == name and decrypt_lsr(context, passkey, account_lsr):
                     account['lsr'] = passkey
+                    authenticated_accounts.append(account)
 
     else:
         accounts = [ACCOUNTS.get(args.username)]
@@ -58,9 +60,10 @@ if __name__ == '__main__':
         passkey = args.password
         if decrypt_lsr(context, passkey, account_lsr):
             account['lsr'] = passkey
+            authenticated_accounts.append(account)
 
 
-    if accounts:
+    if authenticated_accounts:
         print("Authentication started...")
-        auto_mode_on_accounts(accounts)
+        auto_mode_on_accounts(authenticated_accounts)
         print("Authentication finished!!")
