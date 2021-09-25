@@ -48,7 +48,7 @@ def print_stock(args):
         elif pnl > 0:
             profitable_stock_list.append(values)
 
-    headers = ['STOCKS', 'ContractID', 'P/L', 'PNL', 'Position', 'Currency']
+    headers = ['STOCKS', 'ContractID', 'PNL', 'PROFIT/LOSS(P/L)', 'Position', 'Currency']
 
     dash_length = 55
     dash_header = "-" * dash_length
