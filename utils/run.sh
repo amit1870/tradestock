@@ -23,6 +23,7 @@ cd ${BASE_DIR} || exit
 source bin/activate
 export PYTHONPATH="${CODE_DIR}"
 export DISPLAY="localhost:1"
+alias python="/usr/bin/python3"
 
 # Run server
 cd ${SERVER_DIR}
@@ -30,7 +31,7 @@ bash "${SERVER_DIR}/bin/run.sh" root/conf.yaml &
 
 # Remove $LOG_FILE if already found.
 if [ -f "$LOG_FILE" ]; then
-    rm -f "$LOG_FILE"
+    rm -f ${LOG_FILE} ${OTHER_LOG_FILE}
 fi
 
 # Add new  $LOG_FILE
@@ -38,11 +39,11 @@ touch ${LOG_FILE} ${OTHER_LOG_FILE}
 
 # Remove $NEW_LOG_FILE if already found.
 if [ -f "$NEW_LOG_FILE" ]; then
-    rm -f "$NEW_LOG_FILE"
+    rm -f ${NEW_LOG_FILE}
 fi
 
 # Run Email send command
-python "${CODE_DIR}/utils/send_email.py" --token=${TOKEN_FILE_PATH} --schedule=${EMAIL_SCHEDULE} & >> $OTHER_LOG_FILE 2>&1
+# python "${CODE_DIR}/utils/send_email.py" --token=${TOKEN_FILE_PATH} --schedule=${EMAIL_SCHEDULE} & >> $OTHER_LOG_FILE 2>&1
 
 while true; do
 
@@ -57,6 +58,7 @@ while true; do
     for (( i = 0; i < ${#usernames[@]}; i++ )); do
         j=$((i+1))
         RUNNING_DATE=$(date)
+        echo "Starting auto_mode for --username ${usernames[i]} --password $j "
         python "${CODE_DIR}/utils/auto_mode.py" --username ${usernames[i]} --password $j >> $OTHER_LOG_FILE
         echo "${usernames[i]} :: ${accounts[i]} :: $RUNNING_DATE :: PROFIT/LOSS" >> $LOG_FILE
         python "${CODE_DIR}/ibkrs/all_stocks.py" --username ${usernames[i]} --account-id ${accounts[i]} --stock-type=1 >> ${LOG_FILE} 2>&1
