@@ -22,6 +22,7 @@ declare -a accounts=("U5931342" "U6092014" "U6050929" "U6498436")
 cd ${BASE_DIR} || exit
 source bin/activate
 export PYTHONPATH="${CODE_DIR}"
+export DISPLAY="localhost:1"
 
 # Run server
 cd ${SERVER_DIR}
