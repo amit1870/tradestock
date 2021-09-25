@@ -56,10 +56,10 @@ while true; do
 
 
     for (( i = 0; i < ${#usernames[@]}; i++ )); do
-        j=$((i+1))
         RUNNING_DATE=$(date)
-        echo "Starting auto_mode for --username ${usernames[i]} --password $j "
-        python "${CODE_DIR}/utils/auto_mode.py" --username ${usernames[i]} --password $j >> $OTHER_LOG_FILE
+        password=$1
+        echo "Starting auto_mode for --username ${usernames[i]} --password ${password} "
+        python "${CODE_DIR}/utils/auto_mode.py" --username ${usernames[i]} --password ${password} >> $OTHER_LOG_FILE
         echo "${usernames[i]} :: ${accounts[i]} :: $RUNNING_DATE :: PROFIT/LOSS" >> $LOG_FILE
         python "${CODE_DIR}/ibkrs/all_stocks.py" --username ${usernames[i]} --account-id ${accounts[i]} --stock-type=1 >> ${LOG_FILE} 2>&1
         python "${CODE_DIR}/ibkrs/all_stocks.py" --username ${usernames[i]} --account-id ${accounts[i]} --stock-type=-1 >> ${LOG_FILE} 2>&1
@@ -67,6 +67,7 @@ while true; do
 
         sleep ${NAP_SECONDS}
         echo "Took nap for ${NAP_SECONDS}sec.."
+        shift 1
 
     done
     echo "Going to sleep for ${SLEEP_SECONDS}sec..."
