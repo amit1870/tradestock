@@ -10,9 +10,9 @@ NEW_LOG_FILE="/home/ec2-user/virenv/stocks.log.1"
 TOKEN_FILE_PATH="/home/ec2-user/virenv/token.json"
 
 LOG_SIZE=500000 # 5MB
-SLEEP_SECONDS=120 # Seconds
+SLEEP_SECONDS=1200 # Seconds
 NAP_SECONDS=120 # Seconds
-EMAIL_SCHEDULE="S"
+EMAIL_SCHEDULE="H"
 NEW_LINE=$'\n'
 
 declare -a usernames=("peace77t7" "peace77t6" "peace77t5" "peace77t4")
@@ -45,8 +45,14 @@ if [ -f "$NEW_LOG_FILE" ]; then
     rm -f ${NEW_LOG_FILE}
 fi
 
-# Run Email send command
-python "${CODE_DIR}/utils/send_email.py" --token=${TOKEN_FILE_PATH} --schedule=${EMAIL_SCHEDULE} & >> $OTHER_LOG_FILE 2>&1
+# Check if email program is already running
+email_py_program_id=$(ps aux | grep "[p]ython $CODE_DIR/utils/send_email.py" | awk '{print $2}')
+if [[ -z $email_py_program_id ]]; then
+    # Run Email send command
+    python "${CODE_DIR}/utils/send_email.py" --token=${TOKEN_FILE_PATH} --schedule=${EMAIL_SCHEDULE} & >> $OTHER_LOG_FILE 2>&1
+fi
+
+
 
 while true; do
 
