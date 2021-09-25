@@ -5,6 +5,10 @@ sys.path.append('/home/ec2-user/virenv/pcv')
 from requests.exceptions import HTTPError
 from ibw.client import IBClient
 
+PROFIT = 'P'
+LOSS = 'L'
+ZERO = '0'
+
 def print_stock(args):
 
     # Create a new session of the IB Web API.
@@ -60,10 +64,10 @@ def print_stock(args):
     profit_or_loss = None
     if args.stock_type == '-1':
         selected_stock_list = negative_stock_list
-        profit_or_loss = 'LOSS'
+        profit_or_loss = PROFIT
     elif args.stock_type == '1':
         selected_stock_list = profitable_stock_list
-        profit_or_loss = 'PROFIT'
+        profit_or_loss = LOSS
     else:
         selected_stock_list = stock_list
 
@@ -71,11 +75,11 @@ def print_stock(args):
         name, conid, pnl, position, currency = row
         if profit_or_loss is None:
             if pnl < 0:
-                profit_or_loss = 'LOSS'
+                profit_or_loss = LOSS
             elif pnl > 0:
-                profit_or_loss = 'PROFIT'
+                profit_or_loss = PROFIT
             else:
-                profit_or_loss = 'ZERO'
+                profit_or_loss = ZERO
 
         row = '{}    {}    {}    {}    {}    {}  '.format(name, conid, pnl, profit_or_loss, position, currency)
         print(row)
