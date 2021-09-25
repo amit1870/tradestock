@@ -5,8 +5,8 @@ sys.path.append('/home/ec2-user/virenv/pcv')
 from requests.exceptions import HTTPError
 from ibw.client import IBClient
 
-PROFIT = 'P'
-LOSS = 'L'
+PROFIT = 'PF'
+LOSS = 'LS'
 ZERO = '0'
 
 def print_stock(args):
@@ -52,7 +52,7 @@ def print_stock(args):
         elif pnl > 0:
             profitable_stock_list.append(values)
 
-    headers = ['STOCKS', 'ContractID', 'PNL', 'PROFIT/LOSS(P/L)', 'Position', 'Currency']
+    headers = ['STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
 
     dash_length = 55
     dash_header = "-" * dash_length
@@ -61,25 +61,21 @@ def print_stock(args):
     print("{}    {}    {}  {}    {}  ".format(headers[0], headers[1], headers[2], headers[3], headers[4], headers[5]))
     print(dash_header)
 
-    profit_or_loss = None
     if args.stock_type == '-1':
         selected_stock_list = negative_stock_list
-        profit_or_loss = PROFIT
     elif args.stock_type == '1':
         selected_stock_list = profitable_stock_list
-        profit_or_loss = LOSS
     else:
         selected_stock_list = stock_list
 
     for row in selected_stock_list:
         name, conid, pnl, position, currency = row
-        if profit_or_loss is None:
-            if pnl < 0:
-                profit_or_loss = LOSS
-            elif pnl > 0:
-                profit_or_loss = PROFIT
-            else:
-                profit_or_loss = ZERO
+
+        profit_or_loss = ZERO
+        if pnl < 0:
+            profit_or_loss = LOSS
+        elif pnl > 0:
+            profit_or_loss = PROFIT
 
         row = '{}    {}    {}    {}    {}    {}  '.format(name, conid, pnl, profit_or_loss, position, currency)
         print(row)
