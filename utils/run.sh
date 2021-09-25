@@ -10,7 +10,7 @@ NEW_LOG_FILE="/home/ec2-user/virenv/stocks.log.1"
 TOKEN_FILE_PATH="/home/ec2-user/virenv/token.json"
 
 LOG_SIZE=500000 # 5MB
-SLEEP_SECONDS=1200 # Seconds
+SLEEP_SECONDS=120 # Seconds
 NAP_SECONDS=120 # Seconds
 EMAIL_SCHEDULE="S"
 NEW_LINE=$'\n'
@@ -23,11 +23,14 @@ cd ${BASE_DIR} || exit
 source bin/activate
 export PYTHONPATH="${CODE_DIR}"
 export DISPLAY="localhost:1"
-alias python="/usr/bin/python3"
+alias python="$BASE_DIR/bin/python"
 
 # Run server
-cd ${SERVER_DIR}
-bash "${SERVER_DIR}/bin/run.sh" root/conf.yaml &
+java_server_id=$(pidof java)
+if [[ -z $java_server_id ]]; then
+    cd ${SERVER_DIR}
+    bash "${SERVER_DIR}/bin/run.sh" root/conf.yaml &
+fi
 
 # Remove $LOG_FILE if already found.
 if [ -f "$LOG_FILE" ]; then
@@ -53,7 +56,6 @@ while true; do
         mv $LOG_FILE $NEW_LOG_FILE
         touch $LOG_FILE
     fi
-
 
     for (( i = 0; i < ${#usernames[@]}; i++ )); do
         RUNNING_DATE=$(date)
