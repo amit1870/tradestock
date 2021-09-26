@@ -100,8 +100,8 @@ def main(args):
         # try to connect once
         usernames = [args.username]
         passwords = []
-        if args.passkey != '':
-            passwords = passwords.append(args.passkey)
+        if len(args.passkey):
+            passwords.append(args.passkey)
         if usernames and passwords:
             authenticated_accounts = auto_mode_on_accounts(usernames, passwords)
             if authenticated_accounts[0].get('username', None) == args.username:
