@@ -107,7 +107,7 @@ def place_order_stock(ib_client, args):
         print("Cancelled Place Order.")
 
 def failed_place_order_stock():
-    print("Order cannot be placed. Please check account.")
+    print("Order cannot be placed. Please check account details.")
 
 def main(args):
     # Create a new session of the IB Web API.

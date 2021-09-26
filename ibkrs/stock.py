@@ -32,7 +32,7 @@ def print_stock(ib_client, args):
     pprint(portfolio_position)
 
 def print_blank_stock():
-    print("Symblo cannot be searched. Please check account.")
+    print("Symbol cannot be searched. Please check account details.")
 
 def main(args):
     # Create a new session of the IB Web API.
