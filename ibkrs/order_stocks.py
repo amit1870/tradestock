@@ -125,8 +125,8 @@ def main(args):
         # try to connect once
         usernames = [args.username]
         passwords = []
-        if args.password is not None:
-            passwords = passwords.append(args.password)
+        if args.passkey != '':
+            passwords = passwords.append(args.passkey)
         if usernames and passwords:
             authenticated_accounts = auto_mode_on_accounts(usernames, passwords)
             if authenticated_accounts[0].get('username', None) == args.username:
@@ -150,7 +150,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Buy or Sell stock with Interactive Brokers.')
     parser.add_argument('--username', required=True, help='YOUR_USERNAME')
-    parser.add_argument('--password', help='YOUR_PASSWORD')
+    parser.add_argument('--passkey', help='YOUR_PASSWORD')
     parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
 
     parser.add_argument('--conid', type=int, help='STOCK_CONTRACT_ID')
