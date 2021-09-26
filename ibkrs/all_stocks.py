@@ -104,7 +104,7 @@ def main(args):
             passwords.append(args.passkey)
         if usernames and passwords:
             authenticated_accounts = auto_mode_on_accounts(usernames, passwords)
-            if authenticated_accounts[0].get('username', None) == args.username:
+            if authenticated_accounts and (authenticated_accounts[0].get('username', None) == args.username):
                 # Create a new session of the IB Web API.
                 ib_client = IBClient(
                     username=args.username,
@@ -117,6 +117,8 @@ def main(args):
                     print_stock(ib_client, args)
                 else:
                     print_blank()
+            else:
+                print_blank()
         else:
             print("Username and Password is required to authenticate account.")
 

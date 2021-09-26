@@ -109,7 +109,6 @@ def place_order_stock(ib_client, args):
 def failed_place_order_stock():
     print("Order cannot be placed. Please check account.")
 
-
 def main(args):
     # Create a new session of the IB Web API.
     ib_client = IBClient(
@@ -129,7 +128,7 @@ def main(args):
             passwords.append(args.passkey)
         if usernames and passwords:
             authenticated_accounts = auto_mode_on_accounts(usernames, passwords)
-            if authenticated_accounts[0].get('username', None) == args.username:
+            if authenticated_accounts and (authenticated_accounts[0].get('username', None) == args.username):
                 # Create a new session of the IB Web API.
                 ib_client = IBClient(
                     username=args.username,
@@ -141,7 +140,9 @@ def main(args):
                 if connected:
                     place_order_stock(ib_client, args)
                 else:
-                    failed_place_order_stock()
+                    print("Please check account with admin.")
+            else:
+                failed_place_order_stock()
         else:
             print("Username and Password is required to authenticate account.")
     
