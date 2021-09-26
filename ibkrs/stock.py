@@ -48,7 +48,9 @@ def main(args):
     else:
         # try to connect once
         usernames = [args.username]
-        passwords = [args.password]
+        passwords = []
+        if args.passwords is not None:
+            passwords = passwords.append(args.password)
         if usernames and passwords:
             authenticated_accounts = auto_mode_on_accounts(usernames, passwords)
             if authenticated_accounts[0].get('username', None) == args.username:
