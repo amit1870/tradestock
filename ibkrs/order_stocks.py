@@ -126,7 +126,7 @@ def main(args):
         usernames = [args.username]
         passwords = []
         if args.passwords is not None:
-            passwords = passwords.append(args.password)
+            passwords = passwords.append(args.passwords)
         if usernames and passwords:
             authenticated_accounts = auto_mode_on_accounts(usernames, passwords)
             if authenticated_accounts[0].get('username', None) == args.username:
