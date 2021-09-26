@@ -8,8 +8,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
 
-from lsr import ACCOUNTS
-from get_lsr import get_context, decrypt_lsr
+from utils.lsr import ACCOUNTS
+from utils.lsr_opr import get_context, decrypt_lsr
 
 def _auto_mode_on_accounts(accounts, url=None):
 
