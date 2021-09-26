@@ -4,19 +4,13 @@ sys.path.append('/home/ec2-user/virenv/pcv')
 
 from requests.exceptions import HTTPError
 from ibw.client import IBClient
+from utils.auto_mode import auto_mode_on_accounts
 
 PROFIT = 'PF'
 LOSS = 'LS'
 ZERO = '0'
 
-def print_stock(args):
-
-    # Create a new session of the IB Web API.
-    ib_client = IBClient(
-        username=args.username,
-        account=args.account_id,
-        is_server_running=True
-    )
+def print_stock(ib_client, args):
 
     # grab account portfolios
     try:    
@@ -82,15 +76,54 @@ def print_stock(args):
 
     print(dash_header)
 
+def print_blank():
+    headers = ['STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
+    dash_length = 55
+    dash_header = "-" * dash_length
+    print(dash_header)
+    print("{}    {}    {}  {}    {}  ".format(headers[0], headers[1], headers[2], headers[3], headers[4], headers[5]))
+    print(dash_header)
+    print(dash_header)
 
 def main(args):
-    print_stock(args)
+    # Create a new session of the IB Web API.
+    ib_client = IBClient(
+        username=args.username,
+        account=args.account_id,
+        is_server_running=True
+    )
+    content = ib_client.is_authenticated()
+    connected = content.get('connected', False)
+    if connected:
+        print_stock(ib_client, args)
+    else:
+        # try to connect once
+        usernames = [args.username]
+        passwords = [args.password]
+        if usernames and passwords:
+            authenticated_accounts = auto_mode_on_accounts(usernames, passwords)
+            if authenticated_accounts[0].get('username', None) == args.username:
+                # Create a new session of the IB Web API.
+                ib_client = IBClient(
+                    username=args.username,
+                    account=args.account_id,
+                    is_server_running=True
+                )
+                content = ib_client.is_authenticated()
+                connected = content.get('connected', False)
+                if connected:
+                    print_stock(ib_client, args)
+                else:
+                    print_blank()
+        else:
+            print("Username and Password is required to authenticate account.")
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Print avaiable stock with Interactive Brokers.')
-    parser.add_argument('--username', help='YOUR_USERNAME')
-    parser.add_argument('--account-id', help='YOUR_ACCOUNT_NUMBER')
+    parser.add_argument('--username', required=True, help='YOUR_USERNAME')
+    parser.add_argument('--password', help='YOUR_PASSWORD')
+    parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
     parser.add_argument('--stock-type', default='0', help='Stock type (default: 0, Avaiable: 1, -1)')
     args = parser.parse_args()
 
