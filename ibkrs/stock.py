@@ -4,6 +4,7 @@ from requests.exceptions import HTTPError
 from pprint import pprint
 from ibw.client import IBClient
 from utils.auto_mode import auto_mode_on_accounts
+from utils import helper as hp
 
 def print_stock(ib_client, args):
 
@@ -50,7 +51,8 @@ def main(args):
         if usernames and passwords:
             # logout if any existing session
             try:
-                ib_client.logout()
+                with hp.silent_std_out():
+                    ib_client.logout()
             except HTTPError as e:
                 pass
 
