@@ -65,7 +65,7 @@ while true; do
 
     for (( i = 0; i < ${#usernames[@]}; i++ )); do
         RUNNING_DATE=$(date)
-        echo "[${usernames[i]}  :: $RUNNING_DATE]" >> $LOG_FILE
+        echo "[${usernames[i]}  :: ${accounts[i]} :: $RUNNING_DATE]" >> $LOG_FILE
         python "${CODE_DIR}/ibkrs/all_stocks.py" --username "${usernames[i]}" --passkey "${passwords[i]}"  \
                --account-id "${accounts[i]}" --stock-type "${STOCK_TYPE}" >> ${LOG_FILE} 2>&1
         echo "$NEW_LINE" >> ${LOG_FILE}

@@ -7,10 +7,10 @@ from utils import helper as hp
 
 
 HEADERS     = ['AccountID', 'STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
-BUFFER      = 5
+BUFFER      = 1
 SPACE       = ' '
-FOUR_SPACES = SPACE * 4
-HEADERS_LEN = len(FOUR_SPACES.join(HEADERS)) + BUFFER
+HEAD_SPACES = SPACE * 3
+HEADERS_LEN = len(HEAD_SPACES.join(HEADERS)) + BUFFER
 DASH_HEADER = "-" * HEADERS_LEN
 PROFIT      = 'PF'
 LOSS        = 'LS'
