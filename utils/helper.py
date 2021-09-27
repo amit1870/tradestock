@@ -1,18 +1,16 @@
 """
 This module will contain helping functions.
 """
-
+import os
 import contextlib
 import sys
+import os
 
-class DummyFile(object):
-    def write(self, x): pass
 
-    def flush(self): pass
+def supress_stdout(func):
+    def wrapper(*a, **ka):
+        with open(os.devnull, 'w') as devnull:
+            with contextlib.redirect_stdout(devnull):
+                func(*a, **ka)
+    return wrapper
 
-@contextlib.contextmanager
-def silent_std_out():
-    save_stdout = sys.stdout
-    sys.stdout = DummyFile()
-    yield
-    sys.stdout = save_stdout

@@ -720,7 +720,6 @@ class IBClient():
 
         # if it was a bad request print it out.
         elif not response.ok and url != 'https://localhost:5000/v1/portal/iserver/account':
-            print(url, response, response.text)
             raise requests.HTTPError()
 
     def _prepare_arguments_list(self, parameter_list: List[str]) -> str:

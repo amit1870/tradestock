@@ -51,19 +51,19 @@ def main(args):
         if usernames and passwords:
             # logout if any existing session
             try:
-                try:
-                    ib_client.logout()
-                except HTTPError as e:
-                    pass
+                ib_client.logout()
+            except HTTPError as e:
+                pass
 
-                authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=1)
-
+            authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=1)
+            try:
                 if authenticated_accounts:
                     auth_response = ib_client.is_authenticated()
 
                     # Finally make sure we are authenticated.
                     if 'authenticated' in auth_response.keys() and auth_response['authenticated']:
                         authenticated = True
+
             except HTTPError as e:
                 pass
 
