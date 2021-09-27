@@ -63,9 +63,9 @@ def _update_accounts(usernames, passwords):
 
     return authenticated_accounts
 
-def auto_mode_on_accounts(usernames, passwords):
+def auto_mode_on_accounts(usernames, passwords, sleep_sec=5):
     updated_accounts = _update_accounts(usernames, passwords)
-    authenticated_accounts = _auto_mode_on_accounts(updated_accounts)
+    authenticated_accounts = _auto_mode_on_accounts(updated_accounts, sleep_sec=5)
     return authenticated_accounts
 
       
