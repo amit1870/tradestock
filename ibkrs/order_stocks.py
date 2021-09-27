@@ -119,6 +119,12 @@ def main(args):
         passwords = [args.passkey]
         authenticated = False
         if usernames and passwords:
+            # logout if any existing session
+            try:
+                ib_client.logout()
+            except HTTPError as e:
+                pass
+
             authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=1)
 
             if authenticated_accounts:

@@ -13,6 +13,7 @@ LOG_SIZE=500000 # 5MB
 SLEEP_SECONDS=1200 # Seconds
 NAP_SECONDS=120 # Seconds
 EMAIL_SCHEDULE="H"
+STOCK_TYPE=0
 NEW_LINE=$'\n'
 
 declare -a usernames=("peace77t7" "peace77t6" "peace77t5" "peace77t4")
@@ -64,10 +65,9 @@ while true; do
 
     for (( i = 0; i < ${#usernames[@]}; i++ )); do
         RUNNING_DATE=$(date)
-        echo "Starting auto_mode for --username ${usernames[i]} --password ${passwords[i]} "
-        python "${CODE_DIR}/utils/auto_mode.py" --username "${usernames[i]}" --password "${passwords[i]}" >> $OTHER_LOG_FILE
-        echo "${usernames[i]} :: ${accounts[i]} :: $RUNNING_DATE" >> $LOG_FILE
-        python "${CODE_DIR}/ibkrs/all_stocks.py" --username "${usernames[i]}" --account-id "${accounts[i]}" --stock-type=0 >> ${LOG_FILE} 2>&1
+        echo "[${usernames[i]}  :: $RUNNING_DATE]" >> $LOG_FILE
+        python "${CODE_DIR}/ibkrs/all_stocks.py" --username "${usernames[i]}" --passkey "${passwords[i]}"  \
+               --account-id "${accounts[i]}" --stock-type "${STOCK_TYPE}" >> ${LOG_FILE} 2>&1
         echo "$NEW_LINE" >> ${LOG_FILE}
 
         echo "Going to nap for ${NAP_SECONDS}sec.."
