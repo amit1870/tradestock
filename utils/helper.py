@@ -8,7 +8,7 @@ import sys
 class DummyFile(object):
     def write(self, x): pass
 
-    def flush(self, x): pass
+    def flush(self): pass
 
 @contextlib.contextmanager
 def silent_std_out():
