@@ -122,19 +122,22 @@ def main(args):
         if usernames and passwords:
             # logout if any existing session
             try:
-                with hp.silent_std_out():
-                    ib_client.logout()
+                try:    
+                    with hp.silent_std_out():
+                        ib_client.logout()
+                except HTTPError as e:
+                    pass
+
+                authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=1)
+
+                if authenticated_accounts:
+                    auth_response = ib_client.is_authenticated()
+
+                    # Finally make sure we are authenticated.
+                    if 'authenticated' in auth_response.keys() and auth_response['authenticated']:
+                        authenticated = True
             except HTTPError as e:
                 pass
-
-            authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=1)
-
-            if authenticated_accounts:
-                auth_response = ib_client.is_authenticated()
-
-                # Finally make sure we are authenticated.
-                if 'authenticated' in auth_response.keys() and auth_response['authenticated']:
-                    authenticated = True
 
         if authenticated:
             place_order_stock(ib_client, args)
