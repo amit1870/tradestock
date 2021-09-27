@@ -115,9 +115,8 @@ def main(args):
         if usernames and passwords:
             # logout if any existing session
             try:
-                try:    
-                    with hp.silent_std_out():
-                        ib_client.logout()
+                try:
+                    ib_client.logout()
                 except HTTPError as e:
                     pass
 
