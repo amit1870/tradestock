@@ -3,7 +3,7 @@ import argparse
 from requests.exceptions import HTTPError
 from ibw.client import IBClient
 from utils.auto_mode import auto_mode_on_accounts
-from utils.helper as hp
+from utils.helper import helper as hp
 
 
 HEADERS     = ['AccountID', 'STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
