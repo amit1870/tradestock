@@ -7,13 +7,19 @@ from utils import helper as hp
 
 
 HEADERS     = ['AccountID', 'STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
-DASH_LENGTH = 62   # Dash length
-DASH_HEADER = "-" * DASH_LENGTH
+BUFFER      = 5
+SPACE       = ' '
+FOUR_SPACES = SPACE * 4
+HEADERS_LEN = len(FOUR_SPACES.join(HEADERS)) + BUFFER
+DASH_HEADER = "-" * HEADERS_LEN
 PROFIT      = 'PF'
 LOSS        = 'LS'
 ZERO        = 0
 NEGATIVE    = '-1'
 POSITIVE    = '1'
+SPACE_LEN   = 4
+SPACES      = ' ' * SPACE_LEN
+
 
 def print_stock(ib_client, args):
 
@@ -29,20 +35,47 @@ def print_stock(ib_client, args):
     stock_list = []
     negative_stock_list = []
     profitable_stock_list = []
+    max_length_symbol = max_length_pnl = max_length_currency = 0
+    max_length_position = max_length_contractid = max_length_account_id = 0
+    max_length_ps_ls = 5
     for row in account_positions:
         for key, val in row.items():
             if key == 'contractDesc':
                 stock = val
+                len_of_stock_symbol = len(str(stock))
+                if max_length_symbol < len_of_stock_symbol:
+                    max_length_symbol = len_of_stock_symbol
+
             if key == 'unrealizedPnl':
                 pnl = val
+                len_of_stock_pnl = len(str(pnl))
+                if max_length_pnl < len_of_stock_pnl:
+                    max_length_pnl = len_of_stock_pnl
+
             if key == 'currency':
                 currency = val
+                len_of_stock_currency = len(str(currency))
+                if max_length_currency < len_of_stock_currency:
+                    max_length_currency = len_of_stock_currency
+
             if key == 'position':
                 position = val
+                len_of_stock_position = len(str(position))
+                if max_length_position < len_of_stock_position:
+                    max_length_position = len_of_stock_position
+
             if key == 'conid':
                 contractid = val
+                len_of_stock_contractid = len(str(contractid))
+                if max_length_contractid < len_of_stock_contractid:
+                    max_length_contractid = len_of_stock_contractid
+
             if key == 'acctId':
                 account_id = val
+                len_of_stock_account_id = len(str(account_id))
+                if max_length_account_id < len_of_stock_account_id:
+                    max_length_account_id = len_of_stock_account_id
+
 
         values = (account_id, stock, contractid, pnl, position, currency)
 
@@ -54,11 +87,19 @@ def print_stock(ib_client, args):
             profitable_stock_list.append(values)
 
     print(DASH_HEADER)
-    print("{}    {}    {}    {}  {}    {}  ".format(HEADERS[0],
-                                                    HEADERS[1],
-                                                    HEADERS[2],
-                                                    HEADERS[3],
-                                                    HEADERS[4], HEADERS[5], HEADERS[6]))
+    print("{}{}{}{}{}{}{}{}{}{}{}{}".format(HEADERS[0],
+                                            SPACES,                                    
+                                            HEADERS[1],
+                                            SPACES,
+                                            HEADERS[2],
+                                            SPACES,
+                                            HEADERS[3],
+                                            SPACES,
+                                            HEADERS[4],
+                                            SPACES,
+                                            HEADERS[5],
+                                            SPACES,
+                                            HEADERS[6]))
     print(DASH_HEADER)
 
     if args.stock_type == NEGATIVE:
@@ -77,23 +118,38 @@ def print_stock(ib_client, args):
         elif pnl > 0:
             profit_or_loss = PROFIT
 
-        row = '{}    {}    {}    {}    {}    {}    {}  '.format(acc_id,
-                                                                name,
-                                                                conid,
-                                                                pnl,
-                                                                profit_or_loss,
-                                                                position, currency)
+        row = '{}{}{}{}{}{}{}{}{}{}{}{}'.format(acc_id,
+                                                SPACE * (max_length_account_id + SPACE_LEN - len(str(acc_id))),
+                                                name,
+                                                SPACE * (max_length_symbol + SPACE_LEN - len(str(name))),
+                                                conid,
+                                                SPACE * (max_length_contractid + SPACE_LEN - len(str(conid))),
+                                                pnl,
+                                                SPACE * (max_length_pnl + SPACE_LEN - len(str(pnl))),
+                                                profit_or_loss,
+                                                SPACE * (max_length_ps_ls + SPACE_LEN - len(str(profit_or_loss))),
+                                                position,
+                                                SPACE * (max_length_position + SPACE_LEN - len(str(position))),
+                                                currency)
         print(row)
 
     print(DASH_HEADER)
 
 def print_blank_stock():
     print(DASH_HEADER)
-    print("{}    {}    {}    {}  {}    {}  ".format(HEADERS[0],
-                                                    HEADERS[1],
-                                                    HEADERS[2],
-                                                    HEADERS[3],
-                                                    HEADERS[4], HEADERS[5], HEADERS[6]))
+    print("{}{}{}{}{}{}{}{}{}{}{}{}".format(HEADERS[0],
+                                            SPACES,                                    
+                                            HEADERS[1],
+                                            SPACES,
+                                            HEADERS[2],
+                                            SPACES,
+                                            HEADERS[3],
+                                            SPACES,
+                                            HEADERS[4],
+                                            SPACES,
+                                            HEADERS[5],
+                                            SPACES,
+                                            HEADERS[6]))
     print(DASH_HEADER)
     print(DASH_HEADER)
 
