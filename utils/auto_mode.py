@@ -1,14 +1,12 @@
-import sys
 import os
 import argparse
 import time
-sys.path.append('/home/ec2-user/virenv/pcv')
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
 
-from utils.lsr import ACCOUNTS
+from utils.settings import ACCOUNTS
 from utils.lsr_opr import get_context, decrypt_lsr
 
 def _auto_mode_on_accounts(accounts, url=None):

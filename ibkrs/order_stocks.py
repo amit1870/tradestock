@@ -1,19 +1,13 @@
-import sys
 import argparse
 import random
-sys.path.append('/home/ec2-user/virenv/pcv')
 
 from pprint import pprint
 from ibw.client import IBClient
 from utils.auto_mode import auto_mode_on_accounts
 from stock_config import ORDERS
 
-
-
 def place_order_stock(ib_client, args):
-
     # Update ORDERS dictionary
-
     ORDERS['acctId'] = args.account_id
     ORDERS['conid'] = args.conid
     ORDERS['side'] = args.side

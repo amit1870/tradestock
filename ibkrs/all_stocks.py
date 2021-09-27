@@ -1,14 +1,18 @@
-import sys
 import argparse
-sys.path.append('/home/ec2-user/virenv/pcv')
 
 from requests.exceptions import HTTPError
 from ibw.client import IBClient
 from utils.auto_mode import auto_mode_on_accounts
 
-PROFIT = 'PF'
-LOSS = 'LS'
-ZERO = '0'
+
+HEADERS     = ['STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
+DASH_LENGTH = 55   # Dash length
+DASH_HEADER = "-" * DASH_LENGTH
+PROFIT      = 'PF'
+LOSS        = 'LS'
+ZERO        = '0'
+NEGATIVE    = '-1'
+POSITIVE    = '1'
 
 def print_stock(ib_client, args):
 
@@ -41,23 +45,18 @@ def print_stock(ib_client, args):
 
         stock_list.append(values)
 
-        if pnl < 0 :
+        if pnl < ZERO :
             negative_stock_list.append(values)
-        elif pnl > 0:
+        elif pnl > ZERO:
             profitable_stock_list.append(values)
 
-    headers = ['STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
+    print(DASH_HEADER)
+    print("{}    {}    {}  {}    {}  ".format(HEADERS[0], HEADERS[1], HEADERS[2], HEADERS[3], HEADERS[4], HEADERS[5]))
+    print(DASH_HEADER)
 
-    dash_length = 55
-    dash_header = "-" * dash_length
-
-    print(dash_header)
-    print("{}    {}    {}  {}    {}  ".format(headers[0], headers[1], headers[2], headers[3], headers[4], headers[5]))
-    print(dash_header)
-
-    if args.stock_type == '-1':
+    if args.stock_type == NEGATIVE:
         selected_stock_list = negative_stock_list
-    elif args.stock_type == '1':
+    elif args.stock_type == POSITIVE:
         selected_stock_list = profitable_stock_list
     else:
         selected_stock_list = stock_list
@@ -74,16 +73,13 @@ def print_stock(ib_client, args):
         row = '{}    {}    {}    {}    {}    {}  '.format(name, conid, pnl, profit_or_loss, position, currency)
         print(row)
 
-    print(dash_header)
+    print(DASH_HEADER)
 
 def print_blank():
-    headers = ['STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
-    dash_length = 55
-    dash_header = "-" * dash_length
-    print(dash_header)
-    print("{}    {}    {}  {}    {}  ".format(headers[0], headers[1], headers[2], headers[3], headers[4], headers[5]))
-    print(dash_header)
-    print(dash_header)
+    print(DASH_HEADER)
+    print("{}    {}    {}  {}    {}  ".format(HEADERS[0], HEADERS[1], HEADERS[2], HEADERS[3], HEADERS[4], HEADERS[5]))
+    print(DASH_HEADER)
+    print(DASH_HEADER)
 
 def main(args):
     # Create a new session of the IB Web API.

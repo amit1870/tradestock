@@ -1,7 +1,5 @@
-import sys
 import base64
 import argparse
-sys.path.append('/home/ec2-user/virenv/pcv')
 
 from passlib.context import CryptContext
 
