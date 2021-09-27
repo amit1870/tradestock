@@ -9,7 +9,7 @@ from selenium.common.exceptions import WebDriverException
 from utils.settings import ACCOUNTS
 from utils.lsr_opr import get_context, decrypt_lsr
 
-def _auto_mode_on_accounts(accounts, url=None):
+def _auto_mode_on_accounts(accounts, url=None, sleep_sec=5):
 
     # export DISPLAY to localhost:1 for web driver
     os.environ["DISPLAY"] = "localhost:1"
@@ -37,7 +37,7 @@ def _auto_mode_on_accounts(accounts, url=None):
             driver.find_element_by_xpath(password_x_path).send_keys(account.get('lsr'))
             driver.find_element_by_xpath(login_button_x_path).click()
             authenticated_accounts.append(account)
-            time.sleep(5)
+            time.sleep(sleep_sec)
             driver.quit()
         except WebDriverException as e:
             pass

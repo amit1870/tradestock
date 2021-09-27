@@ -5,12 +5,12 @@ from ibw.client import IBClient
 from utils.auto_mode import auto_mode_on_accounts
 
 
-HEADERS     = ['STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
-DASH_LENGTH = 55   # Dash length
+HEADERS     = ['AccountID', 'STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
+DASH_LENGTH = 62   # Dash length
 DASH_HEADER = "-" * DASH_LENGTH
 PROFIT      = 'PF'
 LOSS        = 'LS'
-ZERO        = '0'
+ZERO        = 0
 NEGATIVE    = '-1'
 POSITIVE    = '1'
 
@@ -45,13 +45,13 @@ def print_stock(ib_client, args):
 
         stock_list.append(values)
 
-        if pnl < ZERO :
+        if pnl < ZERO:
             negative_stock_list.append(values)
         elif pnl > ZERO:
             profitable_stock_list.append(values)
 
     print(DASH_HEADER)
-    print("{}    {}    {}  {}    {}  ".format(HEADERS[0], HEADERS[1], HEADERS[2], HEADERS[3], HEADERS[4], HEADERS[5]))
+    print("{}    {}    {}  {}    {}  ".format(HEADERS[0], HEADERS[1], HEADERS[2], HEADERS[3], HEADERS[4], HEADERS[5], HEADERS[6]))
     print(DASH_HEADER)
 
     if args.stock_type == NEGATIVE:
@@ -75,9 +75,9 @@ def print_stock(ib_client, args):
 
     print(DASH_HEADER)
 
-def print_blank():
+def print_blank_stock():
     print(DASH_HEADER)
-    print("{}    {}    {}  {}    {}  ".format(HEADERS[0], HEADERS[1], HEADERS[2], HEADERS[3], HEADERS[4], HEADERS[5]))
+    print("{}    {}    {}  {}    {}  ".format(HEADERS[0], HEADERS[1], HEADERS[2], HEADERS[3], HEADERS[4], HEADERS[5], HEADERS[6]))
     print(DASH_HEADER)
     print(DASH_HEADER)
 
@@ -88,36 +88,28 @@ def main(args):
         account=args.account_id,
         is_server_running=True
     )
-    content = ib_client.is_authenticated()
-    connected = content.get('connected', False)
-    if connected:
+
+    if args.passkey is None:
         print_stock(ib_client, args)
     else:
         # try to connect once
         usernames = [args.username]
-        passwords = []
-        if args.passkey is not None and len(args.passkey):
-            passwords.append(args.passkey)
+        passwords = [args.passkey]
+        authenticated = False
         if usernames and passwords:
-            authenticated_accounts = auto_mode_on_accounts(usernames, passwords)
-            if authenticated_accounts and (authenticated_accounts[0].get('username', None) == args.username):
-                # Create a new session of the IB Web API.
-                ib_client = IBClient(
-                    username=args.username,
-                    account=args.account_id,
-                    is_server_running=True
-                )
-                content = ib_client.is_authenticated()
-                connected = content.get('connected', False)
-                if connected:
-                    print_stock(ib_client, args)
-                else:
-                    print_blank()
-            else:
-                print_blank()
-        else:
-            print("Username and Password is required to authenticate account.")
+            authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=1)
 
+            if authenticated_accounts:
+                auth_response = ib_client.is_authenticated()
+
+                # Finally make sure we are authenticated.
+                if 'authenticated' in auth_response.keys() and auth_response['authenticated']:
+                    authenticated = True
+
+        if authenticated:
+            print_stock(ib_client, args)
+        else:
+            print_blank_stock()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Print avaiable stock with Interactive Brokers.')

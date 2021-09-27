@@ -110,37 +110,28 @@ def main(args):
         account=args.account_id,
         is_server_running=True
     )
-    content = ib_client.is_authenticated()
-    connected = content.get('connected', False)
-    if connected:
+
+    if args.passkey is None:
         place_order_stock(ib_client, args)
     else:
         # try to connect once
         usernames = [args.username]
-        passwords = []
-        if args.passkey is not None and len(args.passkey):
-            passwords.append(args.passkey)
+        passwords = [args.passkey]
+        authenticated = False
         if usernames and passwords:
-            authenticated_accounts = auto_mode_on_accounts(usernames, passwords)
-            if authenticated_accounts and (authenticated_accounts[0].get('username', None) == args.username):
-                # Create a new session of the IB Web API.
-                ib_client = IBClient(
-                    username=args.username,
-                    account=args.account_id,
-                    is_server_running=True
-                )
-                content = ib_client.is_authenticated()
-                connected = content.get('connected', False)
-                if connected:
-                    place_order_stock(ib_client, args)
-                else:
-                    print("Please check account with admin.")
-            else:
-                failed_place_order_stock()
-        else:
-            print("Username and Password is required to authenticate account.")
-    
+            authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=1)
 
+            if authenticated_accounts:
+                auth_response = ib_client.is_authenticated()
+
+                # Finally make sure we are authenticated.
+                if 'authenticated' in auth_response.keys() and auth_response['authenticated']:
+                    authenticated = True
+
+        if authenticated:
+            place_order_stock(ib_client, args)
+        else:
+            failed_place_order_stock()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Buy or Sell stock with Interactive Brokers.')
