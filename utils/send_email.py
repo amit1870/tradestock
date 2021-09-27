@@ -22,6 +22,7 @@ HOUR = 3600 # Seconds
 EMAIL_SCHEDULE = {
     'S': HOUR / 10,
     'H': HOUR,
+    'Q': 6 * HOUR,
     'D': 24 * HOUR,
     'Q': 24 * 15 * HOUR,
     'M': 24 * 15 * 30 * HOUR

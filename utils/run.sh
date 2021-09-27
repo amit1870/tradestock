@@ -10,9 +10,9 @@ NEW_LOG_FILE="/home/ec2-user/virenv/stocks.log.1"
 TOKEN_FILE_PATH="/home/ec2-user/virenv/token.json"
 
 LOG_SIZE=500000 # 5MB
-SLEEP_SECONDS=1200 # Seconds
+SLEEP_SECONDS=7200 # Seconds
 NAP_SECONDS=120 # Seconds
-EMAIL_SCHEDULE="H"
+EMAIL_SCHEDULE="Q"
 STOCK_TYPE=0
 NEW_LINE=$'\n'
 

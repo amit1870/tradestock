@@ -9,7 +9,7 @@ EMAIL = {
         'D': (False, 'Daily'),
         'S': (False, 'Shortly'),
         'H': (True, 'Hourly'),
-        'Q': (False, 'Quarterly'),
+        'Q': (False, 'Half Day'),
         'M': (False, 'Monthly')
     }
 }
