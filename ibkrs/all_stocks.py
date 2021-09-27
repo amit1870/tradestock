@@ -40,8 +40,10 @@ def print_stock(ib_client, args):
                 position = val
             if key == 'conid':
                 contractid = val
+            if key == 'acctId':
+                account_id = val
 
-        values = (stock, contractid, pnl, position, currency)
+        values = (account_id, stock, contractid, pnl, position, currency)
 
         stock_list.append(values)
 
@@ -51,7 +53,11 @@ def print_stock(ib_client, args):
             profitable_stock_list.append(values)
 
     print(DASH_HEADER)
-    print("{}    {}    {}  {}    {}  ".format(HEADERS[0], HEADERS[1], HEADERS[2], HEADERS[3], HEADERS[4], HEADERS[5], HEADERS[6]))
+    print("{}    {}    {}    {}  {}    {}  ".format(HEADERS[0],
+                                                    HEADERS[1],
+                                                    HEADERS[2],
+                                                    HEADERS[3],
+                                                    HEADERS[4], HEADERS[5], HEADERS[6]))
     print(DASH_HEADER)
 
     if args.stock_type == NEGATIVE:
@@ -62,7 +68,7 @@ def print_stock(ib_client, args):
         selected_stock_list = stock_list
 
     for row in selected_stock_list:
-        name, conid, pnl, position, currency = row
+        acc_id, name, conid, pnl, position, currency = row
 
         profit_or_loss = ZERO
         if pnl < 0:
@@ -70,14 +76,23 @@ def print_stock(ib_client, args):
         elif pnl > 0:
             profit_or_loss = PROFIT
 
-        row = '{}    {}    {}    {}    {}    {}  '.format(name, conid, pnl, profit_or_loss, position, currency)
+        row = '{}    {}    {}    {}    {}    {}    {}  '.format(acc_id,
+                                                                name,
+                                                                conid,
+                                                                pnl,
+                                                                profit_or_loss,
+                                                                position, currency)
         print(row)
 
     print(DASH_HEADER)
 
 def print_blank_stock():
     print(DASH_HEADER)
-    print("{}    {}    {}  {}    {}  ".format(HEADERS[0], HEADERS[1], HEADERS[2], HEADERS[3], HEADERS[4], HEADERS[5], HEADERS[6]))
+    print("{}    {}    {}    {}  {}    {}  ".format(HEADERS[0],
+                                                    HEADERS[1],
+                                                    HEADERS[2],
+                                                    HEADERS[3],
+                                                    HEADERS[4], HEADERS[5], HEADERS[6]))
     print(DASH_HEADER)
     print(DASH_HEADER)
 
