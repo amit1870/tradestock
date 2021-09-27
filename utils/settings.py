@@ -1,15 +1,15 @@
 # Email configurations
 EMAIL = {
     'from': 'amitxvf@gmail.com',
-    'to': 'amitpatel@teckvalley.com,sudoxvf@gmail.com',
+    'to': 'amitpatel@teckvalley.com,sunny@peacehaven.co',
     'subject': 'Daily Stock Update',
     'content': 'Dear Receiver,\nPlease find daily stocks updates.',
     'attachments': ['/home/ec2-user/virenv/stocks.log'],
     'schedule':{
         'D': (False, 'Daily'),
         'S': (False, 'Shortly'),
-        'H': (True, 'Hourly'),
-        'Q': (False, 'Half Day'),
+        'H': (False, 'Hourly'),
+        'Q': (True, 'Half Day'),
         'M': (False, 'Monthly')
     }
 }
