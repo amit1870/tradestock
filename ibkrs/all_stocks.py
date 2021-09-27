@@ -3,6 +3,7 @@ import argparse
 from requests.exceptions import HTTPError
 from ibw.client import IBClient
 from utils.auto_mode import auto_mode_on_accounts
+from utils.helper as hp
 
 
 HEADERS     = ['AccountID', 'STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
@@ -114,7 +115,8 @@ def main(args):
         if usernames and passwords:
             # logout if any existing session
             try:
-                ib_client.logout()
+                with hp.silent_std_out():
+                    ib_client.logout()
             except HTTPError as e:
                 pass
 
