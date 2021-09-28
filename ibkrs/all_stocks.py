@@ -194,19 +194,12 @@ def main(args):
             try:
                 if authenticated_accounts:
                     auth_response = ib_client.is_authenticated()
-                    logging.debug('Auth Response: {auth_response}'.format(
-                            auth_response=auth_response
-                        )
-                    )
+
                     # Finally make sure we are authenticated.
                     if 'authenticated' in auth_response.keys() and auth_response['authenticated']:
                         authenticated = True
 
             except HTTPError as e:
-                logging.debug('Auth Error: {auth_error}'.format(
-                            auth_error=e
-                        )
-                    )
                 pass
 
         if authenticated:
