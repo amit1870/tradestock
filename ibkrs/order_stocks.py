@@ -111,6 +111,11 @@ def main(args):
         account=args.account_id,
         is_server_running=True
     )
+    # Log the IB Client.
+    logging.debug('Created IB client: {ib_client}'.format(
+            ib_client=ib_client
+        )
+    )
 
     if args.passkey is None:
         place_order_stock(ib_client, args)
@@ -126,11 +131,19 @@ def main(args):
             except HTTPError as e:
                 pass
 
-            authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=1)
+            authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=2)
+
+            logging.debug('Authenticated account by auto mode: {authenticated_accounts}'.format(
+                    authenticated_accounts=authenticated_accounts
+                )
+            )
             try:
                 if authenticated_accounts:
                     auth_response = ib_client.is_authenticated()
-
+                    logging.debug('Auth Response: {auth_response}'.format(
+                            auth_response=auth_response
+                        )
+                    )
                     # Finally make sure we are authenticated.
                     if 'authenticated' in auth_response.keys() and auth_response['authenticated']:
                         authenticated = True
