@@ -75,6 +75,8 @@ if __name__ == '__main__':
     parser.add_argument('--passwords', required=True, help='Passwords common seperated.')
     args = parser.parse_args()
     if args.usernames and args.passwords:
-        print("Authentication started for {} accounts...".format(args.username))
-        successfully_authenticated_accounts = auto_mode_on_accounts(args.usernames, args.passwords)
-        print("Authentication successful for {} accounts!!".format(successfully_authenticated_accounts))
+        print("Authentication started for {} accounts...".format(args.usernames))
+        usernames = [args.usernames]
+        passwords = [args.passwords]
+        successfully_authenticated_accounts = auto_mode_on_accounts(usernames, passwords)
+        print("Authentication finished for {} accounts!!".format(successfully_authenticated_accounts))

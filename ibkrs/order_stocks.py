@@ -149,6 +149,10 @@ def main(args):
                         authenticated = True
 
             except HTTPError as e:
+                logging.error('Auth Error: {auth_error}'.format(
+                            auth_error=e
+                        )
+                    )
                 pass
 
         if authenticated:
