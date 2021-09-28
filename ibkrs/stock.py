@@ -22,7 +22,6 @@ def print_stock(ib_client, args):
                 account_id=args.account_id,
                 conid=contract_id
             )
-            
         else:
             portfolio_position = ib_client.symbol_search(symbol=symbol)
     except HTTPError as e:
@@ -52,7 +51,7 @@ def main(args):
         # try to connect once
         usernames = [args.username]
         passwords = [args.passkey]
-        authenticated = False
+
         if usernames and passwords:
             # logout if any existing session
             try:
@@ -68,20 +67,11 @@ def main(args):
             )
             try:
                 if authenticated_accounts:
-                    auth_response = ib_client.is_authenticated()
-
-                    # Finally make sure we are authenticated.
-                    if 'authenticated' in auth_response.keys() and auth_response['authenticated']:
-                        authenticated = True
-
+                    ib_client.is_authenticated()
             except HTTPError as e:
                 pass
 
-        if authenticated:
-            print_stock(ib_client, args)
-        else:
-            print_blank_stock(args.conid_or_symbol)
-
+        print_stock(ib_client, args)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get stock details with Interactive Brokers.')

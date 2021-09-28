@@ -177,7 +177,7 @@ def main(args):
         # try to connect once
         usernames = [args.username]
         passwords = [args.passkey]
-        authenticated = False
+
         if usernames and passwords:
             # logout if any existing session
             try:
@@ -193,19 +193,12 @@ def main(args):
             )
             try:
                 if authenticated_accounts:
-                    auth_response = ib_client.is_authenticated()
-
-                    # Finally make sure we are authenticated.
-                    if 'authenticated' in auth_response.keys() and auth_response['authenticated']:
-                        authenticated = True
-
+                    ib_client.is_authenticated()
             except HTTPError as e:
                 pass
 
-        if authenticated:
-            print_stock(ib_client, args)
-        else:
-            print_blank_stock()
+        print_stock(ib_client, args)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Print avaiable stock with Interactive Brokers.')
