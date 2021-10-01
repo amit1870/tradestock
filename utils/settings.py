@@ -24,6 +24,13 @@ API = {
 
 }
 
+# Flask app configuration
+FLASK_CONF = {
+    'hostname': 'localhost',
+    'port': 8085,
+    'debug': True
+}
+
 # Accounts
 account_peace77t7 = {
     'name': 'Sunny',

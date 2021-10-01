@@ -3,12 +3,13 @@
 import os
 import flask
 import requests
+import argparse
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 from email.mime.multipart import MIMEMultipart
-from utils.settings import EMAIL, API
+from utils.settings import EMAIL, API, FLASK_CONF
 from utils.send_email import (create_plain_html_message,
                               create_message_with_attachment,
                               send_message)
@@ -23,7 +24,8 @@ def index():
 
 
 @app.route('/send-email')
-def send_email(message_list):
+def send_email():
+    global EMAIL_ATTACHMENTS
     if 'credentials' not in flask.session:
         return flask.redirect('authorize')
 
@@ -38,6 +40,23 @@ def send_email(message_list):
     # ACTION ITEM: In a production app, you likely want to save these
     #              credentials in a persistent database instead.
     flask.session['credentials'] = credentials_to_dict(credentials)
+
+    message_list = []
+    if EMAIL_ATTACHMENTS:
+        for attachment_file_path in EMAIL_ATTACHMENTS:
+            message = create_message_with_attachment(EMAIL['from'],
+                EMAIL['to'],
+                EMAIL['subject'],
+                EMAIL['content'],
+                attachment_file_path)
+            message_list.append(message)
+
+    if not message_list:
+        message = create_plain_html_message(EMAIL['from'],
+            EMAIL['to'],
+            EMAIL['subject'],
+            EMAIL['content'])
+        message_list.append(message)
 
     message_responses = []
     for message in message_list:
@@ -99,7 +118,7 @@ def oauth2callback():
 @app.route('/revoke')
 def revoke():
     if 'credentials' not in flask.session:
-        return ("You need to <a href='{{ url_for('authorize') }}'>authorize</a> before '" +
+        return ("You need to <a href='/authorize'>authorize</a> before '" +
                 "testing the code to revoke credentials.")
 
     credentials = google.oauth2.credentials.Credentials(
@@ -158,11 +177,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Send Email with Gmail API.')
     parser.add_argument('--token-path', help='TOKEN_FILE_PATH')
     parser.add_argument('--email-attach', default='', help='EMAIL_ATTACHMENT')
-    parser.add_argument('--schedule', default='H', help='D:Daily, H:Hourly, Q:Quarterly, M:Monthly')
     args = parser.parse_args()
+
+    EMAIL_ATTACHMENTS = []
+    CLIENT_SECRETS_FILE = None
 
     if args.token_path:
         CLIENT_SECRETS_FILE = args.token_path
+
+    if args.email_attach != '':
+        EMAIL_ATTACHMENTS.append(args.email_attach)
+    elif EMAIL['attachments']:
+        EMAIL_ATTACHMENTS = EMAIL['attachments']
 
     # When running locally, disable OAuthlib's HTTPs verification.
     # ACTION ITEM for developers:
@@ -172,4 +198,8 @@ if __name__ == '__main__':
 
     # Specify a hostname and port that are set as a valid redirect URI
     # for your API project in the Google API Console.
-    app.run('localhost', 8085, debug=True)
+
+    if CLIENT_SECRETS_FILE:
+        app.run(FLASK_CONF.get('hostname'), FLASK_CONF.get('hostname'), FLASK_CONF.get('debug'))
+    else:
+        print("Provide client secret file path to start flask app server.")
