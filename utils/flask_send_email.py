@@ -200,6 +200,6 @@ if __name__ == '__main__':
     # for your API project in the Google API Console.
 
     if CLIENT_SECRETS_FILE:
-        app.run(FLASK_CONF.get('hostname'), FLASK_CONF.get('hostname'), FLASK_CONF.get('debug'))
+        app.run(FLASK_CONF.get('hostname'), FLASK_CONF.get('port'), FLASK_CONF.get('debug'))
     else:
         print("Provide client secret file path to start flask app server.")
