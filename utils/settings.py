@@ -1,7 +1,7 @@
 # Email configurations
 EMAIL = {
     'from': 'amitxvf@gmail.com',
-    'to': 'amitpatel@teckvalley.com,sunny@peacehaven.co',
+    'to': 'amitpatel@teckvalley.com',
     'subject': 'Daily Stock Update',
     'content': 'Dear Receiver,\nPlease find daily stocks updates.',
     'attachments': ['/home/ec2-user/virenv/stocks.log'],
@@ -18,6 +18,7 @@ EMAIL = {
 API = {
     'name': 'gmail',
     'version': 'v1',
+    'token_path': '/home/ec2-user/virenv/token.json',
     'scope': ['https://mail.google.com/',
               'https://www.googleapis.com/auth/gmail.send']
 

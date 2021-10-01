@@ -114,7 +114,6 @@ def create_message_with_attachment(
 
     return {'raw': base64.urlsafe_b64encode(msg.as_bytes()).decode()}
 
-
 def create_service(client_secrets_file_path, api_name, api_version, scopes):
     creds = None
     service = None
