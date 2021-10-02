@@ -48,10 +48,10 @@ if [ -f "$NEW_LOG_FILE" ]; then
 fi
 
 # Check if email program is already running
-email_py_program_id=$(pgrep -f "[p]ython $CODE_DIR/utils/send_email.py")
+email_py_program_id=$(pgrep -f "[p]ython $CODE_DIR/utils/flask_send_email.py")
 if [[ -z $email_py_program_id ]]; then
     # Run Email send command
-    python "${CODE_DIR}/utils/send_email.py" --token=${TOKEN_FILE_PATH} --schedule=${EMAIL_SCHEDULE} &
+    python "${CODE_DIR}/utils/flask_send_email.py" --token=${TOKEN_FILE_PATH} & > /dev/null 2>&1
 fi
 
 while true; do

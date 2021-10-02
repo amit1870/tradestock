@@ -5,17 +5,31 @@ import flask
 import requests
 import argparse
 
+from time import sleep
+
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
+import settings
 from email.mime.multipart import MIMEMultipart
 from utils.settings import EMAIL, API, FLASK_CONF
 from utils.send_email import (create_plain_html_message,
                               create_message_with_attachment,
                               send_message)
 
+HOUR = 3600 # Seconds
+
+EMAIL_SCHEDULE = {
+    'S': HOUR / 10,
+    'H': HOUR,
+    'Q': 6 * HOUR,
+    'D': 24 * HOUR,
+    'Q': 24 * 15 * HOUR,
+    'M': 24 * 15 * 30 * HOUR
+}
+
 app = flask.Flask(__name__)
-app.secret_key = '4$hsjhd9323j233239032jkj32320903283'
+app.secret_key = settings.secret_key
 
 
 @app.route('/')
@@ -41,27 +55,34 @@ def send_email():
     #              credentials in a persistent database instead.
     flask.session['credentials'] = credentials_to_dict(credentials)
 
-    message_list = []
-    if EMAIL_ATTACHMENTS:
-        for attachment_file_path in EMAIL_ATTACHMENTS:
-            message = create_message_with_attachment(EMAIL['from'],
+    while True:
+        message_list = []
+        if EMAIL_ATTACHMENTS:
+            for attachment_file_path in EMAIL_ATTACHMENTS:
+                message = create_message_with_attachment(EMAIL['from'],
+                    EMAIL['to'],
+                    EMAIL['subject'],
+                    EMAIL['content'],
+                    attachment_file_path)
+                message_list.append(message)
+
+        if not message_list:
+            message = create_plain_html_message(EMAIL['from'],
                 EMAIL['to'],
                 EMAIL['subject'],
-                EMAIL['content'],
-                attachment_file_path)
+                EMAIL['content'])
             message_list.append(message)
 
-    if not message_list:
-        message = create_plain_html_message(EMAIL['from'],
-            EMAIL['to'],
-            EMAIL['subject'],
-            EMAIL['content'])
-        message_list.append(message)
+        message_responses = []
+        for message in message_list:
+            message_response = send_message(service, EMAIL['from'], message)
+            message_responses.append(message_response)
 
-    message_responses = []
-    for message in message_list:
-        message_response = send_message(service, EMAIL['from'], message)
-        message_responses.append(message_response)
+        email_schedule = 'H'
+        sleep_time = EMAIL_SCHEDULE.get(email_schedule)
+        sleep(sleep_time)
+
+
 
     return flask.jsonify(message_responses)
 
@@ -84,6 +105,7 @@ def authorize():
     authorization_url, state = flow.authorization_url(
         access_type='offline',
         include_granted_scopes='true')
+
 
     # Store the state so the callback can verify the auth server response.
     flask.session['state'] = state

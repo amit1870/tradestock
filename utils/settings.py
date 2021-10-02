@@ -1,3 +1,6 @@
+# Secret Key
+secret_key = '4$hsjhd9323j233239032jkj32320903283'
+
 # Email configurations
 EMAIL = {
     'from': 'amitxvf@gmail.com',
