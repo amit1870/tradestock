@@ -10,9 +10,11 @@ EMAIL = {
     'attachments': ['/home/ec2-user/virenv/stocks.log'],
     'schedule':{
         'D': (False, 'Daily'),
-        'S': (False, 'Shortly'),
+        'S': (True, 'Shortly'),
         'H': (False, 'Hourly'),
-        'Q': (True, 'Half Day'),
+        'H2': (False, 'Every Two Hour'),
+        'HF': (False, 'Every Twelve Hour'),
+        'Q': (False, 'Every Quarter'),
         'M': (False, 'Monthly')
     }
 }
