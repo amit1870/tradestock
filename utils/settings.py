@@ -4,7 +4,7 @@ secret_key = '4$hsjhd9323j233239032jkj32320903283'
 # Email configurations
 EMAIL = {
     'from': 'amitxvf@gmail.com',
-    'to': 'amitpatel@teckvalley.com',
+    'to': 'amitpatel@teckvalley.com,investment@peacehaven.co',
     'subject': 'Daily Stock Update',
     'content': 'Dear Receiver,\nPlease find daily stocks updates.',
     'attachments': ['/home/ec2-user/virenv/stocks.log'],
@@ -13,7 +13,7 @@ EMAIL = {
         'S': (True, 'Shortly'),
         'H': (False, 'Hourly'),
         'H2': (False, 'Every Two Hour'),
-        'HF': (False, 'Every Twelve Hour'),
+        'HF': (False, 'Every Six Hour'),
         'Q': (False, 'Every Quarter'),
         'M': (False, 'Monthly')
     }

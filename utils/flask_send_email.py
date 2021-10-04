@@ -23,11 +23,13 @@ EMAIL_SCHEDULE = {
     'S': HOUR / 10,
     'H': HOUR,
     'H2': 2 * HOUR,
-    'HF': 12 * HOUR,
+    'HF': 6 * HOUR,
     'D': 24 * HOUR,
     'Q': 24 * 15 * HOUR,
     'M': 24 * 15 * 30 * HOUR
 }
+
+SELECTED_SCHEDULE = 'HF'
 
 app = flask.Flask(__name__)
 app.secret_key = settings.secret_key
@@ -40,7 +42,7 @@ def index():
 
 @app.route('/send-email')
 def send_email():
-    global EMAIL_ATTACHMENTS
+    global EMAIL_ATTACHMENTS, SELECTED_SCHEDULE
     if 'credentials' not in flask.session:
         return flask.redirect('authorize')
 
@@ -79,8 +81,7 @@ def send_email():
             message_response = send_message(service, EMAIL['from'], message)
             message_responses.append(message_response)
 
-        email_schedule = 'S'
-        sleep_time = EMAIL_SCHEDULE.get(email_schedule)
+        sleep_time = EMAIL_SCHEDULE.get(SELECTED_SCHEDULE)
         sleep(sleep_time)
 
     return flask.jsonify(message_responses)
