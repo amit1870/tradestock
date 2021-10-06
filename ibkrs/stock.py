@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 from requests.exceptions import HTTPError
 from pprint import pprint
