@@ -1,13 +1,15 @@
 import argparse
 import random
-
+import logging
 from pprint import pprint
+from requests.exceptions import HTTPError
+
 from ibw.client import IBClient
 from utils.auto_mode import auto_mode_on_accounts
 from utils import helper as hp
 from stock_config import ORDERS
 
-def place_order_stock(ib_client, args):
+def place_order_stock(ib_client, args, confirm=False):
     # Update ORDERS dictionary
     ORDERS['acctId'] = args.account_id
     ORDERS['conid'] = args.conid
@@ -53,8 +55,11 @@ def place_order_stock(ib_client, args):
     pprint(order_dict)
     print()
 
-    proceed = input("Do you want to place order? Yes/No(Yes):")
-    proceed = proceed.upper()
+    if confirm:
+        proceed = input("Do you want to place order? Yes/No(Yes):")
+        proceed = proceed.upper()
+    else:
+        proceed = ''
 
     if proceed == '':
         proceed = 'Y'
@@ -75,8 +80,11 @@ def place_order_stock(ib_client, args):
             reply_id = response_id_dict.get('id', None)
 
             if reply_id is not None:
-                confirmation = input("Confirm place order in Yes/No(Yes):")
-                confirmation = confirmation.upper()
+                if confirm:
+                    confirmation = input("Confirm place order in Yes/No(Yes):")
+                    confirmation = confirmation.upper()
+                else:
+                    confirmation = ''
 
                 if confirmation == '':
                     confirmation = 'Y'
@@ -118,7 +126,7 @@ def main(args):
     )
 
     if args.passkey is None:
-        place_order_stock(ib_client, args)
+        place_order_stock(ib_client, args, confirm=True)
     else:
         # try to connect once
         usernames = [args.username]
@@ -143,7 +151,7 @@ def main(args):
             except HTTPError as e:
                 pass
 
-        place_order_stock(ib_client, args)
+        place_order_stock(ib_client, args, confirm=True)
 
 
 if __name__ == '__main__':
