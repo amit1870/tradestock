@@ -291,10 +291,10 @@ def on_open(ws):
 
             elif today_date_obj != while_today_date_obj and fetched_market_data:
                 fetched_market_data = False
-                print_flag = False
+                print_flag = True
             else:
                 print("MARKET DATA already fetched for date {}...".format(today_date_obj))
-                if print_flag and DATA_FRAMES:
+                if print_flag:
                     print_df(DATA_FRAMES[0])
                     print_flag = False
 
