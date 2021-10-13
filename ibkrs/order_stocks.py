@@ -8,7 +8,7 @@ from ibw.client import IBClient
 from utils import helper as hp
 from stock_config import ORDERS
 
-def place_order_stock(ib_client, args, confirm=False):
+def place_order_stock(ib_client, args, confirm=True):
     # Update ORDERS dictionary
     ORDERS['acctId'] = args.account_id
     ORDERS['conid'] = args.conid
@@ -108,7 +108,7 @@ def place_order_stock(ib_client, args, confirm=False):
         print("Cancelled Place Order.")
 
 def main(ib_client, args):
-    confirm = False
+    confirm = True
     if args.confirm:
         confirm = args.confirm
     place_order_stock(ib_client, args, confirm=confirm)
