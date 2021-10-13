@@ -3,11 +3,12 @@ import logging
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-plt.style.use('fivethirtyeight')
 
-Fig1 = "/home/ec2-user/virenv/fig1.jpg"
-Fig2 = "/home/ec2-user/virenv/fig2.jpg"
-Fig3 = "/home/ec2-user/virenv/fig3.jpg"
+from datetime import datetime, timedelta
+from utils.fake_data import DATA
+
+pd.options.mode.chained_assignment = None  # default='warn'
+plt.style.use('fivethirtyeight')
 
 def get_signal(data):
     """ Function to get Sell or Buy signal."""
@@ -29,8 +30,8 @@ def get_signal(data):
 
     return buy_signal, sell_signal
 
-def bolliner_bands(data_file_path, period=20):
-    df = pd.read_csv(data_file_path)
+def bolliner_bands(data_list, period):
+    df = pd.DataFrame(data_list)
 
     # set the date as the index
     df = df.set_index(pd.DatetimeIndex(df['Date'].values))
@@ -40,9 +41,9 @@ def bolliner_bands(data_file_path, period=20):
 
     df['STD'] = df['Close'].rolling(window=period).std()
 
-    df['Upper'] = df['SMA'] + (df['STD'] * 2)
+    df['Upper'] = df['SMA'] + (df['STD'] * 1)
 
-    df['Lower'] = df['SMA'] - (df['STD'] * 2)
+    df['Lower'] = df['SMA'] - (df['STD'] * 1)
 
     column_list = ['Close', 'SMA', 'Upper', 'Lower']
 
@@ -52,7 +53,8 @@ def bolliner_bands(data_file_path, period=20):
 
     plt.ylabel('USD Price ($)')
 
-    plt.savefig(Fig1)
+    Fig1 = "{}/fig1{}.jpg".format(file_path,period)
+    plt.savefig("{}".format(Fig1))
 
     # plot and shade the area between the two Bollinger bands
     fig = plt.figure(figsize=(12.2,6.4)) # width = 12.2" and height = 6.4"
@@ -77,11 +79,11 @@ def bolliner_bands(data_file_path, period=20):
     ax.set_ylabel('USD Price ($)')
     plt.xticks(rotation = 45)
     ax.legend()
-    plt.savefig(Fig2)
+    Fig2 = "{}/fig2{}.jpg".format(file_path,period)
+    plt.savefig("{}".format(Fig2))
 
     # create a new data frame
     new_df = df[period-1:]
-
 
     # create new columns for the buy and sell signals
     buy_signal, sell_signal = get_signal(new_df)
@@ -107,14 +109,30 @@ def bolliner_bands(data_file_path, period=20):
     ax.set_ylabel('USD Price ($)')
     plt.xticks(rotation = 45)
     ax.legend()
-    plt.savefig(Fig3)
+    Fig3 = "{}/fig3{}.jpg".format(file_path,period)
+    plt.savefig("{}".format(Fig3))
+
+def update_data(data, start_date_str):
+    """ Add Date to each item of list."""
+    start_date_j = datetime.strptime(start_date_str, '%Y%m%d-%H:%M:%S')
+    start_date = start_date_j.date()
+    one_day = timedelta(days=1)
+    for item in data:
+        item['Date'] = start_date
+        item['Open'] = item.pop('o')
+        item['Close'] = item.pop('c')
+        item['High'] = item.pop('h')
+        item['Low'] = item.pop('l')
+        
+        start_date += one_day
+
+    return data
+
+
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Bollinger Bands for Stock.')
-    parser.add_argument('--data-file-path', required=True, help='Data File Path')
-    args = parser.parse_args()
-
-    DATA_FILE_PATH = args.data_file_path
-    PERIOD = 20
-
-    bolliner_bands(DATA_FILE_PATH, PERIOD)
+    DATA_LIST = DATA.get('data', [])
+    start_date_str = DATA.get('startTime')
+    DATA_LIST = update_data(DATA_LIST, start_date_str)
+    period = 3
+    bolliner_bands(DATA_LIST, period)
