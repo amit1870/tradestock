@@ -4,7 +4,6 @@ import logging
 from requests.exceptions import HTTPError
 from pprint import pprint
 from ibw.client import IBClient
-from utils.auto_mode import auto_mode_on_accounts
 from utils import helper as hp
 
 def portfolio_account_summary(ib_client, account_id):

@@ -18,7 +18,8 @@ import matplotlib.pyplot as plt
 from requests.exceptions import HTTPError
 from datetime import datetime, timedelta
 from ibw.client import IBClient
-from utils.auto_mode import auto_mode_on_accounts
+from utils import helper as hp
+from stock import search_stock_by_conid
 
 plt.style.use('fivethirtyeight')
 pd.options.mode.chained_assignment = None  # default='warn'
@@ -111,15 +112,8 @@ def authenticate_ib_client(ib_client):
     global AUTH_DONE
 
     if PASSWORD and not AUTH_DONE:
-        try:
-            ib_client.logout()
-        except HTTPError as e:
-            pass
-
-        authenticated_accounts = auto_mode_on_accounts([USERNAME], [PASSWORD], sleep_sec=2)
-        if authenticated_accounts:
-            ib_client.is_authenticated()
-            AUTH_DONE = True
+        ib_client = hp.authenticate_ib_client(ib_client, [USERNAME], [PASSWORD])
+        AUTH_DONE = True
 
     return ib_client
 
@@ -162,6 +156,7 @@ def place_order_with_bollinger_band(current_close):
     data_list = DATA_LIST
     period = PERIOD
     order_status = False
+    quantity = 0
 
     current_close = convert_str_into_number(current_close)
 
@@ -175,6 +170,15 @@ def place_order_with_bollinger_band(current_close):
     if side == 'NAN':
         return order_status, side
 
+    if side == 'SELL':
+        stock_postion = search_stock_by_conid(ib_client, ACCOUNT, CONID)
+
+        if stock_postion:
+            quantity = stock_postion.get('position', 0)
+
+    if side == 'BUY':
+        # Check balance
+
     order_dict = {
         "secType": "secType = {}:STK".format(CONID),
         "orderType": "MKT",
@@ -184,7 +188,7 @@ def place_order_with_bollinger_band(current_close):
         "price": 0,
         "tif": "DAY",
         "referrer": "QuickTrade",
-        "quantity": 1,
+        "quantity": quantity,
         "fxQty": 0,
         "useAdaptive": True,
         "isCcyConv": False,

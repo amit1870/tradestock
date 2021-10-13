@@ -4,14 +4,13 @@ import logging
 from requests.exceptions import HTTPError
 from pprint import pprint
 from ibw.client import IBClient
-from utils.auto_mode import auto_mode_on_accounts
 from utils import helper as hp
 
 def search_stock_by_symbol(ib_client, symbol):
     try:
         search_result = ib_client.symbol_search(symbol=symbol)
     except HTTPError as e:
-        search_result = {}
+        search_result = []
 
     return search_result
 
@@ -38,22 +37,21 @@ def portfolio_account_summary(ib_client, account_id):
 
     return account_summary
 
-def get_portfolio_account_position(ib_client, account_id, conid):
-    try:
-        position = ib_client.portfolio_account_position(
+def account_balance(ib_client, account_id):
+    # Grab the Specific Postion in a Portfolio.
+    try:    
+        account_summary = ib_client.portfolio_account_summary(
             account_id=account_id,
-            conid=conid
         )
     except HTTPError as e:
-        position = []
+        account_summary = []
 
-    return position
+    return account_summary
 
 
 def main(ib_client, args):
     if args.conid:
         pprint(search_stock_by_conid(ib_client, args.account_id, args.conid))
-        pprint(get_portfolio_account_position(ib_client, args.account_id, args.conid))
     elif args.symbol:
         pprint(search_stock_by_symbol(ib_client, args.symbol))
     else:

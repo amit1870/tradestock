@@ -2,7 +2,6 @@ import argparse
 import logging
 from requests.exceptions import HTTPError
 from ibw.client import IBClient
-from utils.auto_mode import auto_mode_on_accounts
 from utils import helper as hp
 
 logging.basicConfig(
