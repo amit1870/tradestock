@@ -7,25 +7,6 @@ from ibw.client import IBClient
 from utils.auto_mode import auto_mode_on_accounts
 from utils import helper as hp
 
-def search_stock_by_symbol(ib_client, symbol):
-    try:
-        search_result = ib_client.symbol_search(symbol=symbol)
-    except HTTPError as e:
-        search_result = {}
-
-    return search_result
-
-def search_stock_by_conid(ib_client, account_id, contract_id):
-    try:
-        portfolio_position = ib_client.portfolio_account_position(
-            account_id=account_id,
-            conid=contract_id
-        )
-    except HTTPError as e:
-        portfolio_position = []
-
-    return portfolio_position
-
 def portfolio_account_summary(ib_client, account_id):
 
     # Grab the Specific Postion in a Portfolio.
@@ -39,20 +20,15 @@ def portfolio_account_summary(ib_client, account_id):
     return account_summary
 
 def main(ib_client, args):
-    if args.conid:
-        pprint(search_stock_by_conid(ib_client, args.account_id, args.conid))
-    elif args.symbol:
-        pprint(search_stock_by_symbol(ib_client, args.symbol))
-    else:
-        pprint(portfolio_account_summary(ib_client, args.account_id))
+    print(portfolio_account_summary(ib_client, args.account_id))
+    
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get stock details with Interactive Brokers.')
     parser.add_argument('--username', required=True, help='YOUR_USERNAME')
     parser.add_argument('--passkey', help='YOUR_PASSWORD')
     parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
-    parser.add_argument('--conid', help='Give contract symbol')
-    parser.add_argument('--symbol', help='Give contract symbol')
+    parser.add_argument('--conid-or-symbol', help='Give contract id or symbol')
     args = parser.parse_args()
 
     # Create a new session of the IB Web API.
@@ -65,4 +41,3 @@ if __name__ == '__main__':
         ib_client = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey])
 
     main(ib_client, args)
-

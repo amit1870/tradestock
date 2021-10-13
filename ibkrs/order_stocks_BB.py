@@ -26,17 +26,20 @@ pd.options.mode.chained_assignment = None  # default='warn'
 URL = "wss://localhost:5000/v1/api/ws"
 
 SERVER_IDS = []
+DATA_FRAMES = []
 PERIOD = 3
 AUTH_DONE = False
 DATA_LIST = []
+STD_FACTOR_UPPER = 0.1
+STD_FACTOR_LOWER = 0.1
 
 def print_df(data_frames, use_str=True):
 
     if use_str:
         print(data_frames.to_string())
-
-    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-        print(data_frames)
+    else:
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+            print(data_frames)
 
 def bolliner_bands(data_list, period):
     df = pd.DataFrame(data_list)
@@ -49,9 +52,9 @@ def bolliner_bands(data_list, period):
 
     df['STD'] = df['Close'].rolling(window=period).std()
 
-    df['Upper'] = df['SMA'] + (df['STD'] * 1)
+    df['Upper'] = df['SMA'] + (df['STD'] * STD_FACTOR_UPPER)
 
-    df['Lower'] = df['SMA'] - (df['STD'] * 1)
+    df['Lower'] = df['SMA'] - (df['STD'] * STD_FACTOR_LOWER)
 
     # create a new data frame
     new_df = df[period-1:]
@@ -117,7 +120,9 @@ def build_data_list(data):
 
 def empty_data_list():
     global DATA_LIST
+    global DATA_FRAMES
     DATA_LIST = []
+    DATA_FRAMES = []
 
 def empty_server_id_list():
     global SERVER_IDS
@@ -154,6 +159,7 @@ def convert_str_into_number(string, convert_into=float):
 def place_order_with_bollinger_band(current_close):
     global DATA_LIST, PERIOD
     global ACCOUNT, CONID
+    global DATA_FRAMES
     global ib_client
 
     data_list = DATA_LIST
@@ -164,7 +170,8 @@ def place_order_with_bollinger_band(current_close):
 
     data_frames = bolliner_bands(data_list, period)
 
-    print_df(data_frames)
+    if DATA_FRAMES:
+        DATA_FRAMES.append(data_frames)
 
     side = get_signal(data_frames, current_close)
 
@@ -244,9 +251,11 @@ def on_open(ws):
 
         today_date_obj = datetime.now().date()
         fetched_market_data = False
+        print_flag = True
 
         while True:
             global SERVER_IDS
+            global DATA_FRAMES
 
             # Subscribe to Market Data
             while_today_date_obj = datetime.now().date()
@@ -282,8 +291,12 @@ def on_open(ws):
 
             elif today_date_obj != while_today_date_obj and fetched_market_data:
                 fetched_market_data = False
+                print_flag = False
             else:
                 print("MARKET DATA already fetched for date {}...".format(today_date_obj))
+                if print_flag and DATA_FRAMES:
+                    print_df(DATA_FRAMES[0])
+                    print_flag = False
 
             # Unsubscribe
             for server_id in SERVER_IDS:

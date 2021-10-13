@@ -26,12 +26,12 @@ SPACE_LEN   = 4
 SPACES      = ' ' * SPACE_LEN
 
 
-def print_stock(ib_client, args):
+def print_stock(ib_client, account_id, stock_type='0'):
 
     # grab account portfolios
     try:    
         account_positions = ib_client.portfolio_account_positions(
-            account_id=args.account_id,
+            account_id=account_id,
             page_id=0
         )
     except HTTPError as e:
@@ -107,9 +107,9 @@ def print_stock(ib_client, args):
                                             HEADERS[6]))
     print(DASH_HEADER)
 
-    if args.stock_type == NEGATIVE:
+    if stock_type == NEGATIVE:
         selected_stock_list = negative_stock_list
-    elif args.stock_type == POSITIVE:
+    elif stock_type == POSITIVE:
         selected_stock_list = profitable_stock_list
     else:
         selected_stock_list = stock_list
@@ -140,64 +140,12 @@ def print_stock(ib_client, args):
 
     print(DASH_HEADER)
 
-def print_blank_stock():
-    print(DASH_HEADER)
-    print("{}{}{}{}{}{}{}{}{}{}{}{}".format(HEADERS[0],
-                                            SPACES,                                    
-                                            HEADERS[1],
-                                            SPACES,
-                                            HEADERS[2],
-                                            SPACES,
-                                            HEADERS[3],
-                                            SPACES,
-                                            HEADERS[4],
-                                            SPACES,
-                                            HEADERS[5],
-                                            SPACES,
-                                            HEADERS[6]))
-    print(DASH_HEADER)
-    print(DASH_HEADER)
-
-def main(args):
-    # Create a new session of the IB Web API.
-    ib_client = IBClient(
-        username=args.username,
-        account=args.account_id,
-        is_server_running=True
-    )
-    # Log the IB Client.
-    logging.debug('Created IB client: {ib_client}'.format(
-            ib_client=ib_client
-        )
-    )
-
-    if args.passkey is None:
-        print_stock(ib_client, args)
-    else:
-        # try to connect once
-        usernames = [args.username]
-        passwords = [args.passkey]
-
-        if usernames and passwords:
-            # logout if any existing session
-            try:
-                ib_client.logout()
-            except HTTPError as e:
-                pass
-
-            authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=2)
-
-            logging.debug('Authenticated account by auto mode: {authenticated_accounts}'.format(
-                    authenticated_accounts=authenticated_accounts
-                )
-            )
-            try:
-                if authenticated_accounts:
-                    ib_client.is_authenticated()
-            except HTTPError as e:
-                pass
-
-        print_stock(ib_client, args)
+def main(ib_client, args):
+    account_id = args.account_id
+    stock_type = '0'
+    if args.stock_type:
+        stock_type = args.stock_type
+    print_stock(ib_client, account_id, stock_type)
 
 
 if __name__ == '__main__':
@@ -208,4 +156,13 @@ if __name__ == '__main__':
     parser.add_argument('--stock-type', default='0', help='Stock type (default: 0, Avaiable: 1, -1)')
     args = parser.parse_args()
 
-    main(args)
+    # Create a new session of the IB Web API.
+    ib_client = IBClient(
+        username=args.username,
+        account=args.account_id,
+        is_server_running=True
+    )
+    if args.passkey:
+        ib_client = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey])
+
+    main(ib_client, args)

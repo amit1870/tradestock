@@ -94,7 +94,6 @@ def place_order_stock(ib_client, args, confirm=False):
                     confirmation = False
 
                 if confirmation:
-                    reply = {'confirmed' : confirmation}
                     reply_response = ib_client.place_order_reply(
                         reply_id=reply_id,
                         reply=confirmation)
@@ -109,49 +108,11 @@ def place_order_stock(ib_client, args, confirm=False):
     else:
         print("Cancelled Place Order.")
 
-def failed_place_order_stock():
-    print("Order cannot be placed. Please check account details.")
-
-def main(args):
-    # Create a new session of the IB Web API.
-    ib_client = IBClient(
-        username=args.username,
-        account=args.account_id,
-        is_server_running=True
-    )
-    # Log the IB Client.
-    logging.debug('Created IB client: {ib_client}'.format(
-            ib_client=ib_client
-        )
-    )
-
-    if args.passkey is None:
-        place_order_stock(ib_client, args, confirm=True)
-    else:
-        # try to connect once
-        usernames = [args.username]
-        passwords = [args.passkey]
-
-        if usernames and passwords:
-            # logout if any existing session
-            try:
-                ib_client.logout()
-            except HTTPError as e:
-                pass
-
-            authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=2)
-
-            logging.debug('Authenticated account by auto mode: {authenticated_accounts}'.format(
-                    authenticated_accounts=authenticated_accounts
-                )
-            )
-            try:
-                if authenticated_accounts:
-                    ib_client.is_authenticated()
-            except HTTPError as e:
-                pass
-
-        place_order_stock(ib_client, args, confirm=True)
+def main(ib_client, args):
+    confirm = False
+    if args.confirm:
+        confirm = args.confirm
+    place_order_stock(ib_client, args, confirm=confirm)
 
 
 if __name__ == '__main__':
@@ -166,6 +127,7 @@ if __name__ == '__main__':
     parser.add_argument('--coid', help='Customer Order ID')
     parser.add_argument('--ticker', help='YOUR_STOCK_SYMBOL')
 
+    parser.add_argument('--confirm', help='Confirmation', default=False)
     parser.add_argument('--order-type', default="MKT", help='Available : MKT, LMT, STP, STOP_LIMIT , MIDPRICE')
     parser.add_argument('--quantity', default=1, type=float, help='Quantity')
     parser.add_argument('--listing-exchange', default="SMART", help='valid_exchange: e.g: SMART,AMEX,NYSE,CBOE,...ETC')
@@ -180,4 +142,13 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args)
+    # Create a new session of the IB Web API.
+    ib_client = IBClient(
+        username=args.username,
+        account=args.account_id,
+        is_server_running=True
+    )
+    if args.passkey:
+        ib_client = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey])
+
+    main(ib_client, args)
