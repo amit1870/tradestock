@@ -38,9 +38,22 @@ def portfolio_account_summary(ib_client, account_id):
 
     return account_summary
 
+def get_portfolio_account_position(ib_client, account_id, conid):
+    try:
+        position = ib_client.portfolio_account_position(
+            account_id=account_id,
+            conid=conid
+        )
+    except HTTPError as e:
+        position = []
+
+    return position
+
+
 def main(ib_client, args):
     if args.conid:
         pprint(search_stock_by_conid(ib_client, args.account_id, args.conid))
+        pprint(get_portfolio_account_position(ib_client, args.account_id, args.conid))
     elif args.symbol:
         pprint(search_stock_by_symbol(ib_client, args.symbol))
     else:

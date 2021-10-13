@@ -61,7 +61,6 @@ def bolliner_bands(data_list, period):
 
     return new_df
 
-
 def update_data(data, start_date_str):
     """ Add Date to each item of list."""
     start_date_j = datetime.strptime(start_date_str, '%Y%m%d-%H:%M:%S')
@@ -77,28 +76,6 @@ def update_data(data, start_date_str):
         start_date += one_day
 
     return data
-
-def place_order_stock(ib_client, order_list):
-    order_status = False
-
-    order_response = ib_client.place_orders(
-        account_id=args.account_id,
-        orders=order_list
-    )
-
-    if order_response:
-        response_id_dict = order_response[0]
-        reply_id = response_id_dict.get('id', None)
-
-        if reply_id is not None:
-            confirm = True
-            reply_response = ib_client.place_order_reply(
-                reply_id=reply_id,
-                reply=confirm)
-            order_status = True
-
-    return order_status
-
 
 def get_signal(dataframe, close_price):
     """ Function to get Sell or Buy signal."""
@@ -155,6 +132,26 @@ def convert_str_into_number(string, convert_into=float):
             string = float(string)
         return convert_into(string)
 
+def place_order_stock(ib_client, order_list):
+    order_status = False
+
+    order_response = ib_client.place_orders(
+        account_id=args.account_id,
+        orders=order_list
+    )
+
+    if order_response:
+        response_id_dict = order_response[0]
+        reply_id = response_id_dict.get('id', None)
+
+        if reply_id is not None:
+            confirm = True
+            reply_response = ib_client.place_order_reply(
+                reply_id=reply_id,
+                reply=confirm)
+            order_status = True
+
+    return order_status
 
 def place_order_with_bollinger_band(current_close):
     global DATA_LIST, PERIOD
@@ -170,7 +167,7 @@ def place_order_with_bollinger_band(current_close):
 
     data_frames = bolliner_bands(data_list, period)
 
-    if DATA_FRAMES:
+    if DATA_FRAMES == []:
         DATA_FRAMES.append(data_frames)
 
     side = get_signal(data_frames, current_close)
@@ -294,7 +291,7 @@ def on_open(ws):
                 print_flag = True
             else:
                 print("MARKET DATA already fetched for date {}...".format(today_date_obj))
-                if print_flag:
+                if print_flag and DATA_FRAMES:
                     print_df(DATA_FRAMES[0])
                     print_flag = False
 
