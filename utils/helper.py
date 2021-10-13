@@ -7,7 +7,7 @@ import sys
 import os
 
 from requests.exceptions import HTTPError
-from auto_mode import auto_mode_on_accounts
+from .auto_mode import auto_mode_on_accounts
 
 
 def supress_stdout(func):
