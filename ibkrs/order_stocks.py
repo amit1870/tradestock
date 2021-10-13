@@ -14,8 +14,15 @@ def place_order_stock(ib_client, args, confirm=True):
     ORDERS['conid'] = args.conid
     ORDERS['side'] = args.side
     ORDERS['cOID'] = args.coid
-    ORDERS['secType'] = args.sec_type
-    ORDERS['ticker'] = args.ticker
+
+    ORDERS['ticker'] = "{}".format(args.conid)
+    ORDERS['secType'] = "secType = {}:STK".format(args.conid)
+
+    if args.ticker:
+        ORDERS['ticker'] = args.ticker
+
+    if args.sec_type:
+        ORDERS['secType'] = args.sec_type
 
     if args.order_type:
         ORDERS['orderType'] = args.order_type
@@ -120,10 +127,10 @@ if __name__ == '__main__':
     parser.add_argument('--passkey', help='YOUR_PASSWORD')
     parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
 
-    parser.add_argument('--conid', type=int, help='STOCK_CONTRACT_ID')
-    parser.add_argument('--side', help='SELL/BUY')
-    parser.add_argument('--sec-type', help='secType = conid:security_type')
-    parser.add_argument('--coid', help='Customer Order ID')
+    parser.add_argument('--conid', required=True, type=int, help='STOCK_CONTRACT_ID')
+    parser.add_argument('--side', required=True, help='SELL/BUY')
+    parser.add_argument('--sec-type', required=True, help='secType = conid:security_type')
+    parser.add_argument('--coid', required=True, help='Customer Order ID')
     parser.add_argument('--ticker', help='YOUR_STOCK_SYMBOL')
 
     parser.add_argument('--confirm', help='Confirmation', default=False)
