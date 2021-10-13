@@ -1,3 +1,8 @@
+"""
+This script will place order using real time price of stock.
+Decision to place order will be done by Bollinger Band strategy.
+"""
+
 import websocket
 import ssl
 import random
@@ -25,7 +30,11 @@ PERIOD = 3
 AUTH_DONE = False
 DATA_LIST = []
 
-def print_df(data_frames):
+def print_df(data_frames, use_str=True):
+
+    if use_str:
+        print(data_frames.to_string())
+
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
         print(data_frames)
 
@@ -68,32 +77,31 @@ def update_data(data, start_date_str):
 
 def place_order_stock(ib_client, order_list):
     order_status = False
-    print(order_list)
+
     order_response = ib_client.place_orders(
         account_id=args.account_id,
         orders=order_list
     )
-    print(order_response)
 
     if order_response:
         response_id_dict = order_response[0]
         reply_id = response_id_dict.get('id', None)
 
         if reply_id is not None:
-            reply = {'confirmed' : confirmation}
+            confirm = True
             reply_response = ib_client.place_order_reply(
                 reply_id=reply_id,
-                reply=confirmation)
+                reply=confirm)
             order_status = True
 
     return order_status
 
 
-def get_signal(dataframe, current_price):
+def get_signal(dataframe, close_price):
     """ Function to get Sell or Buy signal."""
-    if current_price > dataframe['Upper'][-1]: # SELL
+    if close_price > dataframe['Upper'][-1]: # SELL
         return "SELL"
-    elif current_price < dataframe['Lower'][-1]: # BUY
+    elif close_price < dataframe['Lower'][-1]: # BUY
         return "BUY"
 
     return "NAN"
@@ -145,7 +153,7 @@ def convert_str_into_number(string, convert_into=float):
 
 def place_order_with_bollinger_band(current_close):
     global DATA_LIST, PERIOD
-    global ACCOUNT
+    global ACCOUNT, CONID
     global ib_client
 
     data_list = DATA_LIST
@@ -161,10 +169,10 @@ def place_order_with_bollinger_band(current_close):
     side = get_signal(data_frames, current_close)
 
     if side == 'NAN':
-        return order_status
+        return order_status, side
 
     order_dict = {
-        "secType": "secType = 51529211:STK",
+        "secType": "secType = {}:STK".format(CONID),
         "orderType": "MKT",
         "listingExchange": "SMART",
         "isSingleGroup": True,
@@ -178,7 +186,7 @@ def place_order_with_bollinger_band(current_close):
         "isCcyConv": False,
         "allocationMethod": "AvailableEquity",
         "acctId": ACCOUNT,
-        "conid": "51529211",
+        "conid": CONID,
         "side": side,
         "cOID": "OID-{}".format(random.randint(1,1000))
     }
@@ -186,7 +194,7 @@ def place_order_with_bollinger_band(current_close):
     orders = {"orders" : [order_dict]}
     order_status = place_order_stock(ib_client, orders)
 
-    return order_status
+    return order_status, side
 
 def extract_data_from_message(message):
     # two type of data for extraction
@@ -196,9 +204,9 @@ def extract_data_from_message(message):
     if '31' in message:
         # do code go for bollinger
         current_close = message.get('31')
-        order_placed = place_order_with_bollinger_band(convert_str_into_number(current_close))
+        order_placed, side = place_order_with_bollinger_band(convert_str_into_number(current_close))
         if order_placed:
-            print("Order has been placed successfully.")
+            print("{} took place with CLOSING PRICE {}.".format(side, current_close))
 
     # market data message
     if 'timePeriod' in message:
@@ -230,8 +238,8 @@ def on_open(ws):
 
         
         time_period_70days = 'smh+51529211+{"exchange":"NYSE","period":"70d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
-        time_period_10days = 'smh+51529211+{"exchange":"NYSE","period":"10d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
-        time_period_1days = 'smh+51529211+{"exchange":"NYSE","period":"1d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
+        time_period_10days = 'smh+51529211+{"exchange":"NYSE","period":"15d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
+        time_period_1days = 'smh+51529211+{"exchange":"NYSE","period":"2d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
         current_price_cmd = 'smd+51529211+{"fields":["31","70","71"]}'
 
         today_date_obj = datetime.now().date()
@@ -245,7 +253,7 @@ def on_open(ws):
 
             if today_date_obj == while_today_date_obj and not fetched_market_data:
                 empty_data_list()
-                print("Sending request to Market Data for date {}...", today_date_obj)
+                print("Sending request to MARKET DATA for date {}...".format(today_date_obj))
 
                 time.sleep(5)
                 ws.send(time_period_70days)
@@ -259,7 +267,7 @@ def on_open(ws):
 
             elif today_date_obj != while_today_date_obj and not fetched_market_data:
                 empty_data_list()
-                print("Sending request to Market Data for date {}...", today_date_obj)
+                print("Sending request to MARKET DATA for date {}...".format(today_date_obj))
 
                 time.sleep(5)
                 ws.send(time_period_70days)
@@ -275,11 +283,11 @@ def on_open(ws):
             elif today_date_obj != while_today_date_obj and fetched_market_data:
                 fetched_market_data = False
             else:
-                print("Market Data already fetched for date {}...", today_date_obj)
+                print("MARKET DATA already fetched for date {}...".format(today_date_obj))
 
             # Unsubscribe
             for server_id in SERVER_IDS:
-                print("Sending unsubscribe request for server id {}...".format(server_id))
+                print("Sending unsubscribe request for SERVER ID {}...".format(server_id))
                 unsub_str = "umh+{}".format(server_id)
                 ws.send(unsub_str)
                 time.sleep(2)
@@ -300,6 +308,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Buy or Sell stock with Interactive Brokers.')
     parser.add_argument('--username', required=True, help='YOUR_USERNAME')
     parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
+    parser.add_argument('--conid', required=True, type=int, help='STOCK_CONTRACT_ID')
     parser.add_argument('--passkey', help='YOUR_PASSWORD')
 
     args = parser.parse_args()
@@ -307,6 +316,7 @@ if __name__ == "__main__":
     USERNAME = args.username
     PASSWORD = args.passkey
     ACCOUNT = args.account_id
+    CONID = args.conid
 
     # Create a new session of the IB Web API.
     ib_client = IBClient(
