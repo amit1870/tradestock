@@ -19,11 +19,7 @@ from order_algo import bolliner_bands
 from utils import helper as hp
 from stock import Stock
 
-plt.style.use('fivethirtyeight')
-
-
 URL = "wss://localhost:5000/v1/api/ws"
-
 SERVER_IDS = []
 DATA_FRAMES = []
 PERIOD = 3
