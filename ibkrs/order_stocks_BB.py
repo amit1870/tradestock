@@ -11,19 +11,16 @@ import time
 import json
 import argparse
 import logging
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 
 from requests.exceptions import HTTPError
-from datetime import datetime, timedelta
+from datetime import datetime
 from ibw.client import IBClient
 from order_algo import bolliner_bands
 from utils import helper as hp
 from stock import Stock
 
 plt.style.use('fivethirtyeight')
-pd.options.mode.chained_assignment = None  # default='warn'
+
 
 URL = "wss://localhost:5000/v1/api/ws"
 

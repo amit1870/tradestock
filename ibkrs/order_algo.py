@@ -2,6 +2,11 @@
 This module will keep different Trade Algorithm Strategy.
 """
 
+import pandas as pd
+import numpy as np
+
+pd.options.mode.chained_assignment = None  # default='warn'
+
 def bolliner_bands(data_list, period):
     ''' Bollinger Bands.'''
     df = pd.DataFrame(data_list)
