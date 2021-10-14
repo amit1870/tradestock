@@ -72,10 +72,10 @@ def authenticate_ib_client(ib_client):
     global AUTH_DONE
 
     if PASSWORD and not AUTH_DONE:
-        ib_client = hp.authenticate_ib_client(ib_client, [USERNAME], [PASSWORD])
+        ib_client, auth_status = hp.authenticate_ib_client(ib_client, [USERNAME], [PASSWORD])
         AUTH_DONE = True
 
-    return ib_client
+    return ib_client, auth_status
 
 def place_order_with_bollinger_band(current_close):
     global DATA_LIST, PERIOD
@@ -270,15 +270,16 @@ if __name__ == "__main__":
         account=PASSWORD,
         is_server_running=True
     )
-    ib_client = authenticate_ib_client(ib_client)
+    ib_client, auth_status = authenticate_ib_client(ib_client)
 
-    stock_obj = Stock(ib_client)
+    if auth_status:
+        stock_obj = Stock(ib_client)
 
-    websocket.enableTrace(True)
-    ws = websocket.WebSocketApp(URL,
-                              on_open=on_open,
-                              on_message=on_message,
-                              on_error=on_error,
-                              on_close=on_close)
+        websocket.enableTrace(True)
+        ws = websocket.WebSocketApp(URL,
+                                  on_open=on_open,
+                                  on_message=on_message,
+                                  on_error=on_error,
+                                  on_close=on_close)
 
-    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+        ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})

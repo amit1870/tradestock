@@ -51,6 +51,8 @@ def update_data(data, start_date_str):
     return data
 
 def authenticate_ib_client(ib_client, usernames, passwords):
+    auth_status = False
+    attempt = 3
     try:
         ib_client.logout()
     except HTTPError as e:
@@ -58,6 +60,14 @@ def authenticate_ib_client(ib_client, usernames, passwords):
 
     authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=2)
     if authenticated_accounts:
-        ib_client.is_authenticated()
+        while attempt and not auth_status:
+            auth_response = ib_client.is_authenticated()
+            if 'authenticated' in auth_response.keys() and auth_response['authenticated']:
+                auth_status = True
 
-    return ib_client
+            if not auth_status:
+                ib_client.reauthenticate()
+
+            attempt -= 1
+    
+    return ib_client, auth_status
