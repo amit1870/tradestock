@@ -65,9 +65,9 @@ def main(ib_client, args):
     order_list = prepare_order_dict_from_args(args)
     stock_obj = Stock(ib_client)
     if args.confirm:
-        order_status = stock_obj.place_order_stock(args.account_id, order_list)
-    else:
         order_status = stock_obj.place_order_stock_with_confirm(args.account_id, order_list)
+    else:
+        order_status = stock_obj.place_order_stock(args.account_id, order_list)
 
     print(order_status)
 
