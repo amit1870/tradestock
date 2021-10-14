@@ -34,6 +34,9 @@ AUTH_DONE = False
 DATA_LIST = []
 STD_FACTOR_UPPER = 0.5
 STD_FACTOR_LOWER = 0.5
+HOUR = 3600 # seconds
+LONG_SLEEP = 1 * HOUR
+SHORT_SLEEP = HOUR / 360
 
 
 
@@ -197,13 +200,13 @@ def on_open(ws):
                 empty_data_list()
                 print("Sending request to MARKET DATA for date {}...".format(today_date_obj))
 
-                time.sleep(5)
+                time.sleep(SHORT_SLEEP)
                 ws.send(time_period_70days)
-                time.sleep(5)
+                time.sleep(SHORT_SLEEP)
                 ws.send(time_period_10days)
-                time.sleep(5)
+                time.sleep(SHORT_SLEEP)
                 ws.send(time_period_1days)
-                time.sleep(5)
+                time.sleep(SHORT_SLEEP)
 
                 fetched_market_data = True
 
@@ -211,13 +214,13 @@ def on_open(ws):
                 empty_data_list()
                 print("Sending request to MARKET DATA for date {}...".format(today_date_obj))
 
-                time.sleep(5)
+                time.sleep(SHORT_SLEEP)
                 ws.send(time_period_70days)
-                time.sleep(5)
+                time.sleep(SHORT_SLEEP)
                 ws.send(time_period_10days)
-                time.sleep(5)
+                time.sleep(SHORT_SLEEP)
                 ws.send(time_period_1days)
-                time.sleep(5)
+                time.sleep(SHORT_SLEEP)
 
                 today_date_obj = while_today_date_obj
                 fetched_market_data = True
@@ -236,7 +239,7 @@ def on_open(ws):
                 print("Sending unsubscribe request for SERVER ID {}...".format(server_id))
                 unsub_str = "umh+{}".format(server_id)
                 ws.send(unsub_str)
-                time.sleep(2)
+                time.sleep(SHORT_SLEEP)
 
             if SERVER_IDS:
                 empty_server_id_list()
@@ -244,7 +247,7 @@ def on_open(ws):
             # Current Close Price
             if fetched_market_data:
                 ws.send(current_price_cmd)
-                time.sleep(60)
+                time.sleep(LONG_SLEEP)
 
         # ws.close()
     _thread.start_new_thread(run, ())
