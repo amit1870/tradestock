@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 from requests.exceptions import HTTPError
 from datetime import datetime, timedelta
 from ibw.client import IBClient
-from utils.order_algo import bolliner_bands
+from .order_algo import bolliner_bands
 from utils import helper as hp
 from stock import Stock
 
