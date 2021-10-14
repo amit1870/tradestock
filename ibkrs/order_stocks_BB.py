@@ -30,6 +30,8 @@ STD_FACTOR_LOWER = 0.5
 HOUR = 3600 # seconds
 LONG_SLEEP = 1 * HOUR
 SHORT_SLEEP = HOUR / 360
+STD_FACTOR_UPPER = 0.7
+STD_FACTOR_LOWER = 0.7
 
 
 config = os.environ.get('CONFIG', 'Testing')
@@ -86,7 +88,7 @@ def place_order_with_bollinger_band(current_close):
     order_status = False
     quantity = 0
 
-    data_frames = bolliner_bands(data_list, period)
+    data_frames = bolliner_bands(data_list, period, lower_factor=STD_FACTOR_LOWER, upper_factor=STD_FACTOR_UPPER)
 
     if DATA_FRAMES == []:
         DATA_FRAMES.append(data_frames)

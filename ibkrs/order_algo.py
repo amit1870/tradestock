@@ -7,7 +7,7 @@ import numpy as np
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
-def bolliner_bands(data_list, period):
+def bolliner_bands(data_list, period, low_factor=0.5, upper_factor=0.5):
     ''' Bollinger Bands.'''
     df = pd.DataFrame(data_list)
 
@@ -19,9 +19,9 @@ def bolliner_bands(data_list, period):
 
     df['STD'] = df['Close'].rolling(window=period).std()
 
-    df['Upper'] = df['SMA'] + (df['STD'] * STD_FACTOR_UPPER)
+    df['Upper'] = df['SMA'] + (df['STD'] * upper_factor)
 
-    df['Lower'] = df['SMA'] - (df['STD'] * STD_FACTOR_LOWER)
+    df['Lower'] = df['SMA'] - (df['STD'] * low_factor)
 
     # create a new data frame
     new_df = df[period-1:]
