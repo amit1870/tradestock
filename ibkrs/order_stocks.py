@@ -6,9 +6,10 @@ from requests.exceptions import HTTPError
 
 from ibw.client import IBClient
 from utils import helper as hp
+from stock import Stock
 from stock_config import ORDERS
 
-def place_order_stock(ib_client, args, confirm=True):
+def prepare_order_dict_from_args(args):
     # Update ORDERS dictionary
     ORDERS['acctId'] = args.account_id
     ORDERS['conid'] = args.conid
@@ -54,71 +55,20 @@ def place_order_stock(ib_client, args, confirm=True):
     if args.tif:
         ORDERS['tif'] = args.tif
 
-    
-    order_dict = {"orders" : [ORDERS]}
-    print()
-    print("Place Order details:")
-    pprint(order_dict)
-    print()
+    orders = {"orders" : [ORDERS]}
 
-    if confirm:
-        proceed = input("Do you want to place order? Yes/No(Yes):")
-        proceed = proceed.upper()
-    else:
-        proceed = ''
+    return orders
 
-    if proceed == '':
-        proceed = 'Y'
-
-    if proceed == 'YES' or proceed == 'Y':
-        # Grab stock list by type
-        order_response = ib_client.place_orders(
-            account_id=args.account_id,
-            orders=order_dict
-        )
-        print("Place Order Response:")
-        pprint(order_response)
-        print()
-
-
-        if order_response:
-            response_id_dict = order_response[0]
-            reply_id = response_id_dict.get('id', None)
-
-            if reply_id is not None:
-                if confirm:
-                    confirmation = input("Confirm place order in Yes/No(Yes):")
-                    confirmation = confirmation.upper()
-                else:
-                    confirmation = ''
-
-                if confirmation == '':
-                    confirmation = 'Y'
-                if confirmation == 'YES' or confirmation == 'Y':
-                    confirmation = True
-                else:
-                    confirmation = False
-
-                if confirmation:
-                    reply_response = ib_client.place_order_reply(
-                        reply_id=reply_id,
-                        reply=confirmation)
-
-                    print("Place Order Reply Response:")
-                    pprint(reply_response)
-                    print()
-                    print("Order has been placed successfully.")
-                else:
-                    print("Cancelled Place Order Reply.")
-                print()
-    else:
-        print("Cancelled Place Order.")
 
 def main(ib_client, args):
-    confirm = True
+    order_list = prepare_order_dict_from_args(args)
+    stock_obj = Stock(ib_client)
     if args.confirm:
-        confirm = args.confirm
-    place_order_stock(ib_client, args, confirm=confirm)
+        order_status = stock_obj.place_order_stock(args.account_id, order_list)
+    else:
+        order_status = stock_obj.place_order_stock_with_confirm(args.account_id, order_list)
+
+    print(order_status)
 
 
 if __name__ == '__main__':
@@ -139,8 +89,7 @@ if __name__ == '__main__':
     parser.add_argument('--listing-exchange', default="SMART", help='valid_exchange: e.g: SMART,AMEX,NYSE,CBOE,...ETC')
     parser.add_argument('--is-single-group', default=True, help='True/False')
     parser.add_argument('--outside-rth', default=False, help='True/False')
-    parser.add_argument('--price', default=0, type=float, help='optional if order is LMT, or STOP_LIMIT, this is the limit price.' +\
-'For STP this is the stop price. For MIDPRICE this is the option price cap.')
+    parser.add_argument('--price', default=0, type=float, help='optional if order is LMT, or STOP_LIMIT, this is the limit price.')
     parser.add_argument('--tif', default="DAY", help='Time in Force. Values are DAY, IOC, GTC, OPG')
     parser.add_argument('--referrer', default="QuickTrade", help='Custom Order reference')
     parser.add_argument('--use-adaptive', default=True, help='True/False')

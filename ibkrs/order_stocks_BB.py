@@ -18,8 +18,9 @@ import matplotlib.pyplot as plt
 from requests.exceptions import HTTPError
 from datetime import datetime, timedelta
 from ibw.client import IBClient
+from utils.order_algo import bolliner_bands
 from utils import helper as hp
-from stock import search_stock_by_conid
+from stock import Stock
 
 plt.style.use('fivethirtyeight')
 pd.options.mode.chained_assignment = None  # default='warn'
@@ -31,52 +32,11 @@ DATA_FRAMES = []
 PERIOD = 3
 AUTH_DONE = False
 DATA_LIST = []
-STD_FACTOR_UPPER = 0.1
-STD_FACTOR_LOWER = 0.1
+STD_FACTOR_UPPER = 0.5
+STD_FACTOR_LOWER = 0.5
 
-def print_df(data_frames, use_str=True):
 
-    if use_str:
-        print(data_frames.to_string())
-    else:
-        with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-            print(data_frames)
 
-def bolliner_bands(data_list, period):
-    df = pd.DataFrame(data_list)
-
-    # set the date as the index
-    df = df.set_index(pd.DatetimeIndex(df['Date'].values))
-
-    # Calculate Simple Moving Average, Std Deviation, Upper Band and Lower Band
-    df['SMA'] = df['Close'].rolling(window=period).mean()
-
-    df['STD'] = df['Close'].rolling(window=period).std()
-
-    df['Upper'] = df['SMA'] + (df['STD'] * STD_FACTOR_UPPER)
-
-    df['Lower'] = df['SMA'] - (df['STD'] * STD_FACTOR_LOWER)
-
-    # create a new data frame
-    new_df = df[period-1:]
-
-    return new_df
-
-def update_data(data, start_date_str):
-    """ Add Date to each item of list."""
-    start_date_j = datetime.strptime(start_date_str, '%Y%m%d-%H:%M:%S')
-    start_date = start_date_j.date()
-    one_day = timedelta(days=1)
-    for item in data:
-        item['Date'] = start_date
-        item['Open'] = item.pop('o')
-        item['Close'] = item.pop('c')
-        item['High'] = item.pop('h')
-        item['Low'] = item.pop('l')
-        
-        start_date += one_day
-
-    return data
 
 def get_signal(dataframe, close_price):
     """ Function to get Sell or Buy signal."""
@@ -117,48 +77,16 @@ def authenticate_ib_client(ib_client):
 
     return ib_client
 
-def convert_str_into_number(string, convert_into=float):
-    try:
-        return convert_into(string)
-    except ValueError:
-        string = string[1:]
-        if convert_into == int:
-            string = float(string)
-        return convert_into(string)
-
-def place_order_stock(ib_client, order_list):
-    order_status = False
-
-    order_response = ib_client.place_orders(
-        account_id=args.account_id,
-        orders=order_list
-    )
-
-    if order_response:
-        response_id_dict = order_response[0]
-        reply_id = response_id_dict.get('id', None)
-
-        if reply_id is not None:
-            confirm = True
-            reply_response = ib_client.place_order_reply(
-                reply_id=reply_id,
-                reply=confirm)
-            order_status = True
-
-    return order_status
-
 def place_order_with_bollinger_band(current_close):
     global DATA_LIST, PERIOD
     global ACCOUNT, CONID
     global DATA_FRAMES
-    global ib_client
+    global stock_obj
 
     data_list = DATA_LIST
     period = PERIOD
     order_status = False
     quantity = 0
-
-    current_close = convert_str_into_number(current_close)
 
     data_frames = bolliner_bands(data_list, period)
 
@@ -171,13 +99,17 @@ def place_order_with_bollinger_band(current_close):
         return order_status, side
 
     if side == 'SELL':
-        stock_postion = search_stock_by_conid(ib_client, ACCOUNT, CONID)
+        stock_postion = stock_obj.search_stock_by_conid(ACCOUNT, CONID)
 
         if stock_postion:
             quantity = stock_postion.get('position', 0)
 
     if side == 'BUY':
-        # Check balance
+        # get balance and calculate number of position to buy
+        balance_type = 'AVB'
+        account_balance_dict = stock_obj.get_account_balance(ACCOUNT, balance_type)
+        account_balance = account_balance_dict.get('amount', 0)
+        quantity = account_balance / current_close
 
     order_dict = {
         "secType": "secType = {}:STK".format(CONID),
@@ -200,8 +132,8 @@ def place_order_with_bollinger_band(current_close):
     }
 
     orders = {"orders" : [order_dict]}
-    order_status = place_order_stock(ib_client, orders)
-
+    order_status = stock_obj.place_order_stock(ACCOUNT, orders)
+    
     return order_status, side
 
 def extract_data_from_message(message):
@@ -212,7 +144,7 @@ def extract_data_from_message(message):
     if '31' in message:
         # do code go for bollinger
         current_close = message.get('31')
-        order_placed, side = place_order_with_bollinger_band(convert_str_into_number(current_close))
+        order_placed, side = place_order_with_bollinger_band(hp.convert_str_into_number(current_close))
         if order_placed:
             print("{} took place with CLOSING PRICE {}.".format(side, current_close))
 
@@ -226,7 +158,7 @@ def extract_data_from_message(message):
             data = message.get('data', [])
             start_date_str = message.get('startTime', '')
             if data:
-                updated_data = update_data(data, start_date_str)
+                updated_data = hp.update_data(data, start_date_str)
                 build_data_list(updated_data)
 
 def on_message(ws, message):
@@ -247,7 +179,7 @@ def on_open(ws):
         
         time_period_70days = 'smh+51529211+{"exchange":"NYSE","period":"70d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
         time_period_10days = 'smh+51529211+{"exchange":"NYSE","period":"15d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
-        time_period_1days = 'smh+51529211+{"exchange":"NYSE","period":"2d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
+        time_period_1days = 'smh+51529211+{"exchange":"NYSE","period":"5d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
         current_price_cmd = 'smd+51529211+{"fields":["31","70","71"]}'
 
         today_date_obj = datetime.now().date()
@@ -339,6 +271,8 @@ if __name__ == "__main__":
         is_server_running=True
     )
     ib_client = authenticate_ib_client(ib_client)
+
+    stock_obj = Stock(ib_client)
 
     websocket.enableTrace(True)
     ws = websocket.WebSocketApp(URL,
