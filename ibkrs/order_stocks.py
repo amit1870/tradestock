@@ -14,8 +14,9 @@ def prepare_order_dict_from_args(args):
     ORDERS['acctId'] = args.account_id
     ORDERS['conid'] = args.conid
     ORDERS['side'] = args.side
-    ORDERS['cOID'] = args.coid
 
+
+    ORDERS['cOID'] = "ORDER-ID-{}".format(random.randint(313,919))
     ORDERS['ticker'] = "{}".format(args.conid)
     ORDERS['secType'] = "secType = {}:STK".format(args.conid)
 
@@ -79,10 +80,10 @@ if __name__ == '__main__':
 
     parser.add_argument('--conid', required=True, type=int, help='STOCK_CONTRACT_ID')
     parser.add_argument('--side', required=True, help='SELL/BUY')
-    parser.add_argument('--sec-type', required=True, help='secType = conid:security_type')
-    parser.add_argument('--coid', required=True, help='Customer Order ID')
-    parser.add_argument('--ticker', help='YOUR_STOCK_SYMBOL')
 
+    parser.add_argument('--sec-type', help='secType = conid:security_type')
+    parser.add_argument('--coid', help='Customer Order ID')
+    parser.add_argument('--ticker', help='YOUR_STOCK_SYMBOL')
     parser.add_argument('--confirm', help='Confirmation', default=False)
     parser.add_argument('--order-type', default="MKT", help='Available : MKT, LMT, STP, STOP_LIMIT , MIDPRICE')
     parser.add_argument('--quantity', default=1, type=float, help='Quantity')
