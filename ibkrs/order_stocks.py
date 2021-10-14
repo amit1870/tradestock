@@ -84,7 +84,7 @@ if __name__ == '__main__':
     parser.add_argument('--sec-type', help='secType = conid:security_type')
     parser.add_argument('--coid', help='Customer Order ID')
     parser.add_argument('--ticker', help='YOUR_STOCK_SYMBOL')
-    parser.add_argument('--confirm', help='Confirmation', default=False)
+    parser.add_argument('--confirm', help='Confirmation', default=True)
     parser.add_argument('--order-type', default="MKT", help='Available : MKT, LMT, STP, STOP_LIMIT , MIDPRICE')
     parser.add_argument('--quantity', default=1, type=float, help='Quantity')
     parser.add_argument('--listing-exchange', default="SMART", help='valid_exchange: e.g: SMART,AMEX,NYSE,CBOE,...ETC')
