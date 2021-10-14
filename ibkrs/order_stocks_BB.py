@@ -88,7 +88,7 @@ def place_order_with_bollinger_band(current_close):
     order_status = False
     quantity = 0
 
-    data_frames = bolliner_bands(data_list, period, lower_factor=STD_FACTOR_LOWER, upper_factor=STD_FACTOR_UPPER)
+    data_frames = bolliner_bands(data_list, period, STD_FACTOR_LOWER, STD_FACTOR_UPPER)
 
     if DATA_FRAMES == []:
         DATA_FRAMES.append(data_frames)
@@ -228,7 +228,7 @@ def on_open(ws):
             else:
                 print("MARKET DATA already fetched for date {}...".format(today_date_obj))
                 if print_flag and DATA_FRAMES:
-                    print_df(DATA_FRAMES[0])
+                    hp.print_df(DATA_FRAMES[0])
                     print_flag = False
 
             # Unsubscribe
