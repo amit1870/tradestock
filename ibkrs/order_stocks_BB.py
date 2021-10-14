@@ -2,7 +2,7 @@
 This script will place order using real time price of stock.
 Decision to place order will be done by Bollinger Band strategy.
 """
-
+import os
 import websocket
 import ssl
 import random
@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 from requests.exceptions import HTTPError
 from datetime import datetime, timedelta
 from ibw.client import IBClient
-from .order_algo import bolliner_bands
+from order_algo import bolliner_bands
 from utils import helper as hp
 from stock import Stock
 
@@ -39,7 +39,9 @@ LONG_SLEEP = 1 * HOUR
 SHORT_SLEEP = HOUR / 360
 
 
-
+config = os.environ.get('CONFIG', 'Testing')
+if config == 'Testing':
+    LONG_SLEEP = LONG_SLEEP / 60
 
 def get_signal(dataframe, close_price):
     """ Function to get Sell or Buy signal."""
