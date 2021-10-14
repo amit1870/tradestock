@@ -54,7 +54,7 @@ def authenticate_ib_client(ib_client, usernames, passwords):
     try:
         ib_client.logout()
     except HTTPError as e:
-        raise e
+        pass
 
     authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=2)
     if authenticated_accounts:
