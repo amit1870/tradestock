@@ -91,7 +91,7 @@ class Stock(object):
             # Place Order
             order_response = self.ib_client.place_orders(
                 account_id=account_id,
-                orders=order_dict
+                orders=orders_list
             )
             order_status = order_response
 
