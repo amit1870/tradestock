@@ -266,15 +266,26 @@ if __name__ == "__main__":
 
     # Create a new session of the IB Web API.
     ib_client = IBClient(
-        username=USERNAME,
-        account=PASSWORD,
+        username=args.username,
+        account=args.account_id,
         is_server_running=True
     )
-    ib_client, auth_status = authenticate_ib_client(ib_client)
+    auth_status = False
+    if args.passkey:
+        ib_client, auth_status = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey])
 
-    if auth_status:
+    if not args.passkey:
         stock_obj = Stock(ib_client)
+        websocket.enableTrace(True)
+        ws = websocket.WebSocketApp(URL,
+                                  on_open=on_open,
+                                  on_message=on_message,
+                                  on_error=on_error,
+                                  on_close=on_close)
 
+        ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+    elif auth_status:
+        stock_obj = Stock(ib_client)
         websocket.enableTrace(True)
         ws = websocket.WebSocketApp(URL,
                                   on_open=on_open,
