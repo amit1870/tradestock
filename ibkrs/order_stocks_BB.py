@@ -37,6 +37,7 @@ STD_FACTOR_LOWER = 0.7
 config = os.environ.get('CONFIG', 'Testing')
 if config == 'Testing':
     LONG_SLEEP = LONG_SLEEP / 60
+    SHORT_SLEEP = SHORT_SLEEP / 2
 
 def get_signal(dataframe, close_price):
     """ Function to get Sell or Buy signal."""
@@ -85,7 +86,7 @@ def place_order_with_bollinger_band(current_close):
 
     data_list = DATA_LIST
     period = PERIOD
-    order_status = False
+    order_status = {}
     quantity = 0
 
     data_frames = bolliner_bands(data_list, period, STD_FACTOR_LOWER, STD_FACTOR_UPPER)
