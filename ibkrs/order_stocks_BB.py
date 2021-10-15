@@ -207,12 +207,18 @@ def on_close(ws, close_status_code, close_msg):
 
 def on_open(ws):
     def run(*args):
-        time_period_70days = 'smh+51529211+{"exchange":"NYSE","period":"67d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
-        time_period_10days = 'smh+51529211+{"exchange":"NYSE","period":"25d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
-        time_period_1days = 'smh+51529211+{"exchange":"NYSE","period":"9d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
-        time_period_1days = 'smh+51529211+{"exchange":"NYSE","period":"2d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
-        time_period_1days = 'smh+51529211+{"exchange":"NYSE","period":"1d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
-        current_price_cmd = 'smd+51529211+{"fields":["31","70","71"]}'
+        global CONID
+
+        time_periods = ["67d", "25d", "9d", "2d"]
+        bar = "1d"
+        command_strings = []
+        for time_period in time_periods:
+            command_string = 'smh+{}+{"exchange":"NYSE","period":"{}","bar":"{}","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
+            command_string = command_string.format(CONID, time_period, bar)
+            command_strings.append(command_string)
+
+        fields = ["31","70","71"]
+        current_price_cmd = 'smd+51529211+{"fields":{}}'.format(fields)
 
         today_date_obj = datetime.now().date()
         fetched_market_data = False
@@ -230,13 +236,9 @@ def on_open(ws):
                 empty_data_list()
                 print("Sending request to MARKET DATA for date {}...".format(today_date_obj))
 
-                time.sleep(SHORT_SLEEP)
-                ws.send(time_period_70days)
-                time.sleep(SHORT_SLEEP)
-                ws.send(time_period_10days)
-                time.sleep(SHORT_SLEEP)
-                ws.send(time_period_1days)
-                time.sleep(SHORT_SLEEP)
+                for cmd in command_strings:
+                    ws.send(cmd)
+                    time.sleep(SHORT_SLEEP)
 
                 fetched_market_data = True
 
@@ -244,13 +246,9 @@ def on_open(ws):
                 empty_data_list()
                 print("Sending request to MARKET DATA for date {}...".format(today_date_obj))
 
-                time.sleep(SHORT_SLEEP)
-                ws.send(time_period_70days)
-                time.sleep(SHORT_SLEEP)
-                ws.send(time_period_10days)
-                time.sleep(SHORT_SLEEP)
-                ws.send(time_period_1days)
-                time.sleep(SHORT_SLEEP)
+                for cmd in command_strings:
+                    ws.send(cmd)
+                    time.sleep(SHORT_SLEEP)
 
                 today_date_obj = while_today_date_obj
                 fetched_market_data = True
@@ -268,8 +266,8 @@ def on_open(ws):
             # Unsubscribe
             for server_id in SERVER_IDS:
                 print("Sending unsubscribe request for SERVER ID {}...".format(server_id))
-                unsub_str = "umh+{}".format(server_id)
-                ws.send(unsub_str)
+                unsub_cmd = "umh+{}".format(server_id)
+                ws.send(unsub_cmd)
                 time.sleep(SHORT_SLEEP)
 
             if SERVER_IDS:
