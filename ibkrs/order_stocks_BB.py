@@ -25,13 +25,9 @@ DATA_FRAMES = []
 PERIOD = 3
 AUTH_DONE = False
 DATA_LIST = []
-STD_FACTOR_UPPER = 0.5
-STD_FACTOR_LOWER = 0.5
 HOUR = 3600 # seconds
 LONG_SLEEP = 1 * HOUR
 SHORT_SLEEP = HOUR / 360
-STD_FACTOR_UPPER = 0.7
-STD_FACTOR_LOWER = 0.7
 data_from_31_flag = True
 
 config = os.environ.get('CONFIG', 'Testing')
@@ -110,6 +106,7 @@ def place_order_with_bollinger_band(current_close):
     global ACCOUNT, CONID
     global DATA_FRAMES
     global stock_obj
+    global STD_FACTOR_LOWER, STD_FACTOR_UPPER
 
     data_list = DATA_LIST
     period = PERIOD
@@ -324,6 +321,8 @@ if __name__ == "__main__":
     parser.add_argument('--passkey', help='YOUR_PASSWORD')
     parser.add_argument('--period', default='93d', help='Time period for Market Data')
     parser.add_argument('--bar', default='1d', help='Bar')
+    parser.add_argument('--upper', default=0.7, type=float, help='STD Upper Factor')
+    parser.add_argument('--lower', default=0.7, type=float, help='STD Lower Factor')
 
     args = parser.parse_args()
 
@@ -333,6 +332,8 @@ if __name__ == "__main__":
     CONID = args.conid
     TIME_PERIOD = args.period
     BAR = args.bar
+    STD_FACTOR_UPPER = args.upper
+    STD_FACTOR_LOWER = args.lower
 
     # Create a new session of the IB Web API.
     ib_client = IBClient(
