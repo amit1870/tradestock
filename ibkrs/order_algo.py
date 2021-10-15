@@ -4,10 +4,12 @@ This module will keep different Trade Algorithm Strategy.
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 pd.options.mode.chained_assignment = None  # default='warn'
+plt.style.use('fivethirtyeight')
 
-FILE_PATH = "/home/ec2-user/virenv"
+FILE_PATH = "/home/ec2-user/virenv" # where plotted images will be saved.
 
 def get_signal(data):
     """ Function to get Sell or Buy signal."""
