@@ -32,6 +32,7 @@ LONG_SLEEP = 1 * HOUR
 SHORT_SLEEP = HOUR / 360
 STD_FACTOR_UPPER = 0.7
 STD_FACTOR_LOWER = 0.7
+data_from_31_flag = True
 
 config = os.environ.get('CONFIG', 'Testing')
 if config == 'Testing':
@@ -55,6 +56,17 @@ def build_data_list(data):
     global DATA_LIST
     for item in data:
         DATA_LIST.append(item)
+
+def add_single_data_to_data_list(data):
+    global DATA_LIST
+    DATA_LIST.append(data)
+
+def update_last_index_close_price(close_price):
+    global DATA_LIST
+    if DATA_LIST:
+        last_item = DATA_LIST[-1]
+        last_item['Close'] = close_price
+
 
 def empty_data_list():
     global DATA_LIST
@@ -140,11 +152,34 @@ def extract_data_from_message(message):
     # two type of data for extraction
     # one message in market data and another message is current day stock
 
+    global data_from_31_flag
+
     # current day stock message
     if '31' in message:
         # do code go for bollinger
         current_close = message.get('31')
         current_close = hp.convert_str_into_number(current_close)
+
+        if data_from_31_flag:
+            current_open = current_close
+
+            current_high = message.get('70', current_close)
+            current_high = hp.convert_str_into_number(current_high)
+
+            current_low = message.get('71', current_close)
+            current_low = hp.convert_str_into_number(current_low)
+
+            current_day_data_dict = {
+                'Date': datetime.now().date(),
+                'High': current_high,
+                'Low': current_low,
+                'Open': current_open,
+                'Close': current_close
+            }
+            add_single_data_to_data_list(current_day_data_dict)
+            data_from_31_flag = False
+        else:
+            update_last_index_close_price(close_price)
 
         print("Getting Bollinger Bands with CLOSING PRICE {}".format(current_close))
         order_placed, side = place_order_with_bollinger_band(current_close)

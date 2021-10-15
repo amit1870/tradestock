@@ -51,7 +51,8 @@ def update_data(data, start_date_str):
         if weekday == 4:
             start_date += one_day
             start_date += one_day
-            start_date += one_day
+
+        start_date += one_day
 
     return data
 
