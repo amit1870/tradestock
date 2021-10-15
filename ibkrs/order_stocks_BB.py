@@ -27,11 +27,12 @@ AUTH_DONE = False
 DATA_LIST = []
 HOUR = 3600 # seconds
 SHORT_SLEEP = HOUR / 2
+NAP_SLEEP = SHORT_SLEEP / 10
 data_from_31_flag = True
 
 config = os.environ.get('CONFIG', 'Testing')
 if config == 'Testing':
-    SHORT_SLEEP = SHORT_SLEEP / 2
+    SHORT_SLEEP = SHORT_SLEEP / 4
 
 def get_signal(dataframe, close_price):
     """ Function to get Sell or Buy signal."""
@@ -224,7 +225,7 @@ def on_error(ws, error):
     global SERVER_IDS
     for server_id in SERVER_IDS:
         ws.send("umh+{}".format(server_id))
-        time.sleep(SHORT_SLEEP)
+        time.sleep(NAP_SLEEP)
 
 def on_close(ws, close_status_code, close_msg):
     print("{} exited with code {} and message {}.".format(ws, close_status_code, close_msg))
@@ -255,10 +256,10 @@ def on_open(ws):
 
             if today_date_obj == while_today_date_obj and not fetched_market_data:
                 empty_data_list()
-                time.sleep(SHORT_SLEEP)
+                time.sleep(NAP_SLEEP)
                 print("SEND SUBSCRIBE REQUEST to MARKET DATA for date {}...".format(today_date_obj))
                 ws.send(cmd_str)
-                time.sleep(SHORT_SLEEP)
+                time.sleep(NAP_SLEEP)
                 calculated_period = calculate_next_period()
                 calculated_period = "{}d".format(calculated_period)
                 cmd_str = cmd_str_template.format(CONID, calculated_period, BAR)
@@ -268,10 +269,10 @@ def on_open(ws):
 
             elif today_date_obj != while_today_date_obj and not fetched_market_data:
                 empty_data_list()
-                time.sleep(SHORT_SLEEP)
+                time.sleep(NAP_SLEEP)
                 print("SEND SUBSCRIBE REQUEST to MARKET DATA for date {}...".format(today_date_obj))
                 ws.send(cmd_str)
-                time.sleep(SHORT_SLEEP)
+                time.sleep(NAP_SLEEP)
                 calculated_period = calculate_next_period()
                 calculated_period = "{}d".format(calculated_period)
                 cmd_str = cmd_str_template.format(CONID, calculated_period, BAR)
@@ -295,15 +296,16 @@ def on_open(ws):
                 print("SEDN UNSUBUSCRIBE REQUEST for SERVER ID {}...".format(server_id))
                 unsub_cmd = "umh+{}".format(server_id)
                 ws.send(unsub_cmd)
-                time.sleep(SHORT_SLEEP)
+                time.sleep(NAP_SLEEP)
 
             if SERVER_IDS:
                 empty_server_id_list()
 
             # Current Close Price
             if fetched_market_data:
-                time.sleep(SHORT_SLEEP)
+                time.sleep(NAP_SLEEP)
                 ws.send(current_price_cmd)
+                time.sleep(SHORT_SLEEP)
 
         # ws.close()
     _thread.start_new_thread(run, ())
