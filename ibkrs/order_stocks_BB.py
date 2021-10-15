@@ -179,7 +179,7 @@ def extract_data_from_message(message):
             add_single_data_to_data_list(current_day_data_dict)
             data_from_31_flag = False
         else:
-            update_last_index_close_price(close_price)
+            update_last_index_close_price(current_close)
 
         print("Getting Bollinger Bands with CLOSING PRICE {}".format(current_close))
         order_placed, side = place_order_with_bollinger_band(current_close)
