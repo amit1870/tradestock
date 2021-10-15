@@ -253,8 +253,8 @@ if __name__ == "__main__":
     parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
     parser.add_argument('--conid', required=True, type=int, help='STOCK_CONTRACT_ID')
     parser.add_argument('--passkey', help='YOUR_PASSWORD')
-    parser.add_argument('--period', default='90d' help='Time period for Market Data')
-    parser.add_argument('--bar', default='1d' help='Bar')
+    parser.add_argument('--period', default='90d', help='Time period for Market Data')
+    parser.add_argument('--bar', default='1d', help='Bar')
 
     args = parser.parse_args()
 
