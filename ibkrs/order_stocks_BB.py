@@ -89,6 +89,22 @@ def authenticate_ib_client(ib_client):
 
     return ib_client, auth_status
 
+def calculate_next_period():
+    global DATA_LIST
+
+    period = 1
+    if DATA_LIST:
+        last_data = DATA_LIST[-1]
+        last_date = last_data.get('Date')
+        last_date_obj = last_date
+        today_date_obj = datetime.now().date()
+
+        days_delta = today_date_obj - last_date_obj
+        period = days_delta.days - 1
+
+    return period
+
+
 def place_order_with_bollinger_band(current_close):
     global DATA_LIST, PERIOD
     global ACCOUNT, CONID
@@ -106,7 +122,6 @@ def place_order_with_bollinger_band(current_close):
         DATA_FRAMES.append(data_frames)
 
     side = get_signal(data_frames, current_close)
-
     if side == 'NAN':
         return order_status, side
 
@@ -121,7 +136,7 @@ def place_order_with_bollinger_band(current_close):
         balance_type = 'AVB'
         account_balance_dict = stock_obj.get_account_balance(ACCOUNT, balance_type)
         account_balance = account_balance_dict.get('amount', 0)
-        quantity = account_balance / current_close
+        quantity = account_balance // current_close
 
     order_dict = {
         "secType": "secType = {}:STK".format(CONID),
@@ -162,12 +177,16 @@ def extract_data_from_message(message):
 
         if data_from_31_flag:
             current_open = current_close
-
             current_high = message.get('70', current_close)
             current_high = hp.convert_str_into_number(current_high)
 
             current_low = message.get('71', current_close)
             current_low = hp.convert_str_into_number(current_low)
+
+            # added a condition when market is not open
+            if current_high == 0:
+                current_high = current_close
+                current_low = current_close
 
             current_day_data_dict = {
                 'Date': datetime.now().date(),
@@ -182,13 +201,14 @@ def extract_data_from_message(message):
             update_last_index_close_price(current_close)
 
         print("Getting Bollinger Bands with CLOSING PRICE {}".format(current_close))
+
         order_placed, side = place_order_with_bollinger_band(current_close)
         if order_placed:
-            print("{} took place with CLOSING PRICE {}.".format(side, current_close))
+            print("{} took place at CLOSING PRICE {} with message {}.".format(side, current_close, order_placed))
         else:
             print("CLOSING PRICE {} do not cross Bollinger Bands.".format(current_close))
 
-    # market data message
+    # market data messages
     if 'timePeriod' in message:
         # do code
         server_id = message.get('serverId', None)
@@ -219,8 +239,8 @@ def on_open(ws):
         global TIME_PERIOD
         global BAR
 
-        cmd_str = 'smh+{}+{{"exchange":"NYSE","period":"{}","bar":"{}","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}}'
-        cmd_str = cmd_str.format(CONID, TIME_PERIOD, BAR)
+        cmd_str_template = 'smh+{}+{{"exchange":"NYSE","period":"{}","bar":"{}","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}}'
+        cmd_str = cmd_str_template.format(CONID, TIME_PERIOD, BAR)
 
         current_price_cmd = 'smd+{}+{{"fields":["31","70","71"]}}'.format(CONID)
 
@@ -231,6 +251,7 @@ def on_open(ws):
         while True:
             global SERVER_IDS
             global DATA_FRAMES
+            global DATA_LIST
             global data_from_31_flag
 
             # Subscribe to Market Data
@@ -238,17 +259,29 @@ def on_open(ws):
 
             if today_date_obj == while_today_date_obj and not fetched_market_data:
                 empty_data_list()
-                print("Sending request to MARKET DATA for date {}...".format(today_date_obj))
                 time.sleep(SHORT_SLEEP)
+                print("SEND SUB REQUEST to MARKET DATA for date {}...".format(today_date_obj))
                 ws.send(cmd_str)
+                time.sleep(SHORT_SLEEP)
+                calculated_period = calculate_next_period()
+                calculated_period = "{}d".format(calculated_period)
+                cmd_str = cmd_str_template.format(CONID, calculated_period, BAR)
+                ws.send(cmd_str)
+                time.sleep(SHORT_SLEEP)
 
                 fetched_market_data = True
 
             elif today_date_obj != while_today_date_obj and not fetched_market_data:
                 empty_data_list()
-                print("Sending request to MARKET DATA for date {}...".format(today_date_obj))
                 time.sleep(SHORT_SLEEP)
+                print("SEND SUB REQUEST to MARKET DATA for date {}...".format(today_date_obj))
                 ws.send(cmd_str)
+                time.sleep(SHORT_SLEEP)
+                calculated_period = calculate_next_period()
+                calculated_period = "{}d".format(calculated_period)
+                cmd_str = cmd_str_template.format(CONID, calculated_period, BAR)
+                ws.send(cmd_str)
+                time.sleep(SHORT_SLEEP)
 
                 today_date_obj = while_today_date_obj
                 fetched_market_data = True
@@ -260,12 +293,13 @@ def on_open(ws):
             else:
                 print("MARKET DATA already fetched for date {}...".format(today_date_obj))
                 if print_flag and DATA_FRAMES:
+                    print(DATA_LIST)
                     hp.print_df(DATA_FRAMES[0])
                     print_flag = False
 
             # Unsubscribe
             for server_id in SERVER_IDS:
-                print("Sending unsubscribe request for SERVER ID {}...".format(server_id))
+                print("SEDN UNSUB REQUEST for SERVER ID {}...".format(server_id))
                 unsub_cmd = "umh+{}".format(server_id)
                 ws.send(unsub_cmd)
                 time.sleep(SHORT_SLEEP)
@@ -276,7 +310,7 @@ def on_open(ws):
             # Current Close Price
             if fetched_market_data:
                 ws.send(current_price_cmd)
-                time.sleep(LONG_SLEEP)
+                time.sleep(SHORT_SLEEP)
 
         # ws.close()
     _thread.start_new_thread(run, ())
@@ -288,7 +322,7 @@ if __name__ == "__main__":
     parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
     parser.add_argument('--conid', required=True, type=int, help='STOCK_CONTRACT_ID')
     parser.add_argument('--passkey', help='YOUR_PASSWORD')
-    parser.add_argument('--period', default='90d', help='Time period for Market Data')
+    parser.add_argument('--period', default='93d', help='Time period for Market Data')
     parser.add_argument('--bar', default='1d', help='Bar')
 
     args = parser.parse_args()
