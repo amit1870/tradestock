@@ -61,6 +61,7 @@ def bolliner_bands(data_list, period, lower_factor=0.5, upper_factor=0.5, plot=T
 
         figure = "{}/fig1.jpg".format(FILE_PATH)
         plt.savefig("{}".format(figure))
+        plt.close(figure)
 
         # plot and shade the area between the two Bollinger bands
         fig = plt.figure(figsize=(12.2,6.4)) # width = 12.2" and height = 6.4"
@@ -88,6 +89,7 @@ def bolliner_bands(data_list, period, lower_factor=0.5, upper_factor=0.5, plot=T
 
         figure = "{}/fig2.jpg".format(FILE_PATH)
         plt.savefig("{}".format(figure))
+        plt.close(figure)
 
         # create new columns for the buy and sell signals
         buy_signal, sell_signal = get_signal(new_df)
@@ -116,5 +118,6 @@ def bolliner_bands(data_list, period, lower_factor=0.5, upper_factor=0.5, plot=T
 
         figure = "{}/fig3.jpg".format(FILE_PATH)
         plt.savefig("{}".format(figure))
+        plt.close(figure)
 
     return new_df
