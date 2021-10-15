@@ -27,7 +27,7 @@ AUTH_DONE = False
 DATA_LIST = []
 HOUR = 3600 # seconds
 SHORT_SLEEP = HOUR / 2
-NAP_SLEEP = SHORT_SLEEP / 10
+NAP_SLEEP = SHORT_SLEEP / 30
 data_from_31_flag = True
 
 config = os.environ.get('CONFIG', 'Testing')
