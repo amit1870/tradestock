@@ -26,13 +26,11 @@ PERIOD = 3
 AUTH_DONE = False
 DATA_LIST = []
 HOUR = 3600 # seconds
-LONG_SLEEP = 1 * HOUR
 SHORT_SLEEP = HOUR / 360
 data_from_31_flag = True
 
 config = os.environ.get('CONFIG', 'Testing')
 if config == 'Testing':
-    LONG_SLEEP = LONG_SLEEP / 60
     SHORT_SLEEP = SHORT_SLEEP / 2
 
 def get_signal(dataframe, close_price):
@@ -226,6 +224,7 @@ def on_error(ws, error):
     global SERVER_IDS
     for server_id in SERVER_IDS:
         ws.send("umh+{}".format(server_id))
+        time.sleep(SHORT_SLEEP)
 
 def on_close(ws, close_status_code, close_msg):
     print("{} exited with code {} and message {}.".format(ws, close_status_code, close_msg))
@@ -257,28 +256,26 @@ def on_open(ws):
             if today_date_obj == while_today_date_obj and not fetched_market_data:
                 empty_data_list()
                 time.sleep(SHORT_SLEEP)
-                print("SEND SUB REQUEST to MARKET DATA for date {}...".format(today_date_obj))
+                print("SEND SUBSCRIBE REQUEST to MARKET DATA for date {}...".format(today_date_obj))
                 ws.send(cmd_str)
                 time.sleep(SHORT_SLEEP)
                 calculated_period = calculate_next_period()
                 calculated_period = "{}d".format(calculated_period)
                 cmd_str = cmd_str_template.format(CONID, calculated_period, BAR)
                 ws.send(cmd_str)
-                time.sleep(SHORT_SLEEP)
 
                 fetched_market_data = True
 
             elif today_date_obj != while_today_date_obj and not fetched_market_data:
                 empty_data_list()
                 time.sleep(SHORT_SLEEP)
-                print("SEND SUB REQUEST to MARKET DATA for date {}...".format(today_date_obj))
+                print("SEND SUBSCRIBE REQUEST to MARKET DATA for date {}...".format(today_date_obj))
                 ws.send(cmd_str)
                 time.sleep(SHORT_SLEEP)
                 calculated_period = calculate_next_period()
                 calculated_period = "{}d".format(calculated_period)
                 cmd_str = cmd_str_template.format(CONID, calculated_period, BAR)
                 ws.send(cmd_str)
-                time.sleep(SHORT_SLEEP)
 
                 today_date_obj = while_today_date_obj
                 fetched_market_data = True
@@ -290,13 +287,12 @@ def on_open(ws):
             else:
                 print("MARKET DATA already fetched for date {}...".format(today_date_obj))
                 if print_flag and DATA_FRAMES:
-                    print(DATA_LIST)
                     hp.print_df(DATA_FRAMES[0])
                     print_flag = False
 
             # Unsubscribe
             for server_id in SERVER_IDS:
-                print("SEDN UNSUB REQUEST for SERVER ID {}...".format(server_id))
+                print("SEDN UNSUBUSCRIBE REQUEST for SERVER ID {}...".format(server_id))
                 unsub_cmd = "umh+{}".format(server_id)
                 ws.send(unsub_cmd)
                 time.sleep(SHORT_SLEEP)
@@ -306,8 +302,8 @@ def on_open(ws):
 
             # Current Close Price
             if fetched_market_data:
-                ws.send(current_price_cmd)
                 time.sleep(SHORT_SLEEP)
+                ws.send(current_price_cmd)
 
         # ws.close()
     _thread.start_new_thread(run, ())
