@@ -47,7 +47,11 @@ def update_data(data, start_date_str):
         item['High'] = item.pop('h')
         item['Low'] = item.pop('l')
         
-        start_date += one_day
+        weekday = start_date.weekday()
+        if weekday == 4:
+            start_date += one_day
+            start_date += one_day
+            start_date += one_day
 
     return data
 

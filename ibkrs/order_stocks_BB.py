@@ -32,8 +32,6 @@ LONG_SLEEP = 1 * HOUR
 SHORT_SLEEP = HOUR / 360
 STD_FACTOR_UPPER = 0.7
 STD_FACTOR_LOWER = 0.7
-data_from_31_flag = True
-
 
 config = os.environ.get('CONFIG', 'Testing')
 if config == 'Testing':
@@ -57,10 +55,6 @@ def build_data_list(data):
     global DATA_LIST
     for item in data:
         DATA_LIST.append(item)
-
-def add_single_data_to_data_list(data):
-    global DATA_LIST
-    DATA_LIST.append(data)
 
 def empty_data_list():
     global DATA_LIST
@@ -146,31 +140,11 @@ def extract_data_from_message(message):
     # two type of data for extraction
     # one message in market data and another message is current day stock
 
-    global data_from_31_flag
-
     # current day stock message
     if '31' in message:
         # do code go for bollinger
         current_close = message.get('31')
         current_close = hp.convert_str_into_number(current_close)
-
-        if data_from_31_flag:
-            current_high = message.get('70')
-            current_high = hp.convert_str_into_number(current_high)
-            current_low = message.get('71')
-            current_low = hp.convert_str_into_number(current_low)
-            current_open = current_close
-            current_day_data_dict = {
-                'Date': datetime.now().date(),
-                'High': current_high,
-                'Low': current_low,
-                'Open': current_open,
-                'Close': current_close
-            }
-            print(current_day_data_dict)
-            add_single_data_to_data_list(current_day_data_dict)
-            data_from_31_flag = False
-
 
         print("Getting Bollinger Bands with CLOSING PRICE {}".format(current_close))
         order_placed, side = place_order_with_bollinger_band(current_close)
@@ -190,7 +164,6 @@ def extract_data_from_message(message):
             start_date_str = message.get('startTime', '')
             if data:
                 updated_data = hp.update_data(data, start_date_str)
-                print(updated_data)
                 build_data_list(updated_data)
 
 def on_message(ws, message):
@@ -208,17 +181,13 @@ def on_close(ws, close_status_code, close_msg):
 def on_open(ws):
     def run(*args):
         global CONID
+        global TIME_PERIOD
+        global BAR
 
-        time_periods = ["67d", "25d", "9d", "2d"]
-        bar = "1d"
-        command_strings = []
-        for time_period in time_periods:
-            command_string = 'smh+{}+{"exchange":"NYSE","period":"{}","bar":"{}","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
-            command_string = command_string.format(CONID, time_period, bar)
-            command_strings.append(command_string)
+        cmd_str = 'smh+{}+{{"exchange":"NYSE","period":"{}","bar":"{}","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}}'
+        cmd_str = cmd_str.format(CONID, TIME_PERIOD, BAR)
 
-        fields = ["31","70","71"]
-        current_price_cmd = 'smd+51529211+{"fields":{}}'.format(fields)
+        current_price_cmd = 'smd+{}+{{"fields":["31","70","71"]}}'.format(CONID)
 
         today_date_obj = datetime.now().date()
         fetched_market_data = False
@@ -235,20 +204,16 @@ def on_open(ws):
             if today_date_obj == while_today_date_obj and not fetched_market_data:
                 empty_data_list()
                 print("Sending request to MARKET DATA for date {}...".format(today_date_obj))
-
-                for cmd in command_strings:
-                    ws.send(cmd)
-                    time.sleep(SHORT_SLEEP)
+                time.sleep(SHORT_SLEEP)
+                ws.send(cmd_str)
 
                 fetched_market_data = True
 
             elif today_date_obj != while_today_date_obj and not fetched_market_data:
                 empty_data_list()
                 print("Sending request to MARKET DATA for date {}...".format(today_date_obj))
-
-                for cmd in command_strings:
-                    ws.send(cmd)
-                    time.sleep(SHORT_SLEEP)
+                time.sleep(SHORT_SLEEP)
+                ws.send(cmd_str)
 
                 today_date_obj = while_today_date_obj
                 fetched_market_data = True
@@ -288,6 +253,8 @@ if __name__ == "__main__":
     parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
     parser.add_argument('--conid', required=True, type=int, help='STOCK_CONTRACT_ID')
     parser.add_argument('--passkey', help='YOUR_PASSWORD')
+    parser.add_argument('--period', default='90d' help='Time period for Market Data')
+    parser.add_argument('--bar', default='1d' help='Bar')
 
     args = parser.parse_args()
 
@@ -295,6 +262,8 @@ if __name__ == "__main__":
     PASSWORD = args.passkey
     ACCOUNT = args.account_id
     CONID = args.conid
+    TIME_PERIOD = args.period
+    BAR = args.bar
 
     # Create a new session of the IB Web API.
     ib_client = IBClient(
