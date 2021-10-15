@@ -293,7 +293,7 @@ def on_open(ws):
 
             # Unsubscribe
             for server_id in SERVER_IDS:
-                print("SEDN UNSUBUSCRIBE REQUEST for SERVER ID {}...".format(server_id))
+                print("SEND UNSUBUSCRIBE REQUEST for SERVER ID {}...".format(server_id))
                 unsub_cmd = "umh+{}".format(server_id)
                 ws.send(unsub_cmd)
                 time.sleep(NAP_SLEEP)
