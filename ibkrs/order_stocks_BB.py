@@ -32,6 +32,7 @@ LONG_SLEEP = 1 * HOUR
 SHORT_SLEEP = HOUR / 360
 STD_FACTOR_UPPER = 0.7
 STD_FACTOR_LOWER = 0.7
+data_from_31_flag = True
 
 
 config = os.environ.get('CONFIG', 'Testing')
@@ -56,6 +57,10 @@ def build_data_list(data):
     global DATA_LIST
     for item in data:
         DATA_LIST.append(item)
+
+def add_single_data_to_data_list(data):
+    global DATA_LIST
+    DATA_LIST.append(data)
 
 def empty_data_list():
     global DATA_LIST
@@ -141,13 +146,38 @@ def extract_data_from_message(message):
     # two type of data for extraction
     # one message in market data and another message is current day stock
 
+    global data_from_31_flag
+
     # current day stock message
     if '31' in message:
         # do code go for bollinger
         current_close = message.get('31')
-        order_placed, side = place_order_with_bollinger_band(hp.convert_str_into_number(current_close))
+        current_close = hp.convert_str_into_number(current_close)
+
+        if data_from_31_flag:
+            current_high = message.get('70')
+            current_high = hp.convert_str_into_number(current_high)
+            current_low = message.get('71')
+            current_low = hp.convert_str_into_number(current_low)
+            current_open = current_close
+            current_day_data_dict = {
+                'Date': datetime.now().date(),
+                'High': current_high,
+                'Low': current_low,
+                'Open': current_open,
+                'Close': current_close
+            }
+            print(current_day_data_dict)
+            add_single_data_to_data_list(current_day_data_dict)
+            data_from_31_flag = False
+
+
+        print("Getting Bollinger Bands with CLOSING PRICE {}".format(current_close))
+        order_placed, side = place_order_with_bollinger_band(current_close)
         if order_placed:
             print("{} took place with CLOSING PRICE {}.".format(side, current_close))
+        else:
+            print("CLOSING PRICE {} do not cross Bollinger Bands.".format(current_close))
 
     # market data message
     if 'timePeriod' in message:
@@ -160,6 +190,7 @@ def extract_data_from_message(message):
             start_date_str = message.get('startTime', '')
             if data:
                 updated_data = hp.update_data(data, start_date_str)
+                print(updated_data)
                 build_data_list(updated_data)
 
 def on_message(ws, message):
@@ -176,11 +207,11 @@ def on_close(ws, close_status_code, close_msg):
 
 def on_open(ws):
     def run(*args):
-
-        
-        time_period_70days = 'smh+51529211+{"exchange":"NYSE","period":"70d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
-        time_period_10days = 'smh+51529211+{"exchange":"NYSE","period":"15d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
-        time_period_1days = 'smh+51529211+{"exchange":"NYSE","period":"5d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
+        time_period_70days = 'smh+51529211+{"exchange":"NYSE","period":"67d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
+        time_period_10days = 'smh+51529211+{"exchange":"NYSE","period":"25d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
+        time_period_1days = 'smh+51529211+{"exchange":"NYSE","period":"9d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
+        time_period_1days = 'smh+51529211+{"exchange":"NYSE","period":"2d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
+        time_period_1days = 'smh+51529211+{"exchange":"NYSE","period":"1d","bar":"1d","outsideRth":false,"source":"t","format":"%h/%l/%c/%o"}'
         current_price_cmd = 'smd+51529211+{"fields":["31","70","71"]}'
 
         today_date_obj = datetime.now().date()
@@ -190,6 +221,7 @@ def on_open(ws):
         while True:
             global SERVER_IDS
             global DATA_FRAMES
+            global data_from_31_flag
 
             # Subscribe to Market Data
             while_today_date_obj = datetime.now().date()
@@ -226,6 +258,7 @@ def on_open(ws):
             elif today_date_obj != while_today_date_obj and fetched_market_data:
                 fetched_market_data = False
                 print_flag = True
+                data_from_31_flag = True
             else:
                 print("MARKET DATA already fetched for date {}...".format(today_date_obj))
                 if print_flag and DATA_FRAMES:

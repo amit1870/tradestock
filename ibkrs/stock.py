@@ -47,7 +47,7 @@ class Stock(object):
         }
         # Grab the balance by its balance type from account summary.
         try:    
-            account_balance_summary = self.ib_client.portfolio_account_summary(
+            account_summary = self.ib_client.portfolio_account_summary(
                 account_id=account_id,
             )
         except HTTPError as e:
