@@ -22,7 +22,9 @@ from stock import Stock
 URL = "wss://localhost:5000/v1/api/ws"
 SERVER_IDS = []
 DATA_FRAMES = []
-PERIOD = 3
+PERIOD = 12 # 12-Day Moving Average
+STD_FACTOR_UPPER = 2 # 2 Standard Deviation
+STD_FACTOR_LOWER = 2 # 2 Standard Deviation
 AUTH_DONE = False
 DATA_LIST = []
 HOUR = 3600 # seconds
@@ -121,13 +123,13 @@ def place_order_with_bollinger_band(current_close):
     if side == 'NAN':
         return order_status, side
 
-    if side == 'SELL':
+    elif side == 'SELL': # SELL
         stock_postion = stock_obj.search_stock_by_conid(ACCOUNT, CONID)
 
         if stock_postion:
             quantity = stock_postion.get('position', 0)
 
-    if side == 'BUY':
+    else: # BUY
         # get balance and calculate number of position to buy
         balance_type = 'AVB'
         account_balance_dict = stock_obj.get_account_balance(ACCOUNT, balance_type)
@@ -260,10 +262,12 @@ def on_open(ws):
                 print("SEND SUBSCRIBE REQUEST to MARKET DATA for date {}...".format(today_date_obj))
                 ws.send(cmd_str)
                 time.sleep(NAP_SLEEP)
-                calculated_period = calculate_next_period()
-                calculated_period = "{}d".format(calculated_period)
-                cmd_str = cmd_str_template.format(CONID, calculated_period, BAR)
-                ws.send(cmd_str)
+                bar_type = BAR[-1]
+                if bar_type == 'd':
+                    calculated_period = calculate_next_period()
+                    calculated_period = "{}{}".format(calculated_period, bar_type)
+                    cmd_str = cmd_str_template.format(CONID, calculated_period, BAR)
+                    ws.send(cmd_str)
 
                 fetched_market_data = True
 
@@ -273,10 +277,12 @@ def on_open(ws):
                 print("SEND SUBSCRIBE REQUEST to MARKET DATA for date {}...".format(today_date_obj))
                 ws.send(cmd_str)
                 time.sleep(NAP_SLEEP)
-                calculated_period = calculate_next_period()
-                calculated_period = "{}d".format(calculated_period)
-                cmd_str = cmd_str_template.format(CONID, calculated_period, BAR)
-                ws.send(cmd_str)
+                bar_type = BAR[-1]
+                if bar_type == 'd':
+                    calculated_period = calculate_next_period()
+                    calculated_period = "{}{}".format(calculated_period, bar_type)
+                    cmd_str = cmd_str_template.format(CONID, calculated_period, BAR)
+                    ws.send(cmd_str)
 
                 today_date_obj = while_today_date_obj
                 fetched_market_data = True
@@ -317,7 +323,8 @@ if __name__ == "__main__":
     parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
     parser.add_argument('--conid', required=True, type=int, help='STOCK_CONTRACT_ID')
     parser.add_argument('--passkey', help='YOUR_PASSWORD')
-    parser.add_argument('--period', default='93d', help='Time period for Market Data')
+    parser.add_argument('--time-period', default='93d', help='Time period for Market Data')
+    parser.add_argument('--period', default=12, type=int, help='Moving Average number')
     parser.add_argument('--bar', default='1d', help='Bar')
     parser.add_argument('--upper', default=0.7, type=float, help='STD Upper Factor')
     parser.add_argument('--lower', default=0.7, type=float, help='STD Lower Factor')
@@ -328,7 +335,8 @@ if __name__ == "__main__":
     PASSWORD = args.passkey
     ACCOUNT = args.account_id
     CONID = args.conid
-    TIME_PERIOD = args.period
+    TIME_PERIOD = args.time_period
+    PERIOD = args.period
     BAR = args.bar
     STD_FACTOR_UPPER = args.upper
     STD_FACTOR_LOWER = args.lower
