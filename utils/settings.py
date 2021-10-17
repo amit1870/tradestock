@@ -65,10 +65,18 @@ account_peace77t4 = {
     'lsr': '$pbkdf2-sha256$50000$O.eck9I6J2QspbSWcg7h3A$07.o555xh2YW41Q27K8zUjLf68MkC6PFWYmNV5T.V7c'
 }
 
+account_peace77t3 = {
+    'name': 'Amit Patel',
+    'username': 'peace77t3',
+    'account_id': 'U7242803',
+    'lsr': '$pbkdf2-sha256$50000$O.eck9I6J2QspbSWcg7h3A$07.o555xh2YW41Q27K8zUjLf68MkC6PFWYmNV5T.V7c'
+}
+
 # Add Accounts to this to authenticate
 ACCOUNTS = {
     'peace77t7': account_peace77t7,
     'peace77t6': account_peace77t6,
     'peace77t5': account_peace77t5,
-    'peace77t4': account_peace77t4
+    'peace77t4': account_peace77t4,
+    'peace77t3': account_peace77t3
 }

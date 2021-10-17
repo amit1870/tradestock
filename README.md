@@ -1,17 +1,48 @@
-# Download Client Portal
-wget https://download2.interactivebrokers.com/portal/clientportal.beta.gw.zip
-You need to unzip the folder and place it in the code repo where this code is stored.
+# Start VNC server on EC2 if not running
+sudo systemctl status vncserver@:1
+sudo systemctl start vncserver@:1
 
-# Run server from Client Portal
-$ cd clientportal
-$ ./bin/run.sh root/conf.yaml &
+# Check if IBKR gateway is running
+java_server_id=$(pidof java)
+echo $java_server_id
 
-# Authenticate opening Browser Google Chrome
-URL :: https://localhost:5000/sso/Login?forwardTo=22&RL=1&ip2loc=US
-Put Username and Password and authenticate to get message "Client login succeeds"
+# Run Server if not running
+BASE_DIR="/home/ec2-user/virenv"
+SERVER_DIR="$BASE_DIR/pcv/clientportal"
+cd ${SERVER_DIR} || exit
+nohup ./bin/run.sh root/conf.yaml & >> /dev/null
+java_server_id=$(pidof java)
+echo $java_server_id
 
-# Run `write_config.py` script to create config and update values
-$ cd pcv; python3 utils/write_config.py
+# Run Chrome Browser
+export DISPLAY="localhost:1"
+chromium-browser &
 
-# Run Scripts
-$ cd pcv; python3 ibkrs/all_stocks.py  --stock-type=0
+
+# Git pull latest code base
+username=amit1870
+passkey=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
+echo "$username with password $passkey"
+BASE_DIR="/home/ec2-user/virenv"
+CODE_DIR="$BASE_DIR/pcv"
+cd $CODE_DIR || exit
+git restore .
+git pull
+
+# Excecute before running Python script
+BASE_DIR="/home/ec2-user/virenv"
+CODE_DIR="$BASE_DIR/pcv"
+cd ${BASE_DIR} || exit
+source bin/activate
+export PYTHONPATH="${CODE_DIR}"
+alias python='$BASE_DIR/bin/python'
+cd $CODE_DIR || exit
+
+# Run any script with --passkey option first for each account
+# When running next time for same account, you can skip --passkey
+python3 ibkrs/all_stocks.py --username XXXXXX --account-id XXXXXX --passkey XXXXXX
+python3 ibkrs/all_stocks.py --username XXXXXX --account-id XXXXXX
+
+# Run Bollinger Band script with below command
+python3 ibkrs/order_stocks_BB.py --username XXXXXX --account-id XXXXXX --passkey XXXXX --conid 51529211 --time-period 93d --period 12 --bar 1d --upper 2 --lower 2
+python3 ibkrs/order_stocks_BB.py --username XXXXXX --account-id XXXXXX --conid 51529211
