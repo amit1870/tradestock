@@ -198,13 +198,17 @@ def extract_data_from_message(message):
         else:
             update_last_index_close_price(current_close)
 
-        print("Getting Bollinger Bands with CLOSING PRICE {}".format(current_close))
+        print("RUNNING BOLLINGER BANDS with CLOSING PRICE at [{}]".format(current_close))
 
         order_placed, side = place_order_with_bollinger_band(current_close)
-        if order_placed:
+        if order_placed and side == 'SELL':
             print("{} took place at CLOSING PRICE {} with message {}.".format(side, current_close, order_placed))
+            print("PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! .".format(side, current_close, order_placed))
+        elif order_placed and side == 'BUY':
+            print("{} took place at CLOSING PRICE {} with message {}.".format(side, current_close, order_placed))
+            print("BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! .".format(side, current_close, order_placed))
         else:
-            print("CLOSING PRICE {} do not cross Bollinger Bands.".format(current_close))
+            print("CLOSING PRICE at [{}] does not cross BOLLINGER BANDS.".format(current_close))
 
     # market data messages
     if 'timePeriod' in message:
