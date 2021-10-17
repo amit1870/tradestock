@@ -34,7 +34,8 @@ data_from_31_flag = True
 
 config = os.environ.get('CONFIG', 'Testing')
 if config == 'Testing':
-    SHORT_SLEEP = SHORT_SLEEP / 4
+    SHORT_SLEEP = SHORT_SLEEP / 30
+    NAP_SLEEP = NAP_SLEEP / 2
 
 def get_signal(dataframe, close_price):
     """ Function to get Sell or Buy signal."""
@@ -211,7 +212,7 @@ def extract_data_from_message(message):
             print("CLOSING PRICE at [{}] does not cross BOLLINGER BANDS.".format(current_close))
 
     # market data messages
-    if 'timePeriod' in message:
+    elif 'timePeriod' in message:
         # do code
         server_id = message.get('serverId', None)
         if server_id is not None:
