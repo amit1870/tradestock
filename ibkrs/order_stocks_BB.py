@@ -33,11 +33,6 @@ SHORT_SLEEP = HOUR // 12
 NAP_SLEEP = SHORT_SLEEP // 2 
 data_from_31_flag = True
 
-config = os.environ.get('CONFIG', 'Testing')
-if config == 'Testing':
-    SHORT_SLEEP = SHORT_SLEEP / 2
-    NAP_SLEEP = NAP_SLEEP / 2
-
 def get_signal(dataframe, close_price):
     """ Function to get Sell or Buy signal."""
     if close_price > dataframe['Upper'][-1]: # SELL
@@ -200,29 +195,29 @@ def extract_data_from_message(message):
         else:
             update_last_index_close_price(current_close)
 
-        print("{} RUNNING BOLLINGER BANDS with CLOSING PRICE at [{}]".format(
-            hp.get_datetime_obj_in_str(),
-            current_close))
-
-        order_placed, side = place_order_with_bollinger_band(current_close)
-        if order_placed and side == 'SELL':
-            print("{} {} took place at CLOSING PRICE {} with message {}.".format(
-                hp.get_datetime_obj_in_str(),
-                side, current_close, order_placed))
-            print("{} PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! .".format(
-                hp.get_datetime_obj_in_str(),
-                side, current_close, order_placed))
-        elif order_placed and side == 'BUY':
-            print("{} {} took place at CLOSING PRICE {} with message {}.".format(
-                hp.get_datetime_obj_in_str(),
-                side, current_close, order_placed))
-            print("{} BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! .".format(
-                hp.get_datetime_obj_in_str(),
-                side, current_close, order_placed))
-        else:
-            print("{} CLOSING PRICE at [{}] does not XXXXX BOLLINGER BANDS.".format(
+            print("{} RUNNING BOLLINGER BANDS with CLOSING PRICE at [{}]".format(
                 hp.get_datetime_obj_in_str(),
                 current_close))
+
+            order_placed, side = place_order_with_bollinger_band(current_close)
+            if order_placed and side == 'SELL':
+                print("{} {} took place at CLOSING PRICE {} with message {}.".format(
+                    hp.get_datetime_obj_in_str(),
+                    side, current_close, order_placed))
+                print("{} PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! .".format(
+                    hp.get_datetime_obj_in_str(),
+                    side, current_close, order_placed))
+            elif order_placed and side == 'BUY':
+                print("{} {} took place at CLOSING PRICE {} with message {}.".format(
+                    hp.get_datetime_obj_in_str(),
+                    side, current_close, order_placed))
+                print("{} BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! .".format(
+                    hp.get_datetime_obj_in_str(),
+                    side, current_close, order_placed))
+            else:
+                print("{} CLOSING PRICE at [{}] does not XXXXX BOLLINGER BANDS.".format(
+                    hp.get_datetime_obj_in_str(),
+                    current_close))
 
     # market data messages
     elif 'timePeriod' in message:
