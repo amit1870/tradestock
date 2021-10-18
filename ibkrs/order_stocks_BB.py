@@ -29,7 +29,7 @@ STD_FACTOR_LOWER = 2 # 2 Standard Deviation
 AUTH_DONE = False
 DATA_LIST = []
 HOUR = 3600 # seconds
-SHORT_SLEEP = HOUR // 30
+SHORT_SLEEP = HOUR // 12
 NAP_SLEEP = SHORT_SLEEP // 2 
 data_from_31_flag = True
 
