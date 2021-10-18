@@ -1,3 +1,4 @@
+import sys
 import argparse
 import random
 import logging
@@ -112,3 +113,5 @@ if __name__ == '__main__':
         main(ib_client, args)
     elif auth_status:
         main(ib_client, args)
+    else:
+        sys.exit("Authentication not successful.")

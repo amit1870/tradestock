@@ -3,6 +3,7 @@ This script will place order using real time price of stock.
 Decision to place order will be done by Bollinger Band strategy.
 """
 import os
+import sys
 import websocket
 import ssl
 import random
@@ -395,3 +396,5 @@ if __name__ == "__main__":
                                   on_close=on_close)
 
         ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+    else:
+        sys.exit("Authentication not successful.")
