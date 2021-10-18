@@ -199,17 +199,29 @@ def extract_data_from_message(message):
         else:
             update_last_index_close_price(current_close)
 
-        print("RUNNING BOLLINGER BANDS with CLOSING PRICE at [{}]".format(current_close))
+        print("{} RUNNING BOLLINGER BANDS with CLOSING PRICE at [{}]".format(
+            hp.get_datetime_obj_in_str(),
+            current_close))
 
         order_placed, side = place_order_with_bollinger_band(current_close)
         if order_placed and side == 'SELL':
-            print("{} took place at CLOSING PRICE {} with message {}.".format(side, current_close, order_placed))
-            print("PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! .".format(side, current_close, order_placed))
+            print("{} {} took place at CLOSING PRICE {} with message {}.".format(
+                hp.get_datetime_obj_in_str(),
+                side, current_close, order_placed))
+            print("{} PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! PROFIT !! .".format(
+                hp.get_datetime_obj_in_str(),
+                side, current_close, order_placed))
         elif order_placed and side == 'BUY':
-            print("{} took place at CLOSING PRICE {} with message {}.".format(side, current_close, order_placed))
-            print("BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! .".format(side, current_close, order_placed))
+            print("{} {} took place at CLOSING PRICE {} with message {}.".format(
+                hp.get_datetime_obj_in_str(),
+                side, current_close, order_placed))
+            print("{} BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! .".format(
+                hp.get_datetime_obj_in_str(),
+                side, current_close, order_placed))
         else:
-            print("CLOSING PRICE at [{}] does not XXXXX BOLLINGER BANDS.".format(current_close))
+            print("{} CLOSING PRICE at [{}] does not XXXXX BOLLINGER BANDS.".format(
+                hp.get_datetime_obj_in_str(),
+                current_close))
 
     # market data messages
     elif 'timePeriod' in message:
@@ -264,7 +276,9 @@ def on_open(ws):
             if today_date_obj == while_today_date_obj and not fetched_market_data:
                 empty_data_list()
                 time.sleep(NAP_SLEEP)
-                print("SEND SUBSCRIBE REQUEST to MARKET DATA for date {}...".format(today_date_obj))
+                print("{} SEND SUBSCRIBE REQUEST to MARKET DATA for date {}...".format(
+                    hp.get_datetime_obj_in_str(),
+                    today_date_obj))
                 ws.send(cmd_str)
                 time.sleep(NAP_SLEEP)
                 bar_type = BAR[-1]
@@ -279,7 +293,9 @@ def on_open(ws):
             elif today_date_obj != while_today_date_obj and not fetched_market_data:
                 empty_data_list()
                 time.sleep(NAP_SLEEP)
-                print("SEND SUBSCRIBE REQUEST to MARKET DATA for date {}...".format(today_date_obj))
+                print("{} SEND SUBSCRIBE REQUEST to MARKET DATA for date {}...".format(
+                    hp.get_datetime_obj_in_str(),
+                    today_date_obj))
                 ws.send(cmd_str)
                 time.sleep(NAP_SLEEP)
                 bar_type = BAR[-1]
@@ -288,6 +304,7 @@ def on_open(ws):
                     calculated_period = "{}{}".format(calculated_period, bar_type)
                     cmd_str = cmd_str_template.format(CONID, calculated_period, BAR)
                     ws.send(cmd_str)
+
                 today_date_obj = while_today_date_obj
                 fetched_market_data = True
 
@@ -296,14 +313,18 @@ def on_open(ws):
                 print_flag = True
                 data_from_31_flag = True
             else:
-                print("MARKET DATA already fetched for date {}...".format(today_date_obj))
+                print("{} MARKET DATA already fetched for date {}...".format(
+                    hp.get_datetime_obj_in_str(),
+                    today_date_obj))
                 if print_flag and DATA_FRAMES:
                     hp.print_df(DATA_FRAMES[0])
                     print_flag = False
 
             # Unsubscribe
             for server_id in SERVER_IDS:
-                print("SEND UNSUBUSCRIBE REQUEST for SERVER ID {}...".format(server_id))
+                print("{} SEND UNSUBUSCRIBE REQUEST for SERVER ID {}...".format(
+                    hp.get_datetime_obj_in_str(),
+                    server_id))
                 unsub_cmd = "umh+{}".format(server_id)
                 ws.send(unsub_cmd)
                 time.sleep(NAP_SLEEP)

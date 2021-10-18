@@ -77,3 +77,11 @@ def authenticate_ib_client(ib_client, usernames, passwords):
             attempt -= 1
     
     return ib_client, auth_status
+
+def get_datetime_obj_in_str(date_obj=None, seprator='-'):
+    str_format = '%Y{}%m{}%d %H:%M:%S'.format(seprator, seprator)
+    if date_obj is None:
+        date_obj = datetime.today()
+
+    return date_obj.strftime(str_format)
+
