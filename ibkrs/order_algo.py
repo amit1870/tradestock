@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 pd.options.mode.chained_assignment = None  # default='warn'
 plt.style.use('fivethirtyeight')
+plt.rcParams.update({'figure.max_open_warning': 0})
 
 FILE_PATH = "/home/ec2-user/virenv" # where plotted images will be saved.
 

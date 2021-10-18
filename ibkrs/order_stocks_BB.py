@@ -28,13 +28,13 @@ STD_FACTOR_LOWER = 2 # 2 Standard Deviation
 AUTH_DONE = False
 DATA_LIST = []
 HOUR = 3600 # seconds
-SHORT_SLEEP = HOUR / 2
-NAP_SLEEP = SHORT_SLEEP / 30
+SHORT_SLEEP = HOUR // 12
+NAP_SLEEP = SHORT_SLEEP // 2 
 data_from_31_flag = True
 
 config = os.environ.get('CONFIG', 'Testing')
 if config == 'Testing':
-    SHORT_SLEEP = SHORT_SLEEP / 30
+    SHORT_SLEEP = SHORT_SLEEP / 2
     NAP_SLEEP = NAP_SLEEP / 2
 
 def get_signal(dataframe, close_price):
@@ -209,7 +209,7 @@ def extract_data_from_message(message):
             print("{} took place at CLOSING PRICE {} with message {}.".format(side, current_close, order_placed))
             print("BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! BUYED !! .".format(side, current_close, order_placed))
         else:
-            print("CLOSING PRICE at [{}] does not cross BOLLINGER BANDS.".format(current_close))
+            print("CLOSING PRICE at [{}] does not XXXXX BOLLINGER BANDS.".format(current_close))
 
     # market data messages
     elif 'timePeriod' in message:
