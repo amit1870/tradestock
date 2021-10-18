@@ -28,7 +28,7 @@ STD_FACTOR_LOWER = 2 # 2 Standard Deviation
 AUTH_DONE = False
 DATA_LIST = []
 HOUR = 3600 # seconds
-SHORT_SLEEP = HOUR // 12
+SHORT_SLEEP = HOUR // 30
 NAP_SLEEP = SHORT_SLEEP // 2 
 data_from_31_flag = True
 
@@ -288,7 +288,6 @@ def on_open(ws):
                     calculated_period = "{}{}".format(calculated_period, bar_type)
                     cmd_str = cmd_str_template.format(CONID, calculated_period, BAR)
                     ws.send(cmd_str)
-
                 today_date_obj = while_today_date_obj
                 fetched_market_data = True
 
@@ -314,7 +313,6 @@ def on_open(ws):
 
             # Current Close Price
             if fetched_market_data:
-                time.sleep(NAP_SLEEP)
                 ws.send(current_price_cmd)
                 time.sleep(SHORT_SLEEP)
 

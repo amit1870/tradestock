@@ -39,7 +39,6 @@ export CONFIG=Prod
 alias python='$BASE_DIR/bin/python'
 cd $CODE_DIR || exit
 
-
 # Run any script with --passkey option first for each account
 # When running next time for same account, you can skip --passkey
 python3 ibkrs/all_stocks.py --username XXXXXX --account-id XXXXXX --passkey XXXXXX
