@@ -135,6 +135,7 @@ dmypy.json
 ibw/server_session.json
 .pypirc
 MANIFEST.in
+clientportal/
 clientportal.gw/
 clientportal.beta.gw/
 alex/
