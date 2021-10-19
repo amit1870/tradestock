@@ -5,6 +5,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.by import By
 
 from utils.settings import ACCOUNTS
 from utils.lsr_opr import get_context, decrypt_lsr
@@ -33,9 +34,9 @@ def _auto_mode_on_accounts(accounts, url=None, sleep_sec=5):
         try:    
             driver = webdriver.Chrome(options=options)
             driver.get(LOGIN_URL)
-            driver.find_element_by_xpath(user_name_x_path).send_keys(account.get('username'))
-            driver.find_element_by_xpath(password_x_path).send_keys(account.get('lsr'))
-            driver.find_element_by_xpath(login_button_x_path).click()
+            driver.find_element(By.XPATH, user_name_x_path).send_keys(account.get('username'))
+            driver.find_element(By.XPATH, password_x_path).send_keys(account.get('lsr'))
+            driver.find_element(By.XPATH, login_button_x_path).click()
             authenticated_accounts.append(account)
             time.sleep(sleep_sec)
             driver.quit()
