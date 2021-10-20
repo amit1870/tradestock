@@ -95,11 +95,14 @@ def parse_file_output(output_file):
     new_parsed_content = []
     dash = "---"
     headers = "AccountID"
+    auth_fail_msg = "Authentication"
     for idx, line in enumerate(lines):
         line = line.strip()
         if len(line):
             if idx > 4:
-                if not line.startswith(dash) or not line.startswith(headers):
+                if not line.startswith(dash) or \
+                    (headers not in line) or \
+                    (auth_fail_msg not in line):
                     new_parsed_content.append(line)
             else:
                 new_parsed_content.append(line)
