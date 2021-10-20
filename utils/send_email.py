@@ -116,7 +116,7 @@ def create_message_with_attachment(
 
     return {'raw': base64.urlsafe_b64encode(msg.as_bytes()).decode()}
 
-def create_service(client_secrets_file_path, api_name, api_version, scopes, use_local=True):
+def create_service(client_secrets_file_path, api_name, api_version, scopes):
     creds = None
     service = None
 
@@ -128,12 +128,10 @@ def create_service(client_secrets_file_path, api_name, api_version, scopes, use_
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
-        elif use_local:
+        else
             flow = InstalledAppFlow.from_client_secrets_file(client_secrets_file_path,scopes)
-            creds = flow.run_local_server(port=0)
-        else:
-            creds = service_account.Credentials.from_service_account_file(client_secrets_file_path,scopes)
-            creds = credentials.with_subject(EMAIL['from'])
+            creds = flow.run_local_server(port=8080)
+
         # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
             pickle.dump(creds, token)

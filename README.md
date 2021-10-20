@@ -7,7 +7,7 @@ java_server_id=$(pidof java)
 echo $java_server_id
 
 # Run Server if not running
-BASE_DIR="/home/ec2-user/virenv"
+BASE_DIR="$HOME/virenv"
 SERVER_DIR="$BASE_DIR/pcv/clientportal"
 cd ${SERVER_DIR} || exit
 ./bin/run.sh root/conf.yaml &
@@ -22,14 +22,14 @@ chromium-browser &
 username=amit1870
 passkey=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
 echo "$username with password $passkey"
-BASE_DIR="/home/ec2-user/virenv"
+BASE_DIR="$HOME/virenv"
 CODE_DIR="$BASE_DIR/pcv"
 cd $CODE_DIR || exit
 git restore .
 git pull
 
 # Excecute before running Python script
-BASE_DIR="/home/ec2-user/virenv"
+BASE_DIR="$HOME/virenv"
 CODE_DIR="$BASE_DIR/pcv"
 cd ${BASE_DIR} || exit
 source bin/activate
