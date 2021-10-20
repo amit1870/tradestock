@@ -11,7 +11,7 @@ logging.basicConfig(
     level=logging.DEBUG
 )
 
-HEADERS     = ['AccountID', 'STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
+HEADERS     = ['Username', 'AccountID', 'STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
 BUFFER      = 1
 SPACE       = ' '
 HEAD_SPACES = SPACE * 3
@@ -26,7 +26,7 @@ SPACE_LEN   = 4
 SPACES      = ' ' * SPACE_LEN
 
 
-def print_stock(ib_client, account_id, stock_type='0'):
+def print_stock(ib_client, username, account_id, stock_type='0'):
 
     # grab account portfolios
     try:    
@@ -43,6 +43,7 @@ def print_stock(ib_client, account_id, stock_type='0'):
     max_length_symbol = max_length_pnl = max_length_currency = 0
     max_length_position = max_length_contractid = max_length_account_id = 0
     max_length_ps_ls = 5
+    max_length_username = len(username)
     for row in account_positions:
         for key, val in row.items():
             if key == 'contractDesc':
@@ -82,7 +83,7 @@ def print_stock(ib_client, account_id, stock_type='0'):
                     max_length_account_id = len_of_stock_account_id
 
 
-        values = (account_id, stock, contractid, pnl, position, currency)
+        values = (username, account_id, stock, contractid, pnl, position, currency)
 
         stock_list.append(values)
 
@@ -92,19 +93,21 @@ def print_stock(ib_client, account_id, stock_type='0'):
             profitable_stock_list.append(values)
 
     print(DASH_HEADER)
-    print("{}{}{}{}{}{}{}{}{}{}{}{}".format(HEADERS[0],
-                                            SPACES,                                    
-                                            HEADERS[1],
-                                            SPACES,
-                                            HEADERS[2],
-                                            SPACES,
-                                            HEADERS[3],
-                                            SPACES,
-                                            HEADERS[4],
-                                            SPACES,
-                                            HEADERS[5],
-                                            SPACES,
-                                            HEADERS[6]))
+    print("{}{}{}{}{}{}{}{}{}{}{}{}{}{}".format(HEADERS[0],
+                                                SPACES,                                    
+                                                HEADERS[1],
+                                                SPACES,
+                                                HEADERS[2],
+                                                SPACES,
+                                                HEADERS[3],
+                                                SPACES,
+                                                HEADERS[4],
+                                                SPACES,
+                                                HEADERS[5],
+                                                SPACES,
+                                                HEADERS[6],
+                                                SPACES,
+                                                HEADERS[7]))
     print(DASH_HEADER)
 
     if stock_type == NEGATIVE:
@@ -115,7 +118,7 @@ def print_stock(ib_client, account_id, stock_type='0'):
         selected_stock_list = stock_list
 
     for row in selected_stock_list:
-        acc_id, name, conid, pnl, position, currency = row
+        uname, acc_id, name, conid, pnl, position, currency = row
 
         profit_or_loss = ZERO
         if pnl < 0:
@@ -123,19 +126,21 @@ def print_stock(ib_client, account_id, stock_type='0'):
         elif pnl > 0:
             profit_or_loss = PROFIT
 
-        row = '{}{}{}{}{}{}{}{}{}{}{}{}'.format(acc_id,
-                                                SPACE * (max_length_account_id + SPACE_LEN - len(str(acc_id))),
-                                                name,
-                                                SPACE * (max_length_symbol + SPACE_LEN - len(str(name))),
-                                                conid,
-                                                SPACE * (max_length_contractid + SPACE_LEN - len(str(conid))),
-                                                pnl,
-                                                SPACE * (max_length_pnl + SPACE_LEN - len(str(pnl))),
-                                                profit_or_loss,
-                                                SPACE * (max_length_ps_ls + SPACE_LEN - len(str(profit_or_loss))),
-                                                position,
-                                                SPACE * (max_length_position + SPACE_LEN - len(str(position))),
-                                                currency)
+        row = '{}{}{}{}{}{}{}{}{}{}{}{}{}{}'.format(uname,
+                                                    SPACE * (max_length_username + SPACE_LEN - len(str(uname))),
+                                                    acc_id,
+                                                    SPACE * (max_length_account_id + SPACE_LEN - len(str(acc_id))),
+                                                    name,
+                                                    SPACE * (max_length_symbol + SPACE_LEN - len(str(name))),
+                                                    conid,
+                                                    SPACE * (max_length_contractid + SPACE_LEN - len(str(conid))),
+                                                    pnl,
+                                                    SPACE * (max_length_pnl + SPACE_LEN - len(str(pnl))),
+                                                    profit_or_loss,
+                                                    SPACE * (max_length_ps_ls + SPACE_LEN - len(str(profit_or_loss))),
+                                                    position,
+                                                    SPACE * (max_length_position + SPACE_LEN - len(str(position))),
+                                                    currency)
         print(row)
 
     print(DASH_HEADER)
@@ -145,7 +150,7 @@ def main(ib_client, args):
     stock_type = '0'
     if args.stock_type:
         stock_type = args.stock_type
-    print_stock(ib_client, account_id, stock_type)
+    print_stock(ib_client, args.username, account_id, stock_type)
 
 
 if __name__ == '__main__':
