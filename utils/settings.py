@@ -1,3 +1,8 @@
+from pathlib import Path
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 # Secret Key
 secret_key = '4$hsjhd9323j233239032jkj32320903283'
 
@@ -7,17 +12,11 @@ EMAIL = {
     'to': 'amitpatel@teckvalley.com,investment@peacehaven.co',
     'subject': 'Daily Stock Update',
     'content': 'Dear Receiver,\nPlease find daily stocks updates.',
-    'attachments': ['/home/ec2-user/virenv/stocks.log'],
-    'schedule':{
-        'D': (False, 'Daily'),
-        'S': (True, 'Shortly'),
-        'H': (False, 'Hourly'),
-        'H2': (False, 'Every Two Hour'),
-        'HF': (False, 'Every Six Hour'),
-        'Q': (False, 'Every Quarter'),
-        'M': (False, 'Monthly')
-    }
+    'attachments': [],
 }
+
+# PosixPath
+LOG_FILE_PATH = BASE_DIR.joinpath('stocks.log')
 
 # API configurations
 API = {

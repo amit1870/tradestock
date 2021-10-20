@@ -2,6 +2,7 @@ import os
 import base64
 import argparse
 import mimetypes
+import pickle
 
 from time import sleep
 from email.mime.image import MIMEImage
@@ -14,18 +15,19 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from google.oauth2 import service_account
 
-from utils.settings import EMAIL, API
+from utils.settings import EMAIL, API, LOG_FILE_PATH
+from utils import helper as hp
 
-HOUR = 3600 # Seconds
+HOUR = 3600
 
 EMAIL_SCHEDULE = {
-    'S': HOUR / 10,
     'H': HOUR,
-    'Q': 6 * HOUR,
-    'D': 24 * HOUR,
-    'Q': 24 * 15 * HOUR,
-    'M': 24 * 15 * 30 * HOUR
+    '2H': HOUR * 2,
+    '3H': HOUR * 3,
+    '4H': HOUR * 4,
+    'HS': HOUR / 30
 }
 
 def create_plain_html_message(sender, to, subject, message_text, html=False):
@@ -114,16 +116,28 @@ def create_message_with_attachment(
 
     return {'raw': base64.urlsafe_b64encode(msg.as_bytes()).decode()}
 
-def create_service(client_secrets_file_path, api_name, api_version, scopes):
+def create_service(client_secrets_file_path, api_name, api_version, scopes, use_local=True):
     creds = None
     service = None
 
-    if not creds or not cred.valid:
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+
+    # if no valid credentials available, let the user log in.
+    if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(client_secrets_file_path, scopes)
+        elif use_local:
+            flow = InstalledAppFlow.from_client_secrets_file(client_secrets_file_path,scopes)
             creds = flow.run_local_server(port=0)
+        else:
+            creds = service_account.Credentials.from_service_account_file(client_secrets_file_path,scopes)
+            creds = credentials.with_subject(EMAIL['from'])
+        # Save the credentials for the next run
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
     try:
         service = build(api_name, api_version, credentials=creds)
     except Exception as e:
@@ -153,13 +167,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Send Email with Gmail API.')
     parser.add_argument('--token-path', help='TOKEN_FILE_PATH')
     parser.add_argument('--email-attach', default='', help='EMAIL_ATTACHMENT')
-    parser.add_argument('--schedule', default='H', help='D:Daily, H:Hourly, Q:Quarterly, M:Monthly')
+    parser.add_argument('--schedule', default='H', help='H:Hourly, 2H:Two Hour, 4H: Four Hour')
     args = parser.parse_args()
 
     service = create_service(args.token_path, API['name'], API['version'], API['scope'])
 
     while True:
         message_list = []
+        EMAIL['content'] = hp.parse_file_output(LOG_FILE_PATH.as_posix())
         if args.email_attach != '':
             message = create_message_with_attachment(EMAIL['from'],
                 EMAIL['to'],
@@ -187,15 +202,6 @@ if __name__ == '__main__':
         for message in message_list:
             message_response = send_message(service, EMAIL['from'], message)
             print(message_response)
-        
-        email_schedule = 'H'
-        if args.schedule:
-            email_schedule = args.schedule
-        else:
-            for notation, pair in EMAIL['schedule'].items():
-                if pair[0]:
-                    email_schedule = notation
-                    break
-        
-        sleep_time = EMAIL_SCHEDULE.get(email_schedule)
+
+        sleep_time = EMAIL_SCHEDULE.get(args.schedule)
         sleep(sleep_time)

@@ -10,7 +10,7 @@ echo $java_server_id
 BASE_DIR="/home/ec2-user/virenv"
 SERVER_DIR="$BASE_DIR/pcv/clientportal"
 cd ${SERVER_DIR} || exit
-nohup ./bin/run.sh root/conf.yaml & >> /dev/null
+./bin/run.sh root/conf.yaml &
 java_server_id=$(pidof java)
 echo $java_server_id
 
@@ -34,7 +34,6 @@ CODE_DIR="$BASE_DIR/pcv"
 cd ${BASE_DIR} || exit
 source bin/activate
 export PYTHONPATH="${CODE_DIR}"
-export DISPLAY="localhost:1"
 export CONFIG=Prod
 alias python='$BASE_DIR/bin/python'
 cd $CODE_DIR || exit

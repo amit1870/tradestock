@@ -85,3 +85,22 @@ def get_datetime_obj_in_str(date_obj=None, seprator='-'):
 
     return date_obj.strftime(str_format)
 
+def parse_file_output(output_file):
+    try:
+        with open(output_file) as f:
+            lines = f.readlines()
+    except FileNotFoundError:
+        lines = []
+
+    new_parsed_content = []
+    dash = "---"
+    headers = "AccountID"
+    for idx, line in enumerate(lines):
+        if idx > 4:
+            if not line.startswith(dash) or not line.startswith(headers):
+                new_parsed_content.append(line)
+        else:
+            new_parsed_content.append(line)
+
+    
+    return "".join(new_parsed_content)
