@@ -96,11 +96,13 @@ def parse_file_output(output_file):
     dash = "---"
     headers = "AccountID"
     for idx, line in enumerate(lines):
-        if idx > 4:
-            if not line.startswith(dash) or not line.startswith(headers):
+        line = line.strip()
+        if len(line):
+            if idx > 4:
+                if not line.startswith(dash) or not line.startswith(headers):
+                    new_parsed_content.append(line)
+            else:
                 new_parsed_content.append(line)
-        else:
-            new_parsed_content.append(line)
 
     
     return "".join(new_parsed_content)

@@ -6,14 +6,14 @@ CODE_DIR="$BASE_DIR/pcv"
 SERVER_DIR="$BASE_DIR/pcv/clientportal"
 LOG_FILE="$CODE_DIR/stocks.log"
 TOKEN_FILE_PATH="$HOME/virenv/token.json"
-NAP_SECONDS=30 # Seconds
+NAP_SECONDS=60 # Seconds
 PF_STOCK=1
 LS_STOCK=-1
 AL_STOCK=0
 NEW_LINE=$'\n'
 
-declare -a usernames=("peace77t7" "peace77t6" "peace77t5" "peace77t4" "peace77t3")
-declare -a accounts=("U5931342" "U6092014" "U6050929" "U6498436" "U7242803")
+declare -a usernames=("peace77t7" "peace77t6" "peace77t4" "peace77t3")
+declare -a accounts=("U5931342" "U6092014" "U6498436" "U7242803")
 declare -a passwords=( "$@" )
 
 # Activate vitural env and export PYTHONPATH
