@@ -85,6 +85,16 @@ def get_datetime_obj_in_str(date_obj=None, seprator='-'):
 
     return date_obj.strftime(str_format)
 
+def convert_space_to_html_code(string):
+    string_chr = []
+    for ch in string:
+        if ch == ' ':
+            string_chr.append('&nbsp;')
+        else:
+            string_chr.append(ch)
+
+    return "".join(string_chr)
+
 def parse_file_output(output_file):
     try:
         with open(output_file) as f:
@@ -96,16 +106,17 @@ def parse_file_output(output_file):
     dash = "---"
     headers = "AccountID"
     auth_fail_msg = "Authentication"
+    space_only = "&nbsp;"
     for idx, line in enumerate(lines):
-        line = line.strip()
+        line = convert_space_to_html_code(line)
         if len(line):
             if idx > 4:
-                if not line.startswith(dash) or \
-                    (headers not in line) or \
-                    (auth_fail_msg not in line):
+                if not line.startswith(dash) and \
+                    (headers not in line) and \
+                    (auth_fail_msg not in line) and\
+                    (not line.startswith(space_only)):
                     new_parsed_content.append(line)
             else:
                 new_parsed_content.append(line)
 
-    
-    return "".join(new_parsed_content)
+    return "<br/><br/>".join(new_parsed_content)

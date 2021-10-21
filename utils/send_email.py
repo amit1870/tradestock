@@ -194,7 +194,8 @@ if __name__ == '__main__':
             message = create_plain_html_message(EMAIL['from'],
                 EMAIL['to'],
                 EMAIL['subject'],
-                EMAIL['content'])
+                EMAIL['content'],
+                html=True)
             message_list.append(message)
 
         for message in message_list:
