@@ -22,13 +22,10 @@ from utils import helper as hp
 
 HOUR = 3600
 
-EMAIL_SCHEDULE = {
-    'H': HOUR,
-    '2H': HOUR * 2,
-    '3H': HOUR * 3,
-    '4H': HOUR * 4,
-    'HS': HOUR / 30
-}
+EMAIL_SCHEDULE = {}
+
+for hour in range(0,25):
+    EMAIL_SCHEDULE['H{}'.format(hour)] = HOUR * hour + 1
 
 def create_plain_html_message(sender, to, subject, message_text, html=False):
     """Create a message for an email.
@@ -164,16 +161,19 @@ def send_message(service, user_id, message):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Send Email with Gmail API.')
     parser.add_argument('--token-path', help='TOKEN_FILE_PATH')
-    parser.add_argument('--email-attach', default='', help='EMAIL_ATTACHMENT')
-    parser.add_argument('--schedule', default='H', help='H:Hourly, 2H:Two Hour, 4H: Four Hour')
+    parser.add_argument('--email-attach', help='EMAIL_ATTACHMENT')
+    parser.add_argument('--schedule', default='H1', help='H1,H2... H1: 1 Hour')
     args = parser.parse_args()
 
-    service = create_service(args.token_path, API['name'], API['version'], API['scope'])
+    if args.token_path:
+        API['token_path'] = args.token_path
+
+    service = create_service(API['token_path'], API['name'], API['version'], API['scope'])
 
     while True:
         message_list = []
         EMAIL['content'] = hp.parse_file_output(LOG_FILE_PATH.as_posix())
-        if args.email_attach != '':
+        if args.email_attach:
             message = create_message_with_attachment(EMAIL['from'],
                 EMAIL['to'],
                 EMAIL['subject'],

@@ -1,3 +1,29 @@
+# Install java, virtual env package
+sudo apt install openjdk-11-jdk python3-pip python3-venv
+
+# Install google chrome and chrome driver after checking google-chrome version
+URL: https://chromedriver.chromium.org/downloads
+google-chrome --version
+wget https://chromedriver.storage.googleapis.com/95.0.4638.17/chromedriver_linux64.zip
+unzip chromedriver_linux64.zip
+sudo mv chromedriver /usr/bin/chromedriver
+
+# Create virtual env and activate it
+python3 -m venv virenv
+BASE_DIR="$HOME/virenv"
+cd $BASE_DIR || exit
+source bin/activate
+CODE_DIR="$BASE_DIR/pcv"
+cd $CODE_DIR || exit
+
+
+# Install pip packages from requirements.txt
+pip install -r requirements.txt
+
+# Download latest Client Portal API
+wget https://download2.interactivebrokers.com/portal/clientportal.beta.gw.zip
+unzip clientportal.beta.gw.zip -d 
+
 # Start VNC server on EC2 if not running
 sudo systemctl status vncserver@:1
 sudo systemctl start vncserver@:1
@@ -34,7 +60,6 @@ CODE_DIR="$BASE_DIR/pcv"
 cd ${BASE_DIR} || exit
 source bin/activate
 export PYTHONPATH="${CODE_DIR}"
-export CONFIG=Prod
 alias python='$BASE_DIR/bin/python'
 cd $CODE_DIR || exit
 

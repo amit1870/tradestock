@@ -8,8 +8,8 @@ secret_key = '4$hsjhd9323j233239032jkj32320903283'
 
 # Email configurations
 EMAIL = {
-    'from': 'amitxvf@gmail.com',
-    'to': 'amitpatel@teckvalley.com',
+    'from': 'investment@peacehaven.co',
+    'to': 'amitpatel@teckvalley.com,investment@peacehaven.co',
     'subject': 'Daily Stock Update',
     'content': 'Dear Receiver,\nPlease find daily stocks updates.',
     'attachments': [],
@@ -22,7 +22,7 @@ LOG_FILE_PATH = BASE_DIR.joinpath('stocks.log')
 API = {
     'name': 'gmail',
     'version': 'v1',
-    'token_path': '/home/ec2-user/virenv/token.json',
+    'token_path': '',
     'scope': ['https://mail.google.com/',
               'https://www.googleapis.com/auth/gmail.send']
 
