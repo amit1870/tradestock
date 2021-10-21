@@ -11,6 +11,8 @@ from requests.exceptions import HTTPError
 from .auto_mode import auto_mode_on_accounts
 
 
+remove_n = lambda ch : ch != '\n'
+
 def supress_stdout(func):
     def wrapper(*a, **ka):
         with open(os.devnull, 'w') as devnull:
@@ -95,6 +97,8 @@ def convert_space_to_html_code(string):
 
     return "".join(string_chr)
 
+
+
 def parse_file_output(output_file):
     try:
         with open(output_file) as f:
@@ -102,21 +106,27 @@ def parse_file_output(output_file):
     except FileNotFoundError:
         lines = []
 
+    headers = []
     new_parsed_content = []
     dash = "---"
-    headers = "AccountID"
+    headers_start = "AccountID"
     auth_fail_msg = "Authentication"
     space_only = "&nbsp;"
     for idx, line in enumerate(lines):
         line = convert_space_to_html_code(line)
+        line = line[:-1]
         if len(line):
-            if idx > 4:
+            if idx > 2:
                 if not line.startswith(dash) and \
-                    (headers not in line) and \
+                    (headers_start not in line) and \
                     (auth_fail_msg not in line) and\
                     (not line.startswith(space_only)):
                     new_parsed_content.append(line)
             else:
-                new_parsed_content.append(line)
+                headers.append(line)
 
-    return "<br/><br/>".join(new_parsed_content)
+    headers = "<br/>".join(headers)
+    new_parsed_content = list(filter(remove_n, new_parsed_content))
+    new_parsed_content = "<br/><br/>".join(new_parsed_content)
+
+    return headers + "<br/>"+ new_parsed_content
