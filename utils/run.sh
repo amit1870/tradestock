@@ -32,6 +32,8 @@ fi
 # Add new  $LOG_FILE
 touch ${LOG_FILE}
 
+DATE=`date`
+echo "$DATE" >> ${LOG_FILE}
 for (( i = 0; i < ${#passwords[@]}; i++ )); do
     python "${CODE_DIR}/ibkrs/all_stocks.py" --username "${usernames[i]}" --passkey "${passwords[i]}"  \
            --account-id "${accounts[i]}" --stock-type "${AL_STOCK}" >> ${LOG_FILE} 2>&1

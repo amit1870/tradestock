@@ -110,6 +110,7 @@ def parse_file_output(output_file):
 
     headers = []
     new_parsed_content = []
+
     dash = "---"
     headers_start = "AccountID"
     auth_fail_msg = "Authentication"
@@ -127,9 +128,14 @@ def parse_file_output(output_file):
                     if profit_tag in line:
                         line = "<b><p style='color:#28a745;'>" + line + "</p></b>"
                     else:
-                        line = "<p style='color:#dc3545;'>" + line + "</p>"
+                        line = "<p style='color:#e83e8c;'>" + line + "</p>"
 
                     new_parsed_content.append(line)
+
+            elif idx == 0:
+                line = "<b><i><p style='color:#ffc107;'>" + line + "</p></b></i>"
+                new_parsed_content.append(line)
+
             else:
                 line = "<b><p style='color:#6c757d;'>" + line + "</p></b>"
                 headers.append(line)
