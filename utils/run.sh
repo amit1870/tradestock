@@ -34,16 +34,7 @@ touch ${LOG_FILE}
 
 for (( i = 0; i < ${#passwords[@]}; i++ )); do
     python "${CODE_DIR}/ibkrs/all_stocks.py" --username "${usernames[i]}" --passkey "${passwords[i]}"  \
-           --account-id "${accounts[i]}" --stock-type "${PF_STOCK}" >> ${LOG_FILE} 2>&1
-    echo "$NEW_LINE" >> ${LOG_FILE}
-
-    echo "Going to nap for ${NAP_SECONDS}sec.."
-    sleep ${NAP_SECONDS}
-done
-
-for (( i = 0; i < ${#passwords[@]}; i++ )); do
-    python "${CODE_DIR}/ibkrs/all_stocks.py" --username "${usernames[i]}" --passkey "${passwords[i]}"  \
-           --account-id "${accounts[i]}" --stock-type "${LS_STOCK}" >> ${LOG_FILE} 2>&1
+           --account-id "${accounts[i]}" --stock-type "${AL_STOCK}" >> ${LOG_FILE} 2>&1
     echo "$NEW_LINE" >> ${LOG_FILE}
 
     echo "Going to nap for ${NAP_SECONDS}sec.."

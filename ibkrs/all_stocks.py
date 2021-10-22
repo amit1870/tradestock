@@ -77,20 +77,20 @@ def print_stock(ib_client, username, account_id, stock_type='0'):
                     max_length_contractid = len_of_stock_contractid
 
             if key == 'acctId':
-                account_id = val
-                len_of_stock_account_id = len(str(account_id))
+                row_account_id = val
+                len_of_stock_account_id = len(str(row_account_id))
                 if max_length_account_id < len_of_stock_account_id:
                     max_length_account_id = len_of_stock_account_id
 
+        if row_account_id == account_id:
+            values = (username, row_account_id, stock, contractid, pnl, position, currency)
 
-        values = (username, account_id, stock, contractid, pnl, position, currency)
+            stock_list.append(values)
 
-        stock_list.append(values)
-
-        if pnl < ZERO:
-            negative_stock_list.append(values)
-        elif pnl > ZERO:
-            profitable_stock_list.append(values)
+            if pnl < ZERO:
+                negative_stock_list.append(values)
+            elif pnl > ZERO:
+                profitable_stock_list.append(values)
 
     print(DASH_HEADER)
     print("{}{}{}{}{}{}{}{}{}{}{}{}{}{}".format(HEADERS[0],
@@ -171,9 +171,5 @@ if __name__ == '__main__':
     if args.passkey:
         ib_client, auth_status = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey])
 
-    if not args.passkey:
-        main(ib_client, args)
-    elif auth_status:
-        main(ib_client, args)
-    else:
-        sys.exit("Authentication not successful.")
+
+    main(ib_client, args)
