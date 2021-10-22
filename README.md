@@ -1,3 +1,8 @@
+
+# Start VNC server to DISPLAY UI activity
+sudo systemctl status vncserver@:1
+sudo systemctl start vncserver@:1
+
 # Install java, virtual env package
 sudo apt install openjdk-11-jdk python3-pip python3-venv
 
@@ -16,27 +21,29 @@ source bin/activate
 CODE_DIR="$BASE_DIR/pcv"
 cd $CODE_DIR || exit
 
-
 # Install pip packages from requirements.txt
 pip install -r requirements.txt
 
 # Download latest Client Portal API
+BASE_DIR="$HOME/virenv"
+SERVER_DIR="$BASE_DIR/pcv/clientportal"
+OPR="$HOME/opr"
+mkdir -p ${OPR}
+cd ${OPR}
 wget https://download2.interactivebrokers.com/portal/clientportal.beta.gw.zip
-unzip clientportal.beta.gw.zip -d 
+unzip clientportal.beta.gw.zip -d ${SERVER_DIR}
+cd
+rm -rf ${OPR}
 
-# Start VNC server on EC2 if not running
-sudo systemctl status vncserver@:1
-sudo systemctl start vncserver@:1
 
-# Check if IBKR gateway is running
+# Run IBKR gateway if not running
 java_server_id=$(pidof java)
 echo $java_server_id
-
-# Run Server if not running
 BASE_DIR="$HOME/virenv"
 SERVER_DIR="$BASE_DIR/pcv/clientportal"
 cd ${SERVER_DIR} || exit
 nohup ./bin/run.sh root/conf.yaml &
+sleep 2
 java_server_id=$(pidof java)
 echo $java_server_id
 
