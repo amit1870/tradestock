@@ -10,8 +10,11 @@ from datetime import datetime, timedelta
 from requests.exceptions import HTTPError
 from .auto_mode import auto_mode_on_accounts
 
+NEW_LINE_CHAR = '\n'
+SPACE = ' '
 
-remove_n = lambda ch : ch != '\n'
+remove_n = lambda ch : ch != NEW_LINE_CHAR
+remove_space = lambda ch: ch != SPACE
 
 def supress_stdout(func):
     def wrapper(*a, **ka):
@@ -98,7 +101,6 @@ def convert_space_to_html_code(string):
     return "".join(string_chr)
 
 
-
 def parse_file_output(output_file):
     try:
         with open(output_file) as f:
@@ -112,6 +114,7 @@ def parse_file_output(output_file):
     headers_start = "AccountID"
     auth_fail_msg = "Authentication"
     space_only = "&nbsp;"
+    profit_tag = 'PF'
     for idx, line in enumerate(lines):
         line = convert_space_to_html_code(line)
         line = line[:-1]
@@ -121,12 +124,18 @@ def parse_file_output(output_file):
                     (headers_start not in line) and \
                     (auth_fail_msg not in line) and\
                     (not line.startswith(space_only)):
+                    if profit_tag in line:
+                        line = "<p style='color:#28a745;'>" + line + "</p>"
+                    else:
+                        line = "<p style='color:#dc3545;'>" + line + "</p>"
+
                     new_parsed_content.append(line)
             else:
+                line = "<p style='color:#6c757d;'>" + line + "</p>"
                 headers.append(line)
 
-    headers = "<br/>".join(headers)
+    headers = "".join(headers)
     new_parsed_content = list(filter(remove_n, new_parsed_content))
-    new_parsed_content = "<br/><br/>".join(new_parsed_content)
+    new_parsed_content = "".join(new_parsed_content)
 
-    return headers + "<br/>"+ new_parsed_content
+    return headers + new_parsed_content

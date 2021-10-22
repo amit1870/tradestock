@@ -12,7 +12,7 @@ logging.basicConfig(
 )
 
 HEADERS     = ['Username', 'AccountID', 'STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
-BUFFER      = 1
+BUFFER      = 10
 SPACE       = ' '
 HEAD_SPACES = SPACE * 3
 HEADERS_LEN = len(HEAD_SPACES.join(HEADERS)) + BUFFER
