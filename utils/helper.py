@@ -8,13 +8,36 @@ import os
 
 from datetime import datetime, timedelta
 from requests.exceptions import HTTPError
+
 from .auto_mode import auto_mode_on_accounts
+from utils.settings import ACCOUNTS
+from utils.lsr_opr import get_context, decrypt_lsr
 
 NEW_LINE_CHAR = '\n'
 SPACE = ' '
 
 remove_n = lambda ch : ch != NEW_LINE_CHAR
 remove_space = lambda ch: ch != SPACE
+
+
+def get_authenticated_accounts(usernames, passwords):
+    context = get_context()
+    authenticated_accounts = []
+
+    for idx,username in enumerate(usernames):    
+        accounts = [account for key, account in ACCOUNTS.items()]
+
+        for account in accounts:
+            account_lsr = account.get('lsr')
+            passkey = passwords[idx]
+            if account.get('username') == username and decrypt_lsr(context, passkey, account_lsr):
+                    account['lsr'] = passkey
+                    authenticated_accounts.append(account)
+                    break
+            elif account.get('username') == username and not decrypt_lsr(context, passkey, account_lsr):
+                break
+
+    return authenticated_accounts
 
 def supress_stdout(func):
     def wrapper(*a, **ka):
@@ -80,6 +103,22 @@ def authenticate_ib_client(ib_client, usernames, passwords):
                 ib_client.reauthenticate()
 
             attempt -= 1
+    
+    return ib_client, auth_status
+
+def reauthenticate_ib_client(ib_client):
+    auth_status = False
+    attempt = 3
+
+    while attempt and not auth_status:
+        auth_response = ib_client.is_authenticated()
+        if 'authenticated' in auth_response.keys() and auth_response['authenticated']:
+            auth_status = True
+
+        if not auth_status:
+            ib_client.reauthenticate()
+
+        attempt -= 1
     
     return ib_client, auth_status
 

@@ -4,7 +4,7 @@ sudo systemctl status vncserver@:1
 sudo systemctl start vncserver@:1
 
 # Install java, virtual env package
-sudo apt install openjdk-11-jdk python3-pip python3-venv
+sudo apt install openjdk-11-jdk python3-pip python3-venv net-tools
 
 # Install google chrome and chrome driver after checking google-chrome version
 URL: https://chromedriver.chromium.org/downloads

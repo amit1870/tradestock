@@ -32,7 +32,7 @@ def get_signal(data):
 
     return buy_signal, sell_signal
 
-def bolliner_bands(data_list, period=12, lower_factor=2, upper_factor=2, plot=True):
+def bolliner_bands(data_list, period=12, lower_factor=2, upper_factor=2, plot=False):
     ''' Bollinger Bands.'''
     df = pd.DataFrame(data_list)
 
