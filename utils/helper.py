@@ -120,7 +120,7 @@ def parse_file_output(output_file):
         line = convert_space_to_html_code(line)
         line = line[:-1]
         if len(line):
-            if idx > 2:
+            if idx > 3:
                 if not line.startswith(dash) and \
                     (headers_start not in line) and \
                     (auth_fail_msg not in line) and\
@@ -131,11 +131,6 @@ def parse_file_output(output_file):
                         line = "<p style='color:#e83e8c;'>" + line + "</p>"
 
                     new_parsed_content.append(line)
-
-            elif idx == 0:
-                line = "<b><i><p style='color:#ffc107;'>" + line + "</p></b></i>"
-                new_parsed_content.append(line)
-
             else:
                 line = "<b><p style='color:#6c757d;'>" + line + "</p></b>"
                 headers.append(line)

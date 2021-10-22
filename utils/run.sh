@@ -34,6 +34,7 @@ touch ${LOG_FILE}
 
 DATE=`date`
 echo "$DATE" >> ${LOG_FILE}
+
 for (( i = 0; i < ${#passwords[@]}; i++ )); do
     python "${CODE_DIR}/ibkrs/all_stocks.py" --username "${usernames[i]}" --passkey "${passwords[i]}"  \
            --account-id "${accounts[i]}" --stock-type "${AL_STOCK}" >> ${LOG_FILE} 2>&1
@@ -42,5 +43,7 @@ for (( i = 0; i < ${#passwords[@]}; i++ )); do
     echo "Going to nap for ${NAP_SECONDS}sec.."
     sleep ${NAP_SECONDS}
 done
+
+
 
 echo "Finished!!"
