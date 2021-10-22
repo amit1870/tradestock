@@ -125,13 +125,13 @@ def parse_file_output(output_file):
                     (auth_fail_msg not in line) and\
                     (not line.startswith(space_only)):
                     if profit_tag in line:
-                        line = "<p style='color:#28a745;'>" + line + "</p>"
+                        line = "<b><p style='color:#28a745;'>" + line + "</p></b>"
                     else:
                         line = "<p style='color:#dc3545;'>" + line + "</p>"
 
                     new_parsed_content.append(line)
             else:
-                line = "<p style='color:#6c757d;'>" + line + "</p>"
+                line = "<b><p style='color:#6c757d;'>" + line + "</p></b>"
                 headers.append(line)
 
     headers = "".join(headers)
