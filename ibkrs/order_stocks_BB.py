@@ -28,9 +28,9 @@ STD_FACTOR_UPPER = 2 # 2 Standard Deviation
 STD_FACTOR_LOWER = 2 # 2 Standard Deviation
 AUTH_DONE = False
 DATA_LIST = []
-HOUR = 3600 # seconds
-SHORT_SLEEP = HOUR // 12
-NAP_SLEEP = SHORT_SLEEP // 2
+MINUTE = 60 # seconds
+SHORT_SLEEP = MINUTE
+NAP_SLEEP = MINUTE // 2
 data_from_31_flag = True
 
 def get_signal(dataframe, close_price):

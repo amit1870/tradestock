@@ -10,31 +10,12 @@ pd.options.mode.chained_assignment = None  # default='warn'
 plt.style.use('fivethirtyeight')
 plt.rcParams.update({'figure.max_open_warning': 0})
 
-FILE_PATH = "/home/ec2-user/virenv" # where plotted images will be saved.
+from utils.settings import DATA_DIR
+from utils.helper as hp
 
-def get_signal(data):
-    """ Function to get Sell or Buy signal."""
-    buy_signal = [] # buy list
-    sell_signal = [] # sell list
 
-    for i in range(len(data['Close'])):
-        # Sell
-        if data['Close'][i] > data['Upper'][i]:
-            buy_signal.append(np.nan)
-            sell_signal.append(data['Close'][i])
-        # Buy
-        elif data['Close'][i] < data['Lower'][i]:
-            sell_signal.append(np.nan)
-            buy_signal.append(data['Close'][i])
-        else:
-            buy_signal.append(np.nan)
-            sell_signal.append(np.nan)
-
-    return buy_signal, sell_signal
-
-def bolliner_bands(data_list, period=12, lower_factor=2, upper_factor=2, plot=False):
+def bolliner_bands(df, period=12, lower_factor=2, upper_factor=2, plot=False):
     ''' Bollinger Bands.'''
-    df = pd.DataFrame(data_list)
 
     # set the date as the index
     df = df.set_index(pd.DatetimeIndex(df['Date'].values))
@@ -60,7 +41,7 @@ def bolliner_bands(data_list, period=12, lower_factor=2, upper_factor=2, plot=Fa
 
         plt.ylabel('USD Price ($)')
 
-        figure = "{}/fig1.jpg".format(FILE_PATH)
+        figure = "{}/fig1.jpg".format(DATA_DIR.as_posix())
         plt.savefig("{}".format(figure))
         plt.close(figure)
 
@@ -88,12 +69,12 @@ def bolliner_bands(data_list, period=12, lower_factor=2, upper_factor=2, plot=Fa
         plt.xticks(rotation = 45)
         ax.legend()
 
-        figure = "{}/fig2.jpg".format(FILE_PATH)
+        figure = "{}/fig2.jpg".format(DATA_DIR.as_posix())
         plt.savefig("{}".format(figure))
         plt.close(figure)
 
         # create new columns for the buy and sell signals
-        buy_signal, sell_signal = get_signal(new_df)
+        buy_signal, sell_signal = hp.get_signal(new_df)
         new_df['Buy'] = buy_signal
         new_df['Sell'] = sell_signal
 
@@ -117,7 +98,7 @@ def bolliner_bands(data_list, period=12, lower_factor=2, upper_factor=2, plot=Fa
         plt.xticks(rotation = 45)
         ax.legend()
 
-        figure = "{}/fig3.jpg".format(FILE_PATH)
+        figure = "{}/fig3.jpg".format(DATA_DIR.as_posix())
         plt.savefig("{}".format(figure))
         plt.close(figure)
 

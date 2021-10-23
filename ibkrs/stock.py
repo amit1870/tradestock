@@ -1,11 +1,10 @@
 import sys
 import argparse
 import logging
+import pandas as pd
 
+from datetime import datetime, timezone
 from requests.exceptions import HTTPError
-from pprint import pprint
-from ibw.client import IBClient
-from utils import helper as hp
 
 class Stock(object):
     def __init__(self, ib_client):
@@ -117,42 +116,31 @@ class Stock(object):
         return order_status
 
 
-def main(ib_client, args):
+    def _update_data_list(self, data_list):
+        for item in data_list:
+            timestamp_ms = item.pop('t') / 1000
+            t_date = datetime.fromtimestamp(int(timestamp_ms), timezone.utc)
+            item['Date'] = t_date.date()
+            item['Open'] = item.pop('o')
+            item['Close'] = item.pop('c')
+            item['High'] = item.pop('h')
+            item['Low'] = item.pop('l')
+            # item['Volume'] = item.pop('v')
+            item.pop('v')
 
-    stock_obj = Stock(ib_client)
+        return data_list
 
-    if args.conid:
-        pprint(stock_obj.search_stock_by_conid(args.account_id, args.conid))
+    def get_market_data_history(self, contract_id, period, bar):
+        # Grab the Market Data History
+        try:    
+            market_data_history_dict = self.ib_client.market_data_history(contract_id, period, bar)
+        except HTTPError as e:
+            market_data_history_dict = {}
 
-    elif args.symbol:
-        pprint(stock_obj.search_stock_by_symbol(args.symbol))
+        return market_data_history_dict.get('data', [])
 
-    else:
-        pprint(stock_obj.portfolio_account_summary(args.account_id))
+    def get_market_data_history_list(self, contract_id, period, bar):
+        data_list = self.get_market_data_history(contract_id, period, bar)
+        data_list = self._update_data_list(data_list)
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Get stock details with Interactive Brokers.')
-    parser.add_argument('--username', required=True, help='YOUR_USERNAME')
-    parser.add_argument('--passkey', help='YOUR_PASSWORD')
-    parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
-    parser.add_argument('--conid', help='Give contract symbol')
-    parser.add_argument('--symbol', help='Give contract symbol')
-    args = parser.parse_args()
-
-    # Create a new session of the IB Web API.
-    ib_client = IBClient(
-        username=args.username,
-        account=args.account_id,
-        is_server_running=True
-    )
-    auth_status = False
-    if args.passkey:
-        ib_client, auth_status = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey])
-
-    if not args.passkey:
-        main(ib_client, args)
-    elif auth_status:
-        main(ib_client, args)
-    else:
-        sys.exit("Authentication not successful.")
-
+        return data_list

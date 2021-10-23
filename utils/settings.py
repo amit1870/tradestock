@@ -1,6 +1,6 @@
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Build paths inside the project like this: BASE_DIR / 'pcv'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Secret Key
@@ -17,6 +17,8 @@ EMAIL = {
 
 # PosixPath
 LOG_FILE_PATH = BASE_DIR.joinpath('stocks.log')
+
+DATA_DIR = BASE_DIR.joinpath('data')
 
 # API configurations
 API = {

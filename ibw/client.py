@@ -1174,7 +1174,7 @@ class IBClient():
 
         return content
 
-    def market_data(self, conids: List[str], since: str, fields: List[str]) -> Dict:
+    def market_data(self, conids: List[str], since: int, fields: List[str]) -> Dict:
         """
             Get Market Data for the given conid(s). The end-point will return by 
             default bid, ask, last, change, change pct, close, listing exchange. 
@@ -1264,6 +1264,46 @@ class IBClient():
             endpoint=endpoint,
             req_type=req_type,
             params=params
+        )
+
+        return content
+
+    def unsubscribe_single_market_data_history(self, conid: str) -> Dict:
+        """Cancel Single Market Data History.
+
+        Arguments:
+        ----        
+        conid {str} -- The contract ID.
+
+        Returns:
+        ----
+        {Dict} -- The response dictionary.
+        """
+
+        # define request components
+        endpoint = 'iserver/marketdata/{}/unsubscribe'.format(conid)
+        req_type = 'GET'
+        content = self._make_request(
+            endpoint=endpoint,
+            req_type=req_type
+        )
+
+        return content
+
+    def unsubscribe_all_market_data_history(self) -> Dict:
+        """Cancel All Market Data History.
+
+        Returns:
+        ----
+        {Dict} -- The response dictionary.
+        """
+
+        # define request components
+        endpoint = 'iserver/marketdata/unsubscribeall'
+        req_type = 'GET'
+        content = self._make_request(
+            endpoint=endpoint,
+            req_type=req_type
         )
 
         return content
