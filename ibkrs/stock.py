@@ -1,6 +1,7 @@
 import sys
 import argparse
 import logging
+import time
 import pandas as pd
 
 from datetime import datetime, timezone
@@ -144,3 +145,13 @@ class Stock(object):
         data_list = self._update_data_list(data_list)
 
         return data_list
+
+    def get_current_market_data_snapshot(self, conid):
+        ''' Get market snapshot current data.'''
+
+        current_time_stamp_ms = int(time.time() * 1000)
+
+        str_conid = '{}'.format(conid)
+        conids = [str_conid]
+        fields = ['30', '70', '71']
+        return self.ib_client.market_data(conids, current_time_stamp_ms, fields)

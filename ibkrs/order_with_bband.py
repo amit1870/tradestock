@@ -4,6 +4,7 @@ This script will provide Bollinger Band values for given contract id.
 import sys
 import os
 import argparse
+import time
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,148 +17,91 @@ from utils import helper as hp
 from stock import Stock
 from utils.helper import print_df
 
-def place_order_with_bollinger_band(stock_obj, account_id, conid, time_period, bar, period, upper, lower):
+MINUTE = 60 # Seconds
+NAP_SLEEP = MINUTE * 1
 
-    market_data_list = stock_obj.get_market_data_history_list(conid, time_period, bar)
+def place_order_with_bollinger_band(stock_obj, account_id, conid, side):
+    if side == 'SELL':
+        stock_postion_dict = stock_obj.search_stock_by_conid(account_id, conid)
+        quantity = stock_postion_dict.get('position', 0)
 
+    else:
+        # get balance and calculate number of position to buy
+        balance_type = 'AVB'
+        account_balance_dict = stock_obj.get_account_balance(account_id, balance_type)
+        account_balance = account_balance_dict.get('amount', 0)
+        quantity = account_balance // current_close
 
-    if market_data_list:
-        stock_obj.ib_client.unsubscribe_all_market_data_history()
-        
-        current_time_stamp_ms = hp.get_current_time_in_ms()
+    order_dict = {
+        'account_id': account_id,
+        'conid': conid,
+        'side': side,
+        'quantity': quantity
+    }
 
-        str_conid = '{}'.format(conid)
-        conids = [str_conid]
-        fields = ['30', '70', '71']
-        current_market_data = stock_obj.ib_client.market_data(conids, current_time_stamp_ms, fields)
+    orders = hp.prepare_order_dict_from_args(order_dict)
+    order_status = stock_obj.place_order_stock(account_id, orders)
 
-        if current_market_data:
-            current_market_data_dict = current_market_data[0]
-            close_price = hp.convert_str_into_number(current_market_data_dict.get('31', 0))
-            current_market_data_dict = hp.update_current_market_data(current_market_data_dict)
-
-        if close_price:
-            market_data_list.append(current_market_data_dict)
-            bolinger_frame = hp.get_bollinger_band(market_data_list, period, upper, lower, plot=True)
-            side = hp.get_signal_for_last_frame(bolinger_frame, close_price)
-
-            order_status = {}
-            quantity = 0
-
-            if side == 'NAN':
-                return order_status, side
-
-            elif side == 'SELL': # SELL
-                stock_postion = stock_obj.search_stock_by_conid(account_id, conid)
-
-                if stock_postion:
-                    quantity = stock_postion.get('position', 0)
-
-            else: # BUY
-                # get balance and calculate number of position to buy
-                balance_type = 'AVB'
-                account_balance_dict = stock_obj.get_account_balance(account_id, balance_type)
-                account_balance = account_balance_dict.get('amount', 0)
-                quantity = account_balance // current_close
-
-            order_dict = {
-                "secType": "secType = {}:STK".format(conid),
-                "orderType": "MKT",
-                "listingExchange": "SMART",
-                "isSingleGroup": True,
-                "outsideRTH": False,
-                "price": 0,
-                "tif": "DAY",
-                "referrer": "QuickTrade",
-                "quantity": quantity,
-                "fxQty": 0,
-                "useAdaptive": True,
-                "isCcyConv": False,
-                "allocationMethod": "AvailableEquity",
-                "acctId": account_id,
-                "conid": conid,
-                "side": side,
-                "cOID": "OID-{}".format(random.randint(1,1000))
-            }
-
-            orders = {"orders" : [order_dict]}
-            order_status = stock_obj.place_order_stock(ACCOUNT, orders)
-            
-            return order_status, side
-
-
+    return order_status
 
 def main(ib_client, args):
 
     stock_obj = Stock(ib_client)
 
-    market_data_list = stock_obj.get_market_data_history_list(args.conid, args.time_period, args.bar)
+    conid = args.conid
+    account_id = args.account_id
+
+    market_data_list = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
 
 
     if market_data_list:
         stock_obj.ib_client.unsubscribe_all_market_data_history()
         
-        current_time_stamp_ms = hp.get_current_time_in_ms()
+        current_market_data = stock_obj.get_current_market_data_snapshot(conid)
 
-        str_conid = '{}'.format(args.conid)
-        conids = [str_conid]
-        fields = ['30', '70', '71']
-        current_market_data = stock_obj.ib_client.market_data(conids, current_time_stamp_ms, fields)
+        first_add_flag = True
 
-        if current_market_data:
-            current_market_data_dict = current_market_data[0]
-            close_price = hp.convert_str_into_number(current_market_data_dict.get('31', 0))
-            current_market_data_dict = hp.update_current_market_data(current_market_data_dict)
+        while current_market_data:
 
-        if close_price:
-            market_data_list.append(current_market_data_dict)
+            snapshot_data = current_market_data[0]
+            current_close = hp.convert_str_into_number(snapshot_data.get('31'))
+            snapshot_data_dict = hp.update_current_market_data(snapshot_data)
+
+            print("{} Running Bollinger with close price {}.....".format(
+                hp.get_datetime_obj_in_str(),
+                current_close))
+
+            if first_add_flag:
+                market_data_list.append(snapshot_data_dict)
+                first_add_flag = False
+            else:
+                market_data_list = market_data_list[:-1]
+                market_data_list.append(snapshot_data_dict)
+
             bolinger_frame = hp.get_bollinger_band(market_data_list, args.period, args.upper, args.lower, plot=True)
-            side = hp.get_signal_for_last_frame(bolinger_frame, close_price)
+            side = hp.get_signal_for_last_frame(bolinger_frame, current_close)
 
-            order_status = {}
-            quantity = 0
+            last_bolinger_frame = bolinger_frame.iloc[-1]
 
-            if side == 'NAN':
-                return order_status, side
+            if side != 'NAN':
+                order_status = place_order_with_bollinger_band(stock_obj, account_id, conid, side)
+                print("{} {} took place against with Bollinger Upper {} Close {} Lower {}".format(
+                    hp.get_datetime_obj_in_str(),
+                    side,
+                    last_bolinger_frame['Upper'],
+                    current_close,
+                    last_bolinger_frame['Lower']))
+            else:
+                print("{} Current Close does not cross Bollinger Upper {} Close {} Lower {}".format(
+                    hp.get_datetime_obj_in_str(),
+                    last_bolinger_frame['Upper'],
+                    current_close,
+                    last_bolinger_frame['Lower']))
 
-            elif side == 'SELL': # SELL
-                stock_postion = stock_obj.search_stock_by_conid(ACCOUNT, CONID)
+            current_market_data = stock_obj.get_current_market_data_snapshot(conid)
 
-                if stock_postion:
-                    quantity = stock_postion.get('position', 0)
-
-            else: # BUY
-                # get balance and calculate number of position to buy
-                balance_type = 'AVB'
-                account_balance_dict = stock_obj.get_account_balance(ACCOUNT, balance_type)
-                account_balance = account_balance_dict.get('amount', 0)
-                quantity = account_balance // current_close
-
-            order_dict = {
-                "secType": "secType = {}:STK".format(CONID),
-                "orderType": "MKT",
-                "listingExchange": "SMART",
-                "isSingleGroup": True,
-                "outsideRTH": False,
-                "price": 0,
-                "tif": "DAY",
-                "referrer": "QuickTrade",
-                "quantity": quantity,
-                "fxQty": 0,
-                "useAdaptive": True,
-                "isCcyConv": False,
-                "allocationMethod": "AvailableEquity",
-                "acctId": ACCOUNT,
-                "conid": CONID,
-                "side": side,
-                "cOID": "OID-{}".format(random.randint(1,1000))
-            }
-
-            orders = {"orders" : [order_dict]}
-            order_status = stock_obj.place_order_stock(ACCOUNT, orders)
-            
-            return order_status, side
-
+            print("Going to take nap for {}s....".format(NAP_SLEEP))
+            time.sleep(NAP_SLEEP)
 
 
 if __name__ == "__main__":

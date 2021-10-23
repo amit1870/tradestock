@@ -6,6 +6,7 @@ import contextlib
 import sys
 import os
 import time
+import random
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,6 +16,7 @@ from requests.exceptions import HTTPError
 
 from .auto_mode import auto_mode_on_accounts
 from utils.settings import ACCOUNTS, DATA_DIR
+from stock_config import ORDERS
 from utils.lsr_opr import get_context, decrypt_lsr
 
 NEW_LINE_CHAR = '\n'
@@ -84,9 +86,9 @@ def get_signal(df):
 
 def get_signal_for_last_frame(df, close_price):
     """ Function to get Sell or Buy signal."""
-    if close_price > dataframe['Upper'][-1]: # SELL
+    if close_price > df['Upper'][-1]: # SELL
         return "SELL"
-    elif close_price < dataframe['Lower'][-1]: # BUY
+    elif close_price < df['Lower'][-1]: # BUY
         return "BUY"
 
     return "NAN"
@@ -313,7 +315,6 @@ def get_current_time_in_ms():
 
 
 def update_current_market_data(data):
-    data = {"70": "150.18","71": "148.64","_updated": 1634994594700, "31": "148.77"}
     current_open = convert_str_into_number(data.pop('31'))
     current_high = convert_str_into_number(data.pop('70'))
     current_low = convert_str_into_number(data.pop('71'))
@@ -328,3 +329,55 @@ def update_current_market_data(data):
     data['Low'] = current_low
 
     return data
+
+
+def prepare_order_dict_from_args(args_dict):
+    # Update ORDERS dictionary
+    ORDERS['acctId'] = args_dict.get('account_id')
+    ORDERS['conid'] = args_dict.get('conid')
+    ORDERS['side'] = args_dict.get('side')
+
+
+    ORDERS['cOID'] = "ORDER-ID-{}".format(random.randint(313,919))
+    ORDERS['ticker'] = "{}".format(args_dict.get('conid'))
+    ORDERS['secType'] = "secType = {}:STK".format(args_dict.get('conid'))
+
+    if 'ticker' in args_dict:
+        ORDERS['ticker'] = args_dict.get('ticker')
+
+    if 'sec_type' in args_dict:
+        ORDERS['secType'] = args_dict.get('sec_type')
+
+    if 'order_type' in args_dict:
+        ORDERS['orderType'] = args_dict.get('order_type')
+
+    if 'quantity' in args_dict:
+        ORDERS['quantity'] = args_dict.get('quantity')
+
+    if 'listingExchange' in args_dict:
+        ORDERS['listingExchange'] = args_dict.get('listingExchange')
+
+    if 'isSingleGroup' in args_dict:
+        ORDERS['isSingleGroup'] = args_dict.get('isSingleGroup')
+
+    if 'outsideRTH' in args_dict:
+        ORDERS['outsideRTH'] = args_dict.get('outsideRTH')
+
+    if 'price' in args_dict:
+        ORDERS['price'] = args_dict.get('price')
+
+    if 'referrer' in args_dict:
+        ORDERS['referrer'] = args_dict.get('referrer')
+
+    if 'useAdaptive' in args_dict:
+        ORDERS['useAdaptive'] = args_dict.get('useAdaptive')
+
+    if 'allocationMethod' in args_dict:
+        ORDERS['allocationMethod'] = args_dict.get('allocationMethod')
+
+    if 'tif' in args_dict:
+        ORDERS['tif'] = args_dict.get('tif')
+
+    orders = {"orders" : [ORDERS]}
+
+    return orders
