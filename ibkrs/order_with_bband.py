@@ -24,7 +24,7 @@ MINUTE = 60 # Seconds
 NAP_SLEEP = MINUTE * 1
 
 logging.basicConfig(
-    filename=BOLLINGER_LOG_FILE.as_posix(),
+    filename='app1.log',
     format='%(levelname)s - %(name)s - %(message)s',
     level=logging.DEBUG
 )
