@@ -67,10 +67,10 @@ class Stock(object):
         if order_response:
             response_id_dict = order_response[0]
             reply_id = response_id_dict.get('id', None)
-                reply_response = self.ib_client.place_order_reply(
-                    reply_id=reply_id,
-                    reply=True)
-                order_status = reply_response
+            reply_response = self.ib_client.place_order_reply(
+                reply_id=reply_id,
+                reply=True)
+            order_status = reply_response
 
         return order_status
 
