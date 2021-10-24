@@ -93,9 +93,7 @@ def main(ib_client, args):
                     market_data_list.append(snapshot_data_dict)
 
                 bolinger_frame = hp.get_bollinger_band(market_data_list, args.period, args.upper, args.lower, plot=False)
-                side = hp.get_signal_for_last_frame(bolinger_frame, current_close)
-
-                last_bolinger_frame = bolinger_frame.iloc[-1]
+                side, b_upper, b_lower = hp.get_signal_for_last_frame(bolinger_frame, current_close)
 
                 if side != 'NAN':
                     order_status = place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close)
@@ -103,17 +101,17 @@ def main(ib_client, args):
                     logging.info("{current_time} {side} took place against with Bollinger Upper {upper} Close {close} Lower {lower}".format(
                         current_time=hp.get_datetime_obj_in_str(),
                         side=side,
-                        upper=last_bolinger_frame['Upper'],
+                        upper=b_upper,
                         close=current_close,
-                        lower=last_bolinger_frame['Lower']
+                        lower=b_lower
                         )
                     )
                 else:
                     logging.info("{current_time} Current Close does not cross Bollinger Upper {} Close {} Lower {}".format(
                         current_time=hp.get_datetime_obj_in_str(),
-                        upper=last_bolinger_frame['Upper'],
+                        upper=b_upper,
                         close=current_close,
-                        lower=last_bolinger_frame['Lower']
+                        lower=b_lower
                         )
                     )
 
