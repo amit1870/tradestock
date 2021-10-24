@@ -59,7 +59,7 @@ def main(ib_client, args):
 
         first_add_flag = True
 
-        current_market_data = stock_obj.get_current_market_data_snapshot(conid, first_add_flag)
+        current_market_data = stock_obj.get_current_market_data_snapshot(conid)
 
         while current_market_data:
 
@@ -101,7 +101,7 @@ def main(ib_client, args):
                         current_close,
                         last_bolinger_frame['Lower']))
 
-            current_market_data = stock_obj.get_current_market_data_snapshot(conid, first_add_flag)
+            current_market_data = stock_obj.get_current_market_data_snapshot(conid, flag=False)
 
             print("Going to take nap for {}s....".format(NAP_SLEEP))
             time.sleep(NAP_SLEEP)
