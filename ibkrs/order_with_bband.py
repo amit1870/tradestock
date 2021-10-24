@@ -5,29 +5,14 @@ import sys
 import os
 import argparse
 import time
-import textwrap
-import logging
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-
-from requests.exceptions import HTTPError
-from datetime import datetime, timezone
 
 from ibw.client import IBClient
 from utils import helper as hp
 from stock import Stock
 from utils.helper import print_df
-from utils.settings import BOLLINGER_LOG_FILE
 
 MINUTE = 60 # Seconds
-NAP_SLEEP = MINUTE * 1
-
-logging.basicConfig(
-    filename=BOLLINGER_LOG_FILE.as_posix(),
-    format='%(levelname)s - %(name)s - %(message)s',
-    level=logging.INFO
-)
+NAP_SLEEP = MINUTE / 5
 
 def place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close):
     if side == 'SELL':
@@ -62,7 +47,6 @@ def main(ib_client, args):
 
     market_data_list = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
 
-
     if market_data_list:
         stock_obj.ib_client.unsubscribe_all_market_data_history()
 
@@ -74,12 +58,18 @@ def main(ib_client, args):
 
             snapshot_data = current_market_data[0]
 
+            print('{current_time} Current market data snapshot {snapshot_data}'.format(
+                current_time=hp.get_datetime_obj_in_str(),
+                snapshot_data=snapshot_data
+                )
+            )
+
             if '71' in  snapshot_data:
 
                 current_close = hp.convert_str_into_number(snapshot_data.get('31', snapshot_data.get('71')))
                 snapshot_data_dict = hp.update_current_market_data(snapshot_data)
 
-                logging.info('{current_time} Running Bollinger with close price {current_close}.....'.format(
+                print('{current_time} Running Bollinger with close price {current_close}.....'.format(
                     current_time=hp.get_datetime_obj_in_str(),
                     current_close=current_close
                     )
@@ -94,13 +84,14 @@ def main(ib_client, args):
 
                 bolinger_frame = hp.get_bollinger_band(market_data_list, args.period, args.upper, args.lower, plot=False)
                 side = hp.get_signal_for_last_frame(bolinger_frame, current_close)
-                b_upper = bolinger_frame['Upper'][-1]
-                b_lower = bolinger_frame['Lower'][-1]
+
+                b_upper = bolinger_frame['Upper'].iloc[-1]
+                b_lower = bolinger_frame['Lower'].iloc[-1]
 
                 if side != 'NAN':
                     order_status = place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close)
 
-                    logging.info("{current_time} {side} took place against with Bollinger Upper {upper} Close {close} Lower {lower}".format(
+                    print("{current_time} {side} took place against with Bollinger Upper {upper} Close {close} Lower {lower}".format(
                         current_time=hp.get_datetime_obj_in_str(),
                         side=side,
                         upper=b_upper,
@@ -109,7 +100,7 @@ def main(ib_client, args):
                         )
                     )
                 else:
-                    logging.info("{current_time} Current Close does not cross Bollinger Upper {} Close {} Lower {}".format(
+                    print("{current_time} Current Close does not cross Bollinger Upper {upper} Close {close} Lower {lower}".format(
                         current_time=hp.get_datetime_obj_in_str(),
                         upper=b_upper,
                         close=current_close,
@@ -119,7 +110,7 @@ def main(ib_client, args):
 
             current_market_data = stock_obj.get_current_market_data_snapshot(conid, flag=False)
 
-            logging.info('{current_time} Going to take nap for {nap}s....'.format(
+            print('{current_time} Going to take nap for {nap}s....'.format(
                 current_time=hp.get_datetime_obj_in_str(),
                 nap=NAP_SLEEP
                 )
