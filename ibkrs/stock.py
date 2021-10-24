@@ -67,52 +67,21 @@ class Stock(object):
         if order_response:
             response_id_dict = order_response[0]
             reply_id = response_id_dict.get('id', None)
-
-            if reply_id is not None:
-                confirm = True
                 reply_response = self.ib_client.place_order_reply(
                     reply_id=reply_id,
-                    reply=confirm)
+                    reply=True)
                 order_status = reply_response
 
         return order_status
 
     def place_order_stock_with_confirm(self, account_id, orders_list):
+        user_input = input(
+            'Would you like to place order? (y/N)? '
+        ).upper()
+
         order_status = {}
-
-        proceed = 'Yes'
-        proceed = input("Do you want to place order? Yes/No(Yes):")
-        proceed = proceed.strip()
-        if proceed == '':
-            proceed = 'Yes'
-
-        proceed = proceed.upper()
-
-        if proceed == 'YES' or proceed == 'Y':
-            # Place Order
-            order_response = self.ib_client.place_orders(
-                account_id=account_id,
-                orders=orders_list
-            )
-            order_status = order_response
-
-        if order_status:
-            response_id_dict = order_response[0]
-            reply_id = response_id_dict.get('id')
-
-            proceed = input("Do you want to confirm order id {}? Yes/No(Yes):".format(reply_id))
-            proceed = proceed.strip()
-            if proceed == '':
-                proceed = 'Yes'
-
-            proceed = proceed.upper()
-
-            if proceed == 'YES' or proceed == 'Y':
-                reply_response = self.ib_client.place_order_reply(
-                    reply_id=reply_id,
-                    reply=True)
-
-                order_status = reply_response
+        if user_input != 'N':
+            order_status = self.place_order_stock(account_id, order_list)
 
         return order_status
 
@@ -146,8 +115,12 @@ class Stock(object):
 
         return data_list
 
-    def get_current_market_data_snapshot(self, conid):
+    def get_current_market_data_snapshot(self, conid, flag=True):
         ''' Get market snapshot current data.'''
+
+        # Below must be called once to receive market data snapshot
+        if flag:
+            self.ib_client.server_accounts()
 
         current_time_stamp_ms = int(time.time() * 1000)
 
