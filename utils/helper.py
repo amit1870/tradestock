@@ -322,6 +322,7 @@ def update_current_market_data(data):
     timestamp_ms = data.pop('_updated') / 1000
     t_date = datetime.fromtimestamp(int(timestamp_ms), timezone.utc)
 
+    data = {}
     data['Date'] = t_date.date()
     data['Open'] = current_open
     data['Close'] = current_open
