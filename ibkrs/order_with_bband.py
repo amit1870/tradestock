@@ -20,7 +20,7 @@ from utils.helper import print_df
 MINUTE = 60 # Seconds
 NAP_SLEEP = MINUTE * 1
 
-def place_order_with_bollinger_band(stock_obj, account_id, conid, side):
+def place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close):
     if side == 'SELL':
         stock_postion_dict = stock_obj.search_stock_by_conid(account_id, conid)
         quantity = stock_postion_dict.get('position', 0)
@@ -84,7 +84,7 @@ def main(ib_client, args):
             last_bolinger_frame = bolinger_frame.iloc[-1]
 
             if side != 'NAN':
-                order_status = place_order_with_bollinger_band(stock_obj, account_id, conid, side)
+                order_status = place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close)
                 print("{} {} took place against with Bollinger Upper {} Close {} Lower {}".format(
                     hp.get_datetime_obj_in_str(),
                     side,
