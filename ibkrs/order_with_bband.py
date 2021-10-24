@@ -5,6 +5,8 @@ import sys
 import os
 import argparse
 import time
+import textwrap
+import logging
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,9 +18,16 @@ from ibw.client import IBClient
 from utils import helper as hp
 from stock import Stock
 from utils.helper import print_df
+from utils.settings import BOLLINGER_LOG_FILE
 
 MINUTE = 60 # Seconds
 NAP_SLEEP = MINUTE * 1
+
+logging.basicConfig(
+    filename=BOLLINGER_LOG_FILE.as_posix(),
+    format='%(levelname)s - %(name)s - %(message)s',
+    level=logging.DEBUG
+)
 
 def place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close):
     if side == 'SELL':
@@ -70,9 +79,11 @@ def main(ib_client, args):
                 current_close = hp.convert_str_into_number(snapshot_data.get('31', snapshot_data.get('71')))
                 snapshot_data_dict = hp.update_current_market_data(snapshot_data)
 
-                print("{} Running Bollinger with close price {}.....".format(
-                    hp.get_datetime_obj_in_str(),
-                    current_close))
+                logging.info('{current_time} Running Bollinger with close price {current_close}.....'.format(
+                    current_time=hp.get_datetime_obj_in_str(),
+                    current_close=current_close
+                    )
+                )
 
                 if first_add_flag:
                     market_data_list.append(snapshot_data_dict)
@@ -81,33 +92,45 @@ def main(ib_client, args):
                     market_data_list = market_data_list[:-1]
                     market_data_list.append(snapshot_data_dict)
 
-                bolinger_frame = hp.get_bollinger_band(market_data_list, args.period, args.upper, args.lower, plot=True)
+                bolinger_frame = hp.get_bollinger_band(market_data_list, args.period, args.upper, args.lower, plot=False)
                 side = hp.get_signal_for_last_frame(bolinger_frame, current_close)
 
                 last_bolinger_frame = bolinger_frame.iloc[-1]
 
                 if side != 'NAN':
                     order_status = place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close)
-                    print("{} {} took place against with Bollinger Upper {} Close {} Lower {}".format(
-                        hp.get_datetime_obj_in_str(),
-                        side,
-                        last_bolinger_frame['Upper'],
-                        current_close,
-                        last_bolinger_frame['Lower']))
+
+                    logging.info("{current_time} {side} took place against with Bollinger Upper {upper} Close {close} Lower {lower}".format(
+                        current_time=hp.get_datetime_obj_in_str(),
+                        side=side,
+                        upper=last_bolinger_frame['Upper'],
+                        close=current_close,
+                        lower=last_bolinger_frame['Lower']
+                        )
+                    )
                 else:
-                    print("{} Current Close does not cross Bollinger Upper {} Close {} Lower {}".format(
-                        hp.get_datetime_obj_in_str(),
-                        last_bolinger_frame['Upper'],
-                        current_close,
-                        last_bolinger_frame['Lower']))
+                    logging.info("{current_time} Current Close does not cross Bollinger Upper {} Close {} Lower {}".format(
+                        current_time=hp.get_datetime_obj_in_str(),
+                        upper=last_bolinger_frame['Upper'],
+                        close=current_close,
+                        lower=last_bolinger_frame['Lower']
+                        )
+                    )
 
             current_market_data = stock_obj.get_current_market_data_snapshot(conid, flag=False)
 
-            print("Going to take nap for {}s....".format(NAP_SLEEP))
+            logging.info('{current_time} Going to take nap for {nap}s....'.format(
+                current_time=hp.get_datetime_obj_in_str(),
+                nap=NAP_SLEEP
+                )
+            )
             time.sleep(NAP_SLEEP)
 
     else:
-        print("Market data snapshot history empty.")
+        logging.info('{current_time} Market data snapshot history empty.'.format(
+            current_time=hp.get_datetime_obj_in_str(),
+            )
+        )
 
 
 if __name__ == "__main__":
