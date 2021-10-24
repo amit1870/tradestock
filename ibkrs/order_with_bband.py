@@ -24,9 +24,9 @@ MINUTE = 60 # Seconds
 NAP_SLEEP = MINUTE * 1
 
 logging.basicConfig(
-    filename='app1.log',
+    filename=BOLLINGER_LOG_FILE.as_posix(),
     format='%(levelname)s - %(name)s - %(message)s',
-    level=logging.DEBUG
+    level=logging.INFO
 )
 
 def place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close):
