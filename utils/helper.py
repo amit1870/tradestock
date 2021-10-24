@@ -87,11 +87,11 @@ def get_signal(df):
 def get_signal_for_last_frame(df, close_price):
     """ Function to get Sell or Buy signal."""
     if close_price > df['Upper'][-1]: # SELL
-        return "SELL", df['Upper'][-1], df['Lower'][-1]
+        return "SELL"
     elif close_price < df['Lower'][-1]: # BUY
-        return "BUY", df['Upper'][-1], df['Lower'][-1]
+        return "BUY"
 
-    return "NAN", df['Upper'][-1], df['Lower'][-1]
+    return "NAN"
 
 def get_bollinger_band(data_list, period, upper, lower, plot=False):
 

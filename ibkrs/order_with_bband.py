@@ -93,7 +93,9 @@ def main(ib_client, args):
                     market_data_list.append(snapshot_data_dict)
 
                 bolinger_frame = hp.get_bollinger_band(market_data_list, args.period, args.upper, args.lower, plot=False)
-                side, b_upper, b_lower = hp.get_signal_for_last_frame(bolinger_frame, current_close)
+                side = hp.get_signal_for_last_frame(bolinger_frame, current_close)
+                b_upper = bolinger_frame['Upper'][-1]
+                b_lower = bolinger_frame['Lower'][-1]
 
                 if side != 'NAN':
                     order_status = place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close)
