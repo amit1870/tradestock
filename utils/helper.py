@@ -315,9 +315,9 @@ def get_current_time_in_ms():
 
 
 def update_current_market_data(data):
-    current_open = convert_str_into_number(data.pop('31'))
     current_high = convert_str_into_number(data.pop('70'))
     current_low = convert_str_into_number(data.pop('71'))
+    current_open = convert_str_into_number(data.pop('31', current_high))
 
     timestamp_ms = data.pop('_updated') / 1000
     t_date = datetime.fromtimestamp(int(timestamp_ms), timezone.utc)

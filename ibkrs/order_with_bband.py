@@ -65,9 +65,9 @@ def main(ib_client, args):
 
             snapshot_data = current_market_data[0]
 
-            if '31' in  snapshot_data:
+            if '71' in  snapshot_data:
 
-                current_close = hp.convert_str_into_number(snapshot_data.get('31'))
+                current_close = hp.convert_str_into_number(snapshot_data.get('31', snapshot_data.get('71')))
                 snapshot_data_dict = hp.update_current_market_data(snapshot_data)
 
                 print("{} Running Bollinger with close price {}.....".format(
