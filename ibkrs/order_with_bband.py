@@ -106,6 +106,9 @@ def main(ib_client, args):
             print("Going to take nap for {}s....".format(NAP_SLEEP))
             time.sleep(NAP_SLEEP)
 
+    else:
+        print("Market data snapshot history empty.")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Buy or Sell stock with Interactive Brokers.')
