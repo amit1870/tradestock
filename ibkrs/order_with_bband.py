@@ -118,7 +118,7 @@ def main(ib_client, args):
             time.sleep(NAP_SLEEP)
 
     else:
-        logging.info('{current_time} Market data snapshot history empty.'.format(
+        print('{current_time} Market data snapshot history empty.'.format(
             current_time=hp.get_datetime_obj_in_str(),
             )
         )
