@@ -21,12 +21,14 @@ def main(ib_client, args):
 
     stock_obj = Stock(ib_client)
 
-    data_frames = stock_obj.get_market_data_history_frame(args.conid, args.time_period, args.bar)
+    data_list = stock_obj.get_market_data_history_list(args.conid, args.time_period, args.bar)
 
-    if not data_frames.empty:
+    if data_list:
         stock_obj.ib_client.unsubscribe_all_market_data_history()
-        bolinger_frame = hp.get_bollinger_band(data_frames, args.period, args.upper, args.lower, plot=True)
+        bolinger_frame = hp.get_bollinger_band(data_list, args.period, args.upper, args.lower, plot=True)
         print_df(bolinger_frame)
+    else:
+        print("Market data snapshot history empty.")
 
 
 if __name__ == "__main__":
