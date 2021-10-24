@@ -15,7 +15,7 @@ from datetime import datetime, timedelta, timezone
 from requests.exceptions import HTTPError
 
 from .auto_mode import auto_mode_on_accounts
-from utils.settings import ACCOUNTS, DATA_DIR
+from utils.settings import ACCOUNTS, BASE_DIR
 from stock_config import ORDERS
 from utils.lsr_opr import get_context, decrypt_lsr
 
@@ -121,7 +121,7 @@ def get_bollinger_band(data_list, period, upper, lower, plot=False):
 
         plt.ylabel('USD Price ($)')
 
-        figure = "{}/fig1.jpg".format(DATA_DIR.as_posix())
+        figure = "{}/fig1.jpg".format(BASE_DIR.as_posix())
         plt.savefig("{}".format(figure))
         plt.close(figure)
 
@@ -149,7 +149,7 @@ def get_bollinger_band(data_list, period, upper, lower, plot=False):
         plt.xticks(rotation = 45)
         ax.legend()
 
-        figure = "{}/fig2.jpg".format(DATA_DIR.as_posix())
+        figure = "{}/fig2.jpg".format(BASE_DIR.as_posix())
         plt.savefig("{}".format(figure))
         plt.close(figure)
 
@@ -178,7 +178,7 @@ def get_bollinger_band(data_list, period, upper, lower, plot=False):
         plt.xticks(rotation = 45)
         ax.legend()
 
-        figure = "{}/fig3.jpg".format(DATA_DIR.as_posix())
+        figure = "{}/fig3.jpg".format(BASE_DIR.as_posix())
         plt.savefig("{}".format(figure))
         plt.close(figure)
 
