@@ -52,9 +52,6 @@ export DISPLAY="localhost:1"
 chromium-browser &
 
 # Git pull latest code base
-username=amit1870
-passkey=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
-echo "$username with password $passkey"
 BASE_DIR="$HOME/virenv"
 CODE_DIR="$BASE_DIR/pcv"
 cd $CODE_DIR || exit

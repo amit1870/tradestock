@@ -10,9 +10,11 @@ from ibw.client import IBClient
 from utils import helper as hp
 from stock import Stock
 from utils.helper import print_df
+from utils import settings
 
 MINUTE = 60 # Seconds
 NAP_SLEEP = MINUTE / 5
+sys.stdout = open(settings.BOLLINGER_LOG_FILE.as_posix(), 'w')
 
 def place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close):
     if side == 'SELL':
@@ -64,9 +66,9 @@ def main(ib_client, args):
                 )
             )
 
-            if '71' in  snapshot_data:
+            if '31' in  snapshot_data:
 
-                current_close = hp.convert_str_into_number(snapshot_data.get('31', snapshot_data.get('71')))
+                current_close = hp.convert_str_into_number(snapshot_data.get('31'))
                 snapshot_data_dict = hp.update_current_market_data(snapshot_data)
 
                 print('{current_time} Running Bollinger with close price {current_close}.....'.format(
@@ -115,6 +117,7 @@ def main(ib_client, args):
                 nap=NAP_SLEEP
                 )
             )
+            sys.stdout.flush()
             time.sleep(NAP_SLEEP)
 
     else:
@@ -122,6 +125,7 @@ def main(ib_client, args):
             current_time=hp.get_datetime_obj_in_str(),
             )
         )
+        sys.stdout.flush()
 
 
 if __name__ == "__main__":
