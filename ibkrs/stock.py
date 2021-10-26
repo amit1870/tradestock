@@ -115,12 +115,11 @@ class Stock(object):
 
         return data_list
 
-    def get_current_market_data_snapshot(self, conid, flag=True):
+    def get_current_market_data_snapshot(self, conid):
         ''' Get market snapshot current data.'''
 
         # Below must be called once to receive market data snapshot
-        if flag:
-            self.ib_client.server_accounts()
+        self.ib_client.server_accounts()
 
         current_time_stamp_ms = int(time.time() * 1000)
 

@@ -110,7 +110,7 @@ def main(ib_client, args):
                         )
                     )
 
-            current_market_data = stock_obj.get_current_market_data_snapshot(conid, flag=False)
+            current_market_data = stock_obj.get_current_market_data_snapshot(conid)
 
             print('{current_time} Going to take nap for {nap}s....'.format(
                 current_time=hp.get_datetime_obj_in_str(),
