@@ -319,6 +319,10 @@ def update_current_market_data(data):
     current_high = convert_str_into_number(data.pop('70',current_open))
     current_low = convert_str_into_number(data.pop('71',current_open))
 
+    if current_high == 0 or current_low == 0:
+        current_low = current_open
+        current_high = current_open
+
 
     timestamp_ms = data.pop('_updated') / 1000
     t_date = datetime.fromtimestamp(int(timestamp_ms), timezone.utc)
