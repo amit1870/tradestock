@@ -131,15 +131,11 @@ class Stock(object):
         attempted_data = []
         while attempt:
             attempted_data = self.ib_client.market_data(conids, current_time_stamp_ms, fields)
-            if attempted_data and '_updated' in attempted_data:
-                if current_time_stamp_ms != attempted_data.get('_updated'):
-                    current_time_stamp_ms = attempted_data.get('_updated')
 
-            print(attempted_data)
             if attempted_data and '31' in attempted_data[0]:
                 return attempted_data
-
-            print(attempt)
-            attempt += 1
+            elif attempted_data and '_updated' in attempted_data:
+                if current_time_stamp_ms != attempted_data.get('_updated'):
+                    current_time_stamp_ms = attempted_data.get('_updated')
 
             time.sleep(0.2)

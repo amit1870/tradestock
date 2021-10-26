@@ -42,8 +42,8 @@ echo $java_server_id
 BASE_DIR="$HOME/virenv"
 SERVER_DIR="$BASE_DIR/pcv/clientportal"
 cd ${SERVER_DIR} || exit
-nohup ./bin/run.sh root/conf.yaml &
-sleep 2
+nohup ./bin/run.sh root/conf.yaml & >> /dev/null
+sleep 3
 java_server_id=$(pidof java)
 echo $java_server_id
 

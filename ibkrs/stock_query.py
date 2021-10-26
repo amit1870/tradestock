@@ -10,15 +10,7 @@ from stock import Stock
 def main(ib_client, args):
 
     stock_obj = Stock(ib_client)
-
-    if args.conid:
-        pprint(stock_obj.search_stock_by_conid(args.account_id, args.conid))
-
-    elif args.symbol:
-        pprint(stock_obj.search_stock_by_symbol(args.symbol))
-
-    else:
-        pprint(stock_obj.portfolio_account_summary(args.account_id))
+    stock_obj.get_current_market_data_snapshot(args.conid)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get stock details with Interactive Brokers.')
@@ -39,10 +31,5 @@ if __name__ == '__main__':
     if args.passkey:
         ib_client, auth_status = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey])
 
-    if not args.passkey:
-        main(ib_client, args)
-    elif auth_status:
-        main(ib_client, args)
-    else:
-        sys.exit("Authentication not successful.")
+    main(ib_client, args)
 
