@@ -15,6 +15,7 @@ from utils import settings
 MINUTE = 60 # Seconds
 NAP_SLEEP = MINUTE / 5
 sys.stdout = open(settings.BOLLINGER_LOG_FILE.as_posix(), 'w')
+sys.stderr = open(settings.BOLLINGER_LOG_FILE.as_posix(), 'a')
 
 def place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close):
     if side == 'SELL':
