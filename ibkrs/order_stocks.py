@@ -10,67 +10,16 @@ from utils import helper as hp
 from stock import Stock
 from stock_config import ORDERS
 
-def prepare_order_dict_from_args(args):
-    # Update ORDERS dictionary
-    ORDERS['acctId'] = args.account_id
-    ORDERS['conid'] = args.conid
-    ORDERS['side'] = args.side
-
-
-    ORDERS['cOID'] = "ORDER-ID-{}".format(random.randint(313,919))
-    ORDERS['ticker'] = "{}".format(args.conid)
-    ORDERS['secType'] = "secType = {}:STK".format(args.conid)
-
-    if args.ticker:
-        ORDERS['ticker'] = args.ticker
-
-    if args.sec_type:
-        ORDERS['secType'] = args.sec_type
-
-    if args.order_type:
-        ORDERS['orderType'] = args.order_type
-
-    if args.quantity:
-        ORDERS['quantity'] = args.quantity
-
-    if args.listing_exchange:
-        ORDERS['listingExchange'] = args.listing_exchange
-
-    if args.is_single_group:
-        ORDERS['isSingleGroup'] = args.is_single_group
-
-    if args.outside_rth:
-        ORDERS['outsideRTH'] = args.outside_rth
-
-    if args.price:
-        ORDERS['price'] = args.price
-
-    if args.referrer:
-        ORDERS['referrer'] = args.referrer
-
-    if args.use_adaptive:
-        ORDERS['useAdaptive'] = args.use_adaptive
-
-    if args.allocation_method:
-        ORDERS['allocationMethod'] = args.allocation_method
-
-    if args.tif:
-        ORDERS['tif'] = args.tif
-
-    orders = {"orders" : [ORDERS]}
-
-    return orders
-
-
 def main(ib_client, args):
-    order_list = prepare_order_dict_from_args(args)
+    order_list = hp.prepare_order_dict_from_args(vars(args))
     stock_obj = Stock(ib_client)
     if args.confirm:
         order_status = stock_obj.place_order_stock_with_confirm(args.account_id, order_list)
     else:
         order_status = stock_obj.place_order_stock(args.account_id, order_list)
 
-    print(order_status)
+    print("Order has taken place with message {}".format(order_status))
+
 
 
 if __name__ == '__main__':
