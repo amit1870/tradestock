@@ -32,7 +32,7 @@ fi
 # Add new  $LOG_FILE
 touch ${LOG_FILE}
 
-DATE=`date`
+DATE=`env TZ=US/Eastern date`
 echo "$DATE" >> ${LOG_FILE}
 
 for (( i = 0; i < ${#passwords[@]}; i++ )); do

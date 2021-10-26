@@ -118,6 +118,14 @@ def main(ib_client, args):
                 nap=NAP_SLEEP
                 )
             )
+
+            tickle_response = stock_obj.ib_client.tickle()
+
+            print('{current_time} Tickling server to keep session active with response : {tickle_response}'.format(
+                current_time=hp.get_datetime_obj_in_str(),
+                tickle_response=tickle_response
+                )
+            )
             sys.stdout.flush()
             time.sleep(NAP_SLEEP)
 
