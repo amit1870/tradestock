@@ -214,41 +214,41 @@ def update_data(data, start_date_str):
 
     return data
 
+def reauthenticate_ib_client(ib_client):
+    auth_status = False
+    max_retries = 3
+
+    while max_retries and not auth_status:
+
+        auth_response = ib_client.is_authenticated()
+
+        if 'authenticated' in auth_response.keys() and auth_response['authenticated'] == True:
+            auth_status = True
+
+        elif 'authenticated' in auth_response.keys() and auth_response['authenticated'] == False:
+            valid_resp = ib_client.validate()
+            reauth_resp = ib_client.reauthenticate()
+            serv_resp = ib_client.server_accounts()
+
+            if 'accounts' in serv_resp:
+                auth_status = True
+
+        max_retries -= 1
+    
+    return ib_client, auth_status
+
 def authenticate_ib_client(ib_client, usernames, passwords):
     auth_status = False
-    attempt = 3
+
     try:
         ib_client.logout()
     except HTTPError as e:
         pass
 
     authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=2)
+
     if authenticated_accounts:
-        while attempt and not auth_status:
-            auth_response = ib_client.is_authenticated()
-            if 'authenticated' in auth_response.keys() and auth_response['authenticated']:
-                auth_status = True
-
-            if not auth_status:
-                ib_client.reauthenticate()
-
-            attempt -= 1
-    
-    return ib_client, auth_status
-
-def reauthenticate_ib_client(ib_client):
-    auth_status = False
-    attempt = 3
-
-    while attempt and not auth_status:
-        auth_response = ib_client.is_authenticated()
-        if 'authenticated' in auth_response.keys() and auth_response['authenticated']:
-            auth_status = True
-
-        if not auth_status:
-            ib_client.reauthenticate()
-
-        attempt -= 1
+        ib_client, auth_status = reauthenticate_ib_client(ib_client)
     
     return ib_client, auth_status
 
