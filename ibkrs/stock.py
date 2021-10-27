@@ -133,6 +133,8 @@ class Stock(object):
             if attempt_data and '31' not in attempt_data[0]:
                 current_time_stamp_ms = attempt_data[0].get('_updated', current_time_stamp_ms)
                 attempt -= 1
+            elif attempt_data and '31' in attempt_data[0]:
+                attempt = 0
 
             time.sleep(1)
 
