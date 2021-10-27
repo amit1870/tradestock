@@ -56,8 +56,17 @@ class Stock(object):
 
         return account_summary.get(BAL_TYPES.get(balance_type,'AVB')) if account_summary else account_summary
 
-    def place_order_stock(self, account_id, order_list):
+    def place_order_stock(self, account_id, order_list, confirm=False):
         order_status = {}
+
+        if confirm:
+            user_input = input(
+                'Would you like to place order? (y/N)? '
+            ).upper()
+
+        if confirm and user_input == 'N':
+            return order_status
+
 
         order_response = self.ib_client.place_orders(
             account_id=account_id,
@@ -73,18 +82,6 @@ class Stock(object):
             order_status = reply_response
 
         return order_status
-
-    def place_order_stock_with_confirm(self, account_id, order_list):
-        user_input = input(
-            'Would you like to place order? (y/N)? '
-        ).upper()
-
-        order_status = {}
-        if user_input != 'N':
-            order_status = self.place_order_stock(account_id, order_list)
-
-        return order_status
-
 
     def _update_data_list(self, data_list):
         for item in data_list:
@@ -102,7 +99,7 @@ class Stock(object):
 
     def get_market_data_history(self, contract_id, period, bar):
         # Grab the Market Data History
-        try:    
+        try:
             market_data_history_dict = self.ib_client.market_data_history(contract_id, period, bar)
         except HTTPError as e:
             market_data_history_dict = {}
@@ -121,21 +118,22 @@ class Stock(object):
         # Below must be called once to receive market data snapshot
         self.ib_client.server_accounts()
 
-        current_time_stamp_ms = int(time.time() * 1000)
+        current_time_stamp_ms = int(time.time() * 1000) - 60000
 
         str_conid = '{}'.format(conid)
         conids = [str_conid]
         fields = ['30', '70', '71']
 
-        attempt = 1
-        attempted_data = []
+        attempt = 10
+        attempt_data = []
         while attempt:
-            attempted_data = self.ib_client.market_data(conids, current_time_stamp_ms, fields)
 
-            if attempted_data and '31' in attempted_data[0]:
-                return attempted_data
-            elif attempted_data and '_updated' in attempted_data:
-                if current_time_stamp_ms != attempted_data.get('_updated'):
-                    current_time_stamp_ms = attempted_data.get('_updated')
+            attempt_data = self.ib_client.market_data(conids, current_time_stamp_ms, fields)
 
-            time.sleep(0.2)
+            if attempt_data and '31' not in attempt_data[0]:
+                current_time_stamp_ms = attempt_data[0].get('_updated', current_time_stamp_ms)
+                attempt -= 1
+
+            time.sleep(1)
+
+        return attempt_data

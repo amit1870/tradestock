@@ -13,11 +13,9 @@ from stock_config import ORDERS
 def main(ib_client, args):
     order_list = hp.prepare_order_dict_from_args(vars(args))
     print("Review Order Details: {}".format(order_list))
+
     stock_obj = Stock(ib_client)
-    if args.confirm:
-        order_status = stock_obj.place_order_stock_with_confirm(args.account_id, order_list)
-    else:
-        order_status = stock_obj.place_order_stock(args.account_id, order_list)
+    order_status = stock_obj.place_order_stock(args.account_id, order_list, confirm=args.confirm)
 
     print("Order has taken place with message {}".format(order_status))
 
@@ -59,9 +57,4 @@ if __name__ == '__main__':
     if args.passkey:
         ib_client, auth_status = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey])
 
-    if not args.passkey:
-        main(ib_client, args)
-    elif auth_status:
-        main(ib_client, args)
-    else:
-        sys.exit("Authentication not successful.")
+    main(ib_client, args)

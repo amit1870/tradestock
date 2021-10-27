@@ -51,6 +51,7 @@ def main(ib_client, args):
     market_data_list = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
 
     if market_data_list:
+
         stock_obj.ib_client.unsubscribe_all_market_data_history()
 
         first_add_flag = True
@@ -67,9 +68,9 @@ def main(ib_client, args):
                 )
             )
 
-            if '31' in  snapshot_data:
+            if '31' in  snapshot_data or '71' in snapshot_data:
 
-                current_close = hp.convert_str_into_number(snapshot_data.get('31'))
+                current_close = hp.convert_str_into_number(snapshot_data.get('31', snapshot_data.get('71')))
                 snapshot_data_dict = hp.update_current_market_data(snapshot_data)
 
                 print('{current_time} Running Bollinger with close price {current_close}.....'.format(
@@ -111,7 +112,13 @@ def main(ib_client, args):
                         )
                     )
 
-            current_market_data = stock_obj.get_current_market_data_snapshot(conid)
+            
+            tickle_response = stock_obj.ib_client.tickle()
+            print('{current_time} Tickling server to keep session active with response : {tickle_response}'.format(
+                current_time=hp.get_datetime_obj_in_str(),
+                tickle_response=tickle_response
+                )
+            )
 
             print('{current_time} Going to take nap for {nap}s....'.format(
                 current_time=hp.get_datetime_obj_in_str(),
@@ -119,22 +126,17 @@ def main(ib_client, args):
                 )
             )
 
-            tickle_response = stock_obj.ib_client.tickle()
-
-            print('{current_time} Tickling server to keep session active with response : {tickle_response}'.format(
-                current_time=hp.get_datetime_obj_in_str(),
-                tickle_response=tickle_response
-                )
-            )
-            sys.stdout.flush()
             time.sleep(NAP_SLEEP)
+
+            current_market_data = stock_obj.get_current_market_data_snapshot(conid)
 
     else:
         print('{current_time} Market data snapshot history empty.'.format(
             current_time=hp.get_datetime_obj_in_str(),
             )
         )
-        sys.stdout.flush()
+
+    sys.stdout.flush()
 
 
 if __name__ == "__main__":
