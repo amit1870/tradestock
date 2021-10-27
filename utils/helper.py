@@ -353,40 +353,40 @@ def prepare_order_dict_from_args(args_dict):
     ORDERS['ticker'] = "{}".format(args_dict.get('conid'))
     ORDERS['secType'] = "secType = {}:STK".format(args_dict.get('conid'))
 
-    if 'ticker' in args_dict:
+    if 'ticker' in args_dict and args.get('ticker') is not None:
         ORDERS['ticker'] = args_dict.get('ticker')
 
-    if 'sec_type' in args_dict:
+    if 'sec_type' in args_dict and args.get('sec_type') is not None:
         ORDERS['secType'] = args_dict.get('sec_type')
 
-    if 'order_type' in args_dict:
+    if 'order_type' in args_dict and args.get('order_type') is not None:
         ORDERS['orderType'] = args_dict.get('order_type')
 
-    if 'quantity' in args_dict:
+    if 'quantity' in args_dict and args.get('quantity') is not None:
         ORDERS['quantity'] = args_dict.get('quantity')
 
-    if 'listingExchange' in args_dict:
+    if 'listingExchange' in args_dict and args.get('listingExchange') is not None:
         ORDERS['listingExchange'] = args_dict.get('listingExchange')
 
-    if 'isSingleGroup' in args_dict:
+    if 'isSingleGroup' in args_dict and args.get('isSingleGroup') is not None:
         ORDERS['isSingleGroup'] = args_dict.get('isSingleGroup')
 
-    if 'outsideRTH' in args_dict:
+    if 'outsideRTH' in args_dict and args.get('outsideRTH') is not None:
         ORDERS['outsideRTH'] = args_dict.get('outsideRTH')
 
-    if 'price' in args_dict:
+    if 'price' in args_dict and args.get('price') is not None:
         ORDERS['price'] = args_dict.get('price')
 
-    if 'referrer' in args_dict:
+    if 'referrer' in args_dict and args.get('referrer') is not None:
         ORDERS['referrer'] = args_dict.get('referrer')
 
-    if 'useAdaptive' in args_dict:
+    if 'useAdaptive' in args_dict and args.get('useAdaptive') is not None:
         ORDERS['useAdaptive'] = args_dict.get('useAdaptive')
 
-    if 'allocationMethod' in args_dict:
+    if 'allocationMethod' in args_dict and args.get('allocationMethod') is not None:
         ORDERS['allocationMethod'] = args_dict.get('allocationMethod')
 
-    if 'tif' in args_dict:
+    if 'tif' in args_dict and args.get('tif') is not None:
         ORDERS['tif'] = args_dict.get('tif')
 
     orders = {"orders" : [ORDERS]}
