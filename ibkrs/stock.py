@@ -118,24 +118,23 @@ class Stock(object):
         # Below must be called once to receive market data snapshot
         self.ib_client.server_accounts()
 
-        current_time_stamp_ms = int(time.time() * 1000) - 60000
+        current_time_stamp_ms = int(time.time() * 1000)
 
         str_conid = '{}'.format(conid)
         conids = [str_conid]
         fields = ['30', '70', '71']
 
-        attempt = 5
+        attempt = 500
         attempt_data = []
         while attempt:
 
             attempt_data = self.ib_client.market_data(conids, current_time_stamp_ms, fields)
 
             if attempt_data and '31' not in attempt_data[0]:
-                current_time_stamp_ms = attempt_data[0].get('_updated', current_time_stamp_ms)
                 attempt -= 1
             elif attempt_data and '31' in attempt_data[0]:
                 attempt = 0
 
-            time.sleep(2)
+            time.sleep(0.2)
 
         return attempt_data
