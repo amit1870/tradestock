@@ -71,48 +71,50 @@ def main(ib_client, args):
             if '31' in  snapshot_data or '71' in snapshot_data:
 
                 current_close = hp.convert_str_into_number(snapshot_data.get('31', snapshot_data.get('71')))
-                snapshot_data_dict = hp.update_current_market_data(snapshot_data)
 
-                print('{current_time} Running Bollinger with close price {current_close}.....'.format(
-                    current_time=hp.get_datetime_obj_in_str(),
-                    current_close=current_close
-                    )
-                )
+                if current_close > 0:
 
-                if first_add_flag:
-                    market_data_list.append(snapshot_data_dict)
-                    first_add_flag = False
-                else:
-                    market_data_list = market_data_list[:-1]
-                    market_data_list.append(snapshot_data_dict)
+                    snapshot_data_dict = hp.update_current_market_data(snapshot_data)
 
-                bolinger_frame = hp.get_bollinger_band(market_data_list, args.period, args.upper, args.lower, plot=False)
-                side = hp.get_signal_for_last_frame(bolinger_frame, current_close)
-
-                b_upper = bolinger_frame['Upper'].iloc[-1]
-                b_lower = bolinger_frame['Lower'].iloc[-1]
-
-                if side != 'NAN':
-                    order_status = place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close)
-
-                    print("{current_time} {side} took place against with Bollinger Upper {upper} Close {close} Lower {lower}".format(
+                    print('{current_time} Running Bollinger with close price {current_close}.....'.format(
                         current_time=hp.get_datetime_obj_in_str(),
-                        side=side,
-                        upper=b_upper,
-                        close=current_close,
-                        lower=b_lower
-                        )
-                    )
-                else:
-                    print("{current_time} Current Close does not cross Bollinger Upper {upper} Close {close} Lower {lower}".format(
-                        current_time=hp.get_datetime_obj_in_str(),
-                        upper=b_upper,
-                        close=current_close,
-                        lower=b_lower
+                        current_close=current_close
                         )
                     )
 
-            
+                    if first_add_flag:
+                        market_data_list.append(snapshot_data_dict)
+                        first_add_flag = False
+                    else:
+                        market_data_list = market_data_list[:-1]
+                        market_data_list.append(snapshot_data_dict)
+
+                    bolinger_frame = hp.get_bollinger_band(market_data_list, args.period, args.upper, args.lower, plot=False)
+                    side = hp.get_signal_for_last_frame(bolinger_frame, current_close)
+
+                    b_upper = bolinger_frame['Upper'].iloc[-1]
+                    b_lower = bolinger_frame['Lower'].iloc[-1]
+
+                    if side != 'NAN':
+                        order_status = place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close)
+
+                        print("{current_time} {side} took place against with Bollinger Upper {upper} Close {close} Lower {lower}".format(
+                            current_time=hp.get_datetime_obj_in_str(),
+                            side=side,
+                            upper=b_upper,
+                            close=current_close,
+                            lower=b_lower
+                            )
+                        )
+                    else:
+                        print("{current_time} Current Close does not cross Bollinger Upper {upper} Close {close} Lower {lower}".format(
+                            current_time=hp.get_datetime_obj_in_str(),
+                            upper=b_upper,
+                            close=current_close,
+                            lower=b_lower
+                            )
+                        )
+
             tickle_response = stock_obj.ib_client.tickle()
             print('{current_time} Tickling server to keep session active with response : {tickle_response}'.format(
                 current_time=hp.get_datetime_obj_in_str(),
