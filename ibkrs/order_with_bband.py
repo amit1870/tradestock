@@ -126,6 +126,7 @@ def main(ib_client, args):
                 )
             )
 
+            sys.stdout.flush()
             time.sleep(NAP_SLEEP)
 
             current_market_data = stock_obj.get_current_market_data_snapshot(conid)
