@@ -234,6 +234,7 @@ def reauthenticate_ib_client(ib_client):
                 auth_status = True
 
         max_retries -= 1
+        time.sleep(1)
     
     return ib_client, auth_status
 
