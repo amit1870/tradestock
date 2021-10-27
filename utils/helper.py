@@ -228,10 +228,12 @@ def reauthenticate_ib_client(ib_client):
         elif 'authenticated' in auth_response.keys() and auth_response['authenticated'] == False:
             valid_resp = ib_client.validate()
             reauth_resp = ib_client.reauthenticate()
-            serv_resp = ib_client.server_accounts()
-
-            if 'accounts' in serv_resp:
-                auth_status = True
+            try:
+                serv_resp = ib_client.server_accounts()
+                if 'accounts' in serv_resp:
+                    auth_status = True
+            except HTTPError:
+                pass
 
         max_retries -= 1
         time.sleep(1)
