@@ -124,7 +124,7 @@ class Stock(object):
         conids = [str_conid]
         fields = ['30', '70', '71']
 
-        attempt = 10
+        attempt = 5
         attempt_data = []
         while attempt:
 
@@ -136,6 +136,6 @@ class Stock(object):
             elif attempt_data and '31' in attempt_data[0]:
                 attempt = 0
 
-            time.sleep(1)
+            time.sleep(2)
 
         return attempt_data
