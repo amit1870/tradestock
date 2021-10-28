@@ -116,6 +116,7 @@ class Stock(object):
         ''' Get market snapshot current data.'''
 
         # Below must be called once to receive market data snapshot
+
         self.ib_client.server_accounts()
 
         current_time_stamp_ms = int(time.time() * 1000)
@@ -124,7 +125,7 @@ class Stock(object):
         conids = [str_conid]
         fields = ['30', '70', '71']
 
-        attempt = 500
+        attempt = 10
         attempt_data = []
         while attempt:
 
