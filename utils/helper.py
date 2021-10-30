@@ -241,7 +241,7 @@ def reauthenticate_ib_client(ib_client, hard=False):
     
     return ib_client, auth_status
 
-def authenticate_ib_client(ib_client, usernames, passwords):
+def authenticate_ib_client(ib_client, usernames, passwords, hard=False):
     auth_status = False
 
     try:
@@ -252,7 +252,7 @@ def authenticate_ib_client(ib_client, usernames, passwords):
     authenticated_accounts = auto_mode_on_accounts(usernames, passwords, sleep_sec=2)
 
     if authenticated_accounts:
-        ib_client, auth_status = reauthenticate_ib_client(ib_client)
+        ib_client, auth_status = reauthenticate_ib_client(ib_client, hard=hard)
     
     return ib_client, auth_status
 

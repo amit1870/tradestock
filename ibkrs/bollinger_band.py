@@ -53,6 +53,6 @@ if __name__ == "__main__":
     )
     auth_status = False
     if args.passkey:
-        ib_client, auth_status = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey])
+        ib_client, auth_status = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey], hard=True)
 
     main(ib_client, args)
