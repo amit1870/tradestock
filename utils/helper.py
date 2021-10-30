@@ -214,7 +214,7 @@ def update_data(data, start_date_str):
 
     return data
 
-def reauthenticate_ib_client(ib_client):
+def reauthenticate_ib_client(ib_client, hard=False):
     auth_status = False
     max_retries = 3
 
@@ -228,12 +228,13 @@ def reauthenticate_ib_client(ib_client):
         elif 'authenticated' in auth_response.keys() and auth_response['authenticated'] == False:
             valid_resp = ib_client.validate()
             reauth_resp = ib_client.reauthenticate()
-            try:
-                serv_resp = ib_client.server_accounts()
-                if 'accounts' in serv_resp:
-                    auth_status = True
-            except HTTPError:
-                pass
+            if hard:
+                try:
+                    serv_resp = ib_client.server_accounts()
+                    if 'accounts' in serv_resp:
+                        auth_status = True
+                except HTTPError:
+                    pass
 
         max_retries -= 1
         time.sleep(1)
