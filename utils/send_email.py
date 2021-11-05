@@ -17,7 +17,7 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google.oauth2 import service_account
 
-from utils.settings import EMAIL, API, LOG_FILE_PATH
+from utils.settings import EMAIL, API, LOG_FILE_PATH, BOLLINGER_STOCK_FILE
 from utils import helper as hp
 
 HOUR = 3600
