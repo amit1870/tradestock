@@ -17,7 +17,6 @@ from stock import Stock
 from stock_config import BOLLINGER_CONF
 from utils.helper import print_df
 
-
 def main(ib_client, args):
 
     stock_obj = Stock(ib_client)
@@ -29,7 +28,7 @@ def main(ib_client, args):
         # grab account portfolios
         try:    
             account_positions = ib_client.portfolio_account_positions(
-                account_id=account_id,
+                account_id=args.account_id,
                 page_id=0
             )
         except HTTPError as e:
@@ -65,8 +64,16 @@ def main(ib_client, args):
         data_list = stock_obj.get_market_data_history_list(conid, time_period, bar)
 
         if data_list:
+
             bolinger_frame = hp.get_bollinger_band(data_list, period, upper, lower, plot=True)
-            print_df(bolinger_frame)
+
+            if args.conid:
+                print_df(bolinger_frame)
+            else:
+                print("Bollinger Decision for contract id {}".format(conid))
+                print(bolinger_frame.tail(5))
+                print("--------------------------------------------------------------------------")
+                print()
         else:
             print("Market data snapshot history empty for contract id {}.".format(conid))
 

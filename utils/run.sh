@@ -5,6 +5,7 @@ BASE_DIR="$HOME/virenv"
 CODE_DIR="$BASE_DIR/pcv"
 SERVER_DIR="$BASE_DIR/pcv/clientportal"
 LOG_FILE="$CODE_DIR/stocks.log"
+BOLLINGER_LOG_FILE="$CODE_DIR/bbstock.log"
 TOKEN_FILE_PATH="$HOME/virenv/token.json"
 NAP_SECONDS=10 # Seconds
 PF_STOCK=1
@@ -26,11 +27,11 @@ alias python='$BASE_DIR/bin/python'
 
 # Remove $LOG_FILE if already found.
 if [ -f "$LOG_FILE" ]; then
-    rm -f ${LOG_FILE}
+    rm -f ${LOG_FILE} ${BOLLINGER_LOG_FILE}
 fi
 
 # Add new  $LOG_FILE
-touch ${LOG_FILE}
+touch ${LOG_FILE} ${BOLLINGER_LOG_FILE}
 
 DATE=`env TZ=US/Eastern date`
 echo "$DATE" >> ${LOG_FILE}
@@ -39,6 +40,10 @@ for (( i = 0; i < ${#passwords[@]}; i++ )); do
     python "${CODE_DIR}/ibkrs/all_stocks.py" --username "${usernames[i]}" --passkey "${passwords[i]}"  \
            --account-id "${accounts[i]}" --stock-type "${AL_STOCK}" >> ${LOG_FILE} 2>&1
     echo "$NEW_LINE" >> ${LOG_FILE}
+
+    python "${CODE_DIR}/ibkrs/bollinger_band.py" --username "${usernames[i]}" \
+           --account-id "${accounts[i]}"  >> ${BOLLINGER_LOG_FILE} 2>&1
+    echo "$NEW_LINE" >> ${BOLLINGER_LOG_FILE}
 
     echo "Going to nap for ${NAP_SECONDS}sec.."
     sleep ${NAP_SECONDS}

@@ -198,6 +198,15 @@ if __name__ == '__main__':
                 html=True)
             message_list.append(message)
 
+            EMAIL['content'] = "<br/>".join(hp.read_file_content(BOLLINGER_STOCK_FILE.as_posix()))
+
+            message = create_plain_html_message(EMAIL['from'],
+                EMAIL['to'],
+                'Bollinger Stock Decision',
+                EMAIL['content'],
+                html=True)
+            message_list.append(message)
+
         for message in message_list:
             message_response = send_message(service, EMAIL['from'], message)
             print(message_response)

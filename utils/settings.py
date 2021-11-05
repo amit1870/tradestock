@@ -18,6 +18,7 @@ EMAIL = {
 # PosixPath
 LOG_FILE_PATH = BASE_DIR.joinpath('stocks.log')
 BOLLINGER_LOG_FILE = BASE_DIR.joinpath('bollinger.log')
+BOLLINGER_STOCK_FILE = BASE_DIR.joinpath('bbstock.log')
 
 
 # API configurations
