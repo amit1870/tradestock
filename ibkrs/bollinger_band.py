@@ -77,7 +77,7 @@ def main(ib_client, args):
                 print()
                 print(bolinger_frame.tail(5))
         else:
-            print("Market data snapshot history empty for contract id {}.".format(conid))
+            print("Market data snapshot history empty for contract id {}({}).".format(conid, symbols[idx]))
 
     else:
         stock_obj.ib_client.unsubscribe_all_market_data_history()
