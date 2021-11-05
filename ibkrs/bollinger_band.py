@@ -22,6 +22,7 @@ def main(ib_client, args):
     stock_obj = Stock(ib_client)
 
     contract_ids = []
+    symbols = []
 
     if not args.conid:
 
@@ -38,6 +39,8 @@ def main(ib_client, args):
             for key, val in row.items():
                 if key == 'conid':
                     contract_ids.append(val)
+                elif key == 'contractDesc':
+                    symbols.append(val)
     else:
         contract_ids.append(args.conid)
 
@@ -59,7 +62,7 @@ def main(ib_client, args):
     if args.lower:
         lower = args.lower
 
-    for conid in contract_ids:
+    for idx, conid in enumerate(contract_ids):
 
         data_list = stock_obj.get_market_data_history_list(conid, time_period, bar)
 
@@ -70,7 +73,8 @@ def main(ib_client, args):
             if args.conid:
                 print_df(bolinger_frame)
             else:
-                print("Bollinger Decision for contract id {}".format(conid))
+                print("Bollinger Decision for contract id {}({})".format(conid, symbols[idx]))
+                print()
                 print(bolinger_frame.tail(5))
                 print("--------------------------------------------------------------------------")
                 print()

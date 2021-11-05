@@ -16,7 +16,6 @@ from requests.exceptions import HTTPError
 
 from .auto_mode import auto_mode_on_accounts
 from utils.settings import ACCOUNTS, BASE_DIR
-from stock_config import ORDERS
 from utils.lsr_opr import get_context, decrypt_lsr
 
 NEW_LINE_CHAR = '\n'
