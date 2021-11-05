@@ -76,8 +76,6 @@ def main(ib_client, args):
                 print("Bollinger Decision for contract id {}({})".format(conid, symbols[idx]))
                 print()
                 print(bolinger_frame.tail(5))
-                print("--------------------------------------------------------------------------")
-                print()
         else:
             print("Market data snapshot history empty for contract id {}.".format(conid))
 
