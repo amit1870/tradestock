@@ -278,7 +278,7 @@ def change_line_color(line, color_code):
     span_close = '</span>'
 
     line_words.insert(-3, span_word)
-    line.insert(-1, span_close)
+    line_words.insert(-1, span_close)
 
     line = "|".join(line_words)
 
@@ -301,6 +301,8 @@ def read_file_content(file_path, preserve_space=True):
 
     preserve_spaced_lines = []
     for line in lines:
+        line = convert_space_to_html_code(line)
+
         line_split = line.split('nan')
         if len(line_split) == 2:
             last_word = line_split[-1]
@@ -310,6 +312,7 @@ def read_file_content(file_path, preserve_space=True):
             line = change_line_color(line, color_code)
 
         line = convert_space_to_html_code(line)
+        line = line.replace('<span&nbsp;', '<span ')
         preserve_spaced_lines.append(line)
 
     return preserve_spaced_lines
