@@ -10,12 +10,18 @@ import matplotlib.pyplot as plt
 
 from requests.exceptions import HTTPError
 from datetime import datetime, timezone
+from tabulate import tabulate
 
 from ibw.client import IBClient
 from utils import helper as hp
 from stock import Stock
 from stock_config import BOLLINGER_CONF
 from utils.helper import print_df
+
+# pd.set_option('display.max_columns', None)
+# pd.set_option('display.max_rows', None)
+pdtabulate = lambda df: tabulate(df, headers='keys', tablefmt='psql')
+
 
 def main(ib_client, args):
 
@@ -73,9 +79,10 @@ def main(ib_client, args):
             if args.conid:
                 print_df(bolinger_frame)
             else:
-                print("Bollinger Decision for contract id {}({})".format(conid, symbols[idx]))
+                print("Bollinger Decision for contract id <b>{}({})</b>".format(conid, symbols[idx]))
                 print()
-                print(bolinger_frame.tail(5))
+                print(pdtabulate(bolinger_frame.tail(5)))
+                print()
         else:
             print("Market data snapshot history empty for contract id {}({}).".format(conid, symbols[idx]))
 

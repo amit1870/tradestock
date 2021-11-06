@@ -273,14 +273,23 @@ def convert_space_to_html_code(string):
     return "".join(string_chr)
 
 
-def read_file_content(file_path):
+def read_file_content(file_path, preserve_space=True):
     try:
         with open(file_path) as f:
             lines = f.readlines()
     except FileNotFoundError:
         lines = []
 
-    return lines
+    if not preserve_space:
+        return lines
+
+    preserve_spaced_lines = []
+    for line in lines:
+        line = convert_space_to_html_code(line)
+        preserve_spaced_lines.append(line)
+
+    return preserve_spaced_lines
+
 
 def parse_file_output(output_file):
     try:
