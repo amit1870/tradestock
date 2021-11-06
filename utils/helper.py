@@ -272,6 +272,18 @@ def convert_space_to_html_code(string):
 
     return "".join(string_chr)
 
+def change_line_color(line, color_code):
+    line_words = line.split("|")
+    span_word = '<span style="color:{};font-weight:bold;">'.format(color_code)
+    span_close = '</span>'
+
+    line_words.insert(-3, span_word)
+    line.insert(-1, span_close)
+
+    line = "|".join(line_words)
+
+    return line
+
 
 def read_file_content(file_path, preserve_space=True):
     try:
@@ -283,8 +295,20 @@ def read_file_content(file_path, preserve_space=True):
     if not preserve_space:
         return lines
 
+    sell_color_code = "#28a745"
+    buy_color_code = "#e83e8c"
+    color_code = sell_color_code
+
     preserve_spaced_lines = []
     for line in lines:
+        line_split = line.split('nan')
+        if len(line_split) == 2:
+            last_word = line_split[-1]
+            if last_word.strip() == '|':
+                color_code = buy_color_code
+
+            line = change_line_color(line, color_code)
+
         line = convert_space_to_html_code(line)
         preserve_spaced_lines.append(line)
 
