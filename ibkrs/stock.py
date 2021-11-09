@@ -30,6 +30,18 @@ class Stock(object):
 
         return portfolio_position
 
+    def get_account_positions_by_page_id(self, account_id, page_id=0):
+        # grab account portfolios
+        try:
+            account_positions = self.ib_client.portfolio_account_positions(
+                account_id=account_id,
+                page_id=page_id
+            )
+        except HTTPError as e:
+            account_positions = []
+
+        return account_positions
+
     def portfolio_account_summary(self, account_id):
 
         # Grab the Specific Postion in a Portfolio.
@@ -55,6 +67,7 @@ class Stock(object):
             account_summary = {}
 
         return account_summary.get(BAL_TYPES.get(balance_type,'AVB')) if account_summary else account_summary
+
 
     def place_order_stock(self, account_id, order_list, confirm=False):
         order_status = {}

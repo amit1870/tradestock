@@ -3,6 +3,7 @@ import argparse
 import logging
 from requests.exceptions import HTTPError
 from ibw.client import IBClient
+from stock import Stock
 from utils import helper as hp
 
 logging.basicConfig(
@@ -11,8 +12,8 @@ logging.basicConfig(
     level=logging.DEBUG
 )
 
-HEADERS     = ['Username', 'AccountID', 'STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Currency']
-BUFFER      = 10
+HEADERS     = ['Username', 'AccountID', 'STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Balance', 'Currency']
+BUFFER      = 15
 SPACE       = ' '
 HEAD_SPACES = SPACE * 3
 HEADERS_LEN = len(HEAD_SPACES.join(HEADERS)) + BUFFER
@@ -26,16 +27,15 @@ SPACE_LEN   = 4
 SPACES      = ' ' * SPACE_LEN
 
 
-def print_stock(ib_client, username, account_id, stock_type='0'):
+def print_stock(stock_obj, username, account_id, stock_type='0'):
 
     # grab account portfolios
-    try:    
-        account_positions = ib_client.portfolio_account_positions(
-            account_id=account_id,
-            page_id=0
-        )
-    except HTTPError as e:
-        account_positions = []
+    account_positions = stock_obj.get_account_positions_by_page_id(account_id, page_id=0)
+
+    # Get account balance
+    account_balance_dict = stock_obj.get_account_balance(account_id, balance_type='AVB')
+    account_balance = account_balance_dict.get('amount', 0)
+    account_balance = "{:.2f}".format(round(account_balance, 2))
 
     stock_list = []
     negative_stock_list = []
@@ -44,6 +44,8 @@ def print_stock(ib_client, username, account_id, stock_type='0'):
     max_length_position = max_length_contractid = max_length_account_id = 0
     max_length_ps_ls = 5
     max_length_username = len(username)
+    max_length_balance = len(str(account_balance))
+
     for row in account_positions:
         for key, val in row.items():
             if key == 'contractDesc':
@@ -83,7 +85,7 @@ def print_stock(ib_client, username, account_id, stock_type='0'):
                     max_length_account_id = len_of_stock_account_id
 
         if row_account_id == account_id:
-            values = (username, row_account_id, stock, contractid, pnl, position, currency)
+            values = (username, row_account_id, stock, contractid, pnl, position, account_balance, currency)
 
             stock_list.append(values)
 
@@ -93,7 +95,7 @@ def print_stock(ib_client, username, account_id, stock_type='0'):
                 profitable_stock_list.append(values)
 
     print(DASH_HEADER)
-    print("{}{}{}{}{}{}{}{}{}{}{}{}{}{}".format(HEADERS[0],
+    print("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}".format(HEADERS[0],
                                                 SPACES,                                    
                                                 HEADERS[1],
                                                 SPACES,
@@ -107,7 +109,9 @@ def print_stock(ib_client, username, account_id, stock_type='0'):
                                                 SPACES,
                                                 HEADERS[6],
                                                 SPACES,
-                                                HEADERS[7]))
+                                                HEADERS[7],
+                                                SPACES,
+                                                HEADERS[8]))
     print(DASH_HEADER)
 
     if stock_type == NEGATIVE:
@@ -118,7 +122,7 @@ def print_stock(ib_client, username, account_id, stock_type='0'):
         selected_stock_list = stock_list
 
     for row in selected_stock_list:
-        uname, acc_id, name, conid, pnl, position, currency = row
+        uname, acc_id, name, conid, pnl, position, balance, currency = row
 
         profit_or_loss = ZERO
         if pnl < 0:
@@ -126,7 +130,7 @@ def print_stock(ib_client, username, account_id, stock_type='0'):
         elif pnl > 0:
             profit_or_loss = PROFIT
 
-        row = '{}{}{}{}{}{}{}{}{}{}{}{}{}{}'.format(uname,
+        row = '{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}'.format(uname,
                                                     SPACE * (max_length_username + SPACE_LEN - len(str(uname))),
                                                     acc_id,
                                                     SPACE * (max_length_account_id + SPACE_LEN - len(str(acc_id))),
@@ -140,17 +144,18 @@ def print_stock(ib_client, username, account_id, stock_type='0'):
                                                     SPACE * (max_length_ps_ls + SPACE_LEN - len(str(profit_or_loss))),
                                                     position,
                                                     SPACE * (max_length_position + SPACE_LEN - len(str(position))),
+                                                    balance,
+                                                    SPACE * (max_length_balance + SPACE_LEN - len(str(max_length_balance))),
                                                     currency)
         print(row)
 
     print(DASH_HEADER)
 
 def main(ib_client, args):
-    account_id = args.account_id
-    stock_type = '0'
-    if args.stock_type:
-        stock_type = args.stock_type
-    print_stock(ib_client, args.username, account_id, stock_type)
+
+    stock_obj = Stock(ib_client)
+
+    print_stock(stock_obj, args.username, args.account_id, args.stock_type)
 
 
 if __name__ == '__main__':

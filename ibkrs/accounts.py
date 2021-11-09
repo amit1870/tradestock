@@ -5,23 +5,23 @@ import logging
 from requests.exceptions import HTTPError
 from pprint import pprint
 from ibw.client import IBClient
+from stock import Stock
 from utils import helper as hp
 
-def portfolio_account_summary(ib_client, account_id):
+def get_account_balance(stock_obj, account_id, balance_type='AVB'):
 
-    # Grab the Specific Postion in a Portfolio.
-    try:    
-        account_summary = ib_client.portfolio_account_summary(
-            account_id=account_id,
-        )
-    except HTTPError as e:
-        account_summary = []
+    # Get account balance
+    account_balance_dict = stock_obj.get_account_balance(account_id, balance_type)
+    account_balance = account_balance_dict.get('amount', 0)
 
-    return account_summary
+    return account_balance
 
 def main(ib_client, args):
-    print(portfolio_account_summary(ib_client, args.account_id))
-    
+    stock_obj = Stock(ib_client)
+    balance = get_account_balance(stock_obj, args.account_id)
+    print('Username ',args.username, end=' | ')
+    print('AccountID ',args.account_id, end=' | ')
+    print('Balance ', balance, end=' | \n')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get stock details with Interactive Brokers.')
@@ -41,10 +41,4 @@ if __name__ == '__main__':
     if args.passkey:
         ib_client, auth_status = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey])
 
-    if not args.passkey:
-        main(ib_client, args)
-    elif auth_status:
-        main(ib_client, args)
-    else:
-        sys.exit("Authentication not successful.")
-
+    main(ib_client, args)
