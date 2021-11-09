@@ -10,7 +10,16 @@ from stock import Stock
 def main(ib_client, args):
 
     stock_obj = Stock(ib_client)
-    stock_obj.get_current_market_data_snapshot(args.conid)
+    
+    if args.conid:
+        pprint(stock_obj.search_stock_by_conid(args.account_id, args.conid))
+
+    elif args.symbol:
+        pprint(stock_obj.search_stock_by_symbol(args.symbol))
+
+    else:
+        pprint(stock_obj.ib_client.portfolio_account_info(args.account_id))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get stock details with Interactive Brokers.')
