@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Images
+*.jpg
+*.png
+
 # Pickle file
 token.pickle
 
@@ -42,6 +46,7 @@ pip-log.txt
 pip-delete-this-directory.txt
 stocks.log
 stocks.log.1
+nohup.out
 
 # Unit test / coverage reports
 htmlcov/
