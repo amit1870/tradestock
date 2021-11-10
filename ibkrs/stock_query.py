@@ -19,6 +19,7 @@ def main(ib_client, args):
 
     else:
         pprint(stock_obj.ib_client.portfolio_account_info(args.account_id))
+        pprint(stock_obj.ib_client.get_live_orders())
 
 
 if __name__ == '__main__':
