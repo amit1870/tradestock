@@ -41,11 +41,13 @@ for (( i = 0; i < ${#passwords[@]}; i++ )); do
            --account-id "${accounts[i]}" --stock-type "${AL_STOCK}" >> ${LOG_FILE} 2>&1
     echo "$NEW_LINE" >> ${LOG_FILE}
 
-    echo "Running Bollinger for account ${usernames[i]} ${accounts[i]} ..." >> ${BOLLINGER_LOG_FILE}
-    echo "$NEW_LINE" >> ${BOLLINGER_LOG_FILE}
+    ((j=i+1))
+    if [[ $j -eq ${#usernames[@]} ]]; then
 
-    python "${CODE_DIR}/ibkrs/bollinger_band.py" --username "${usernames[i]}" \
-           --account-id "${accounts[i]}"  >> ${BOLLINGER_LOG_FILE} 2>&1
+        echo "Running Bollinger for account ${usernames[i]} ${accounts[i]} ..." >> ${BOLLINGER_LOG_FILE}
+        python "${CODE_DIR}/ibkrs/bollinger_band.py" --username "${usernames[i]}" --account-id "${accounts[i]}"  >> ${BOLLINGER_LOG_FILE} 2>&1
+
+    fi
 
     echo "Going to nap for ${NAP_SECONDS}sec.."
     sleep ${NAP_SECONDS}
