@@ -14,8 +14,6 @@ from utils import settings
 
 MINUTE = 60 # Seconds
 NAP_SLEEP = MINUTE / 5
-sys.stdout = open(settings.BOLLINGER_LOG_FILE.as_posix(), 'w')
-sys.stderr = open(settings.BOLLINGER_LOG_FILE.as_posix(), 'a')
 
 def place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close):
     if side == 'SELL':
@@ -127,8 +125,6 @@ def main(ib_client, args):
                 nap=NAP_SLEEP
                 )
             )
-
-            sys.stdout.flush()
             time.sleep(NAP_SLEEP)
 
             current_market_data = stock_obj.get_current_market_data_snapshot(conid)
@@ -138,9 +134,6 @@ def main(ib_client, args):
             current_time=hp.get_datetime_obj_in_str(),
             )
         )
-
-    sys.stdout.flush()
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Buy or Sell stock with Interactive Brokers.')

@@ -390,12 +390,25 @@ def update_current_market_data(data):
 
 
 def prepare_order_dict_from_args(args_dict):
+    ORDERS = {
+        "orderType": "MKT",
+        "listingExchange": "SMART",
+        "isSingleGroup": True,
+        "outsideRTH": False,
+        "price": 0,
+        "tif": "DAY",
+        "referrer": "QuickTrade",
+        "fxQty": 0,
+        "useAdaptive": True,
+        "isCcyConv": False,
+        "allocationMethod": "AvailableEquity"
+    }
+
     # Update ORDERS dictionary
-    ORDERS = {}
+
     ORDERS['acctId'] = args_dict.get('account_id')
     ORDERS['conid'] = args_dict.get('conid')
     ORDERS['side'] = args_dict.get('side')
-
 
     ORDERS['cOID'] = "ORDER-ID-{}".format(random.randint(313,919))
     ORDERS['ticker'] = "{}".format(args_dict.get('conid'))
