@@ -27,6 +27,10 @@ def place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_
         account_balance = account_balance_dict.get('amount', 0)
         quantity = account_balance // current_close
 
+    # TODO: Remove this check when able to place order over 500
+    if quantity > 500:
+        quantity = 499
+
     order_dict = {
         'account_id': account_id,
         'conid': conid,
