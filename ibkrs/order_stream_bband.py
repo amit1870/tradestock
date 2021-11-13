@@ -118,7 +118,8 @@ def on_open(ws):
                 print('{current_time} Tickling server to keep session active with response : {tickle_response}'.format(
                     current_time=hp.get_datetime_obj_in_str(),
                     tickle_response=tickle_response
-                    )
+                    ),
+                    file=f
                 )
                 print('{current_time} Going to take nap for {nap}s....'.format(
                     current_time=hp.get_datetime_obj_in_str(),
