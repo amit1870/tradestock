@@ -3,7 +3,7 @@ echo "Running....."
 
 BASE_DIR="$HOME/virenv"
 CODE_DIR="$BASE_DIR/pcv"
-RESOURCE_DIR="$BASE_DIR/resources"
+RESOURCE_DIR="$CODE_DIR/resources"
 LOG_FILE="$RESOURCE_DIR/stocks.log"
 BOLLINGER_LOG_FILE="$RESOURCE_DIR/bbstock.log"
 NAP_SECONDS=10 # Seconds
