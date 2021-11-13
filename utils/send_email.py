@@ -118,7 +118,7 @@ def create_service(client_secrets_file_path, api_name, api_version, scopes):
     creds = None
     service = None
 
-    token_pickle_file_path = RESOURCE_DIR.as_posix() + 'token.pickle'
+    token_pickle_file_path = RESOURCE_DIR.as_posix() + '/token.pickle'
 
     if os.path.exists(token_pickle_file_path):
         with open(token_pickle_file_path, 'rb') as token:
