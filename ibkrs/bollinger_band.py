@@ -49,7 +49,7 @@ def main(ib_client, args):
                     symbols.append(val)
     else:
         contract_ids.append(args.conid)
-        symbols.append(stock_obj.get_symbol_by_contract_id(args.conid))
+        symbols.append(stock_obj.get_symbol_by_conid(args.conid))
 
     time_period = BOLLINGER_CONF['time-period']
     period = BOLLINGER_CONF['period']
