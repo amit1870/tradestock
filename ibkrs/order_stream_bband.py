@@ -17,26 +17,30 @@ from ibw.client import IBClient
 from ibw.stock import Stock
 from utils import helper as hp
 from utils.helper import print_df
-from utils import settings
+from utils.settings import BOLLINGER_STREAM_LOG
 
 MINUTE = 60 # Seconds
-NAP_SLEEP = MINUTE / 5
+NAP_SLEEP = MINUTE
 URL = "wss://localhost:5000/v1/api/ws"
 ADD_ONCE = True
 
 def on_message(ws, message):
     global stock_obj
-    global market_data_list
+    global market_data_list, conid
     global period, lower, upper
     global ADD_ONCE, NAP_SLEEP
 
     message_dict = json.loads(message.decode('utf-8'))
 
-    print('{current_time} Current market data snapshot {snapshot_data}'.format(
-        current_time=hp.get_datetime_obj_in_str(),
-        snapshot_data=message_dict
+    with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
+
+        print('{current_time} Current market data snapshot {snapshot_data} for contract id {contract_id}.'.format(
+            current_time=hp.get_datetime_obj_in_str(),
+            snapshot_data=message_dict,
+            contract_id=conid
+            ),
+            file=f
         )
-    )
 
     current_close = message_dict.get('31', 0)
     current_close = hp.convert_str_into_number(current_close)
@@ -61,55 +65,64 @@ def on_message(ws, message):
         if side != 'NAN':
             order_status = stock_obj.place_order_with_bollinger_band(account_id, conid, side, current_close)
 
-            print("{current_time} {side} took place against with Bollinger Upper {upper} Close {close} Lower {lower}".format(
-                current_time=hp.get_datetime_obj_in_str(),
-                side=side,
-                upper=b_upper,
-                close=current_close,
-                lower=b_lower
+            with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
+                print("{current_time} {side} took place for contract id {contract_id} against \
+Bollinger Upper {upper} Close {close} Lower {lower}".format(
+                    current_time=hp.get_datetime_obj_in_str(),
+                    side=side,
+                    upper=b_upper,
+                    close=current_close,
+                    lower=b_lower,
+                    contract_id=conid
+                    ),
+                    file=f
                 )
-            )
         else:
-            print("{current_time} Current Close does not cross Bollinger Upper {upper} Close {close} Lower {lower}".format(
-                current_time=hp.get_datetime_obj_in_str(),
-                upper=b_upper,
-                close=current_close,
-                lower=b_lower
+            with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
+                print("{current_time} Current Close for contract id {contract_id} does not cross \
+Bollinger Upper {upper} Close {close} Lower {lower}".format(
+                    current_time=hp.get_datetime_obj_in_str(),
+                    upper=b_upper,
+                    close=current_close,
+                    lower=b_lower,
+                    contract_id=conid
+                    ),
+                    file=f
                 )
-            )
-
-            tickle_response = stock_obj.ib_client.tickle()
-            print('{current_time} Tickling server to keep session active with response : {tickle_response}'.format(
-                current_time=hp.get_datetime_obj_in_str(),
-                tickle_response=tickle_response
-                )
-            )
-
-        print('{current_time} Going to take nap for {nap}s....'.format(
-            current_time=hp.get_datetime_obj_in_str(),
-            nap=NAP_SLEEP
-            )
-        )
 
 def on_error(ws, error):
     global conid
-    ws.send("umd+{}".format(conid))
+    ws.send("umd+{}+{{}}".format(conid))
 
 def on_close(ws, close_status_code, close_msg):
     global conid
-    ws.send("umd+{}".format(conid))
+    ws.send("umd+{}+{{}}".format(conid))
     print("{} exited with code {} and message {}.".format(ws, close_status_code, close_msg))
 
 def on_open(ws):
     def run(*args):
 
-        global NAP_SLEEP
-
         current_price_cmd = 'smd+{}+{{"fields":["31","70","71"]}}'.format(conid)
+
         while True:
-            for i in range(10):
+            for i in range(3):
                 ws.send(current_price_cmd)
                 time.sleep(1)
+
+            tickle_response = stock_obj.ib_client.tickle()
+
+            with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
+                print('{current_time} Tickling server to keep session active with response : {tickle_response}'.format(
+                    current_time=hp.get_datetime_obj_in_str(),
+                    tickle_response=tickle_response
+                    )
+                )
+                print('{current_time} Going to take nap for {nap}s....'.format(
+                    current_time=hp.get_datetime_obj_in_str(),
+                    nap=NAP_SLEEP
+                    ),
+                    file=f
+                )
 
             time.sleep(NAP_SLEEP)
 
