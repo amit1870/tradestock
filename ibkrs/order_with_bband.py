@@ -49,7 +49,7 @@ def main(ib_client, args):
 
     conid = args.conid
     account_id = args.account_id
-    symbol = stock_obj.ib_client.get_symbol_by_contract_id(conid)
+    symbol = stock_obj.get_symbol_by_conid(conid)
 
     market_data_list = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
 
