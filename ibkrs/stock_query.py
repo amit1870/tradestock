@@ -3,9 +3,8 @@ import argparse
 
 from pprint import pprint
 from ibw.client import IBClient
+from ibw.stock import Stock
 from utils import helper as hp
-from stock import Stock
-
 
 def main(ib_client, args):
 
@@ -20,7 +19,8 @@ def main(ib_client, args):
 
     else:
         pprint(stock_obj.ib_client.portfolio_account_info(args.account_id))
-        pprint(stock_obj.ib_client.get_live_orders())
+        for i in range(10):
+            pprint(stock_obj.ib_client.get_live_orders())
 
 
 if __name__ == '__main__':

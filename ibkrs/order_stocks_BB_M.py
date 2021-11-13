@@ -21,9 +21,9 @@ from requests.exceptions import HTTPError
 from datetime import datetime
 
 from ibw.client import IBClient
+from ibw.stock import Stock
 from order_algo import bolliner_bands
 from utils import helper as hp
-from stock import Stock
 
 from utils.settings import ACCOUNTS
 from utils.lsr_opr import get_context, decrypt_lsr

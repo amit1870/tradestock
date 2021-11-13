@@ -39,6 +39,15 @@ FLASK_CONF = {
     'debug': True
 }
 
+# Bollinger Band configuration
+BOLLINGER_CONF = {
+    'period': 12,
+    'lower': 2,
+    'upper': 2,
+    'time-period': '90d',
+    'bar': '1d'
+}
+
 # Accounts
 account_peace77t7 = {
     'name': 'Sunny',

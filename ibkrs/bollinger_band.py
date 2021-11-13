@@ -14,8 +14,8 @@ from tabulate import tabulate
 
 from ibw.client import IBClient
 from utils import helper as hp
-from stock import Stock
-from stock_config import BOLLINGER_CONF
+from ibw.stock import Stock
+from utils.settings import BOLLINGER_CONF
 from utils.helper import print_df
 
 # pd.set_option('display.max_columns', None)

@@ -6,9 +6,8 @@ from pprint import pprint
 from requests.exceptions import HTTPError
 
 from ibw.client import IBClient
+from ibw.stock import Stock
 from utils import helper as hp
-from stock import Stock
-from stock_config import ORDERS
 
 def main(ib_client, args):
     order_list = hp.prepare_order_dict_from_args(vars(args))

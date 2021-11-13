@@ -7,8 +7,8 @@ import argparse
 import time
 
 from ibw.client import IBClient
+from ibw.stock import Stock
 from utils import helper as hp
-from stock import Stock
 from utils.helper import print_df
 from utils import settings
 

@@ -16,9 +16,9 @@ import logging
 from requests.exceptions import HTTPError
 from datetime import datetime
 from ibw.client import IBClient
+from ibw.stock import Stock
 from order_algo import bolliner_bands
 from utils import helper as hp
-from stock import Stock
 
 URL = "wss://localhost:5000/v1/api/ws"
 SERVER_IDS = []

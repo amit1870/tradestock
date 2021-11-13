@@ -15,10 +15,3 @@ ORDERS = {
     "allocationMethod": "AvailableEquity"
 }
 
-BOLLINGER_CONF = {
-    'period': 12,
-    'lower': 2,
-    'upper': 2,
-    'time-period': '90d',
-    'bar': '1d'
-}

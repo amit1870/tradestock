@@ -1,8 +1,4 @@
-import sys
-import argparse
-import logging
 import time
-import pandas as pd
 
 from datetime import datetime, timezone
 from requests.exceptions import HTTPError
@@ -125,7 +121,7 @@ class Stock(object):
 
         return data_list
 
-    def get_current_market_data_snapshot(self, conid):
+    def get_current_market_data_snapshot(self, conid, attempt=10):
         ''' Get market snapshot current data.'''
 
         # Below must be called once to receive market data snapshot
@@ -138,7 +134,6 @@ class Stock(object):
         conids = [str_conid]
         fields = ['30', '70', '71']
 
-        attempt = 10
         attempt_data = []
         while attempt:
 

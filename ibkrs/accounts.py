@@ -5,7 +5,7 @@ import logging
 from requests.exceptions import HTTPError
 from pprint import pprint
 from ibw.client import IBClient
-from stock import Stock
+from ibw.stock import Stock
 from utils import helper as hp
 
 def get_account_balance(stock_obj, account_id, balance_type='AVB'):

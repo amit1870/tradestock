@@ -4,7 +4,7 @@ import argparse
 from requests.exceptions import HTTPError
 
 from ibw.client import IBClient
-from stock import Stock
+from ibw.stock import Stock
 from utils import helper as hp
 
 
