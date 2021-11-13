@@ -21,6 +21,7 @@ EMAIL = {
 LOG_FILE_PATH = RESOURCE_DIR.joinpath('stocks.log')
 BOLLINGER_STOCK_FILE = RESOURCE_DIR.joinpath('bbstock.log')
 BOLLINGER_STREAM_LOG = RESOURCE_DIR.joinpath('bbstream.log')
+ORDER_LOG = RESOURCE_DIR.joinpath('orders.log')
 
 
 # API configurations

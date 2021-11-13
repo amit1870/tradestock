@@ -164,7 +164,7 @@ class Stock(object):
         else:
             # get balance and calculate number of position to buy
             balance_type = 'AVB'
-            account_balance_dict = stock_obj.get_account_balance(account_id, balance_type)
+            account_balance_dict = self.get_account_balance(account_id, balance_type)
             account_balance = account_balance_dict.get('amount', 0)
             quantity = account_balance // current_close
 

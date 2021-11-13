@@ -15,34 +15,6 @@ from utils import settings
 MINUTE = 60 # Seconds
 NAP_SLEEP = MINUTE / 5
 
-def place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close):
-    if side == 'SELL':
-        stock_postion_dict = stock_obj.search_stock_by_conid(account_id, conid)
-        quantity = stock_postion_dict.get('position', 0)
-
-    else:
-        # get balance and calculate number of position to buy
-        balance_type = 'AVB'
-        account_balance_dict = stock_obj.get_account_balance(account_id, balance_type)
-        account_balance = account_balance_dict.get('amount', 0)
-        quantity = account_balance // current_close
-
-    # TODO: Remove this check when able to place order over 500
-    if quantity > 500:
-        quantity = 499
-
-    order_dict = {
-        'account_id': account_id,
-        'conid': conid,
-        'side': side,
-        'quantity': quantity
-    }
-
-    orders = hp.prepare_order_dict_from_args(order_dict)
-    order_status = stock_obj.place_order_stock(account_id, orders)
-
-    return order_status
-
 def main(ib_client, args):
 
     stock_obj = Stock(ib_client)
@@ -99,7 +71,7 @@ def main(ib_client, args):
                     b_lower = bolinger_frame['Lower'].iloc[-1]
 
                     if side != 'NAN':
-                        order_status = place_order_with_bollinger_band(stock_obj, account_id, conid, side, current_close)
+                        order_status = stock_obj.place_order_with_bollinger_band(account_id, conid, side, current_close)
 
                         print("{current_time} {side} took place against with Bollinger Upper {upper} Close {close} Lower {lower}".format(
                             current_time=hp.get_datetime_obj_in_str(),

@@ -19,6 +19,7 @@ from google.oauth2 import service_account
 
 from utils.settings import EMAIL, API, LOG_FILE_PATH
 from utils.settings import RESOURCE_DIR, BOLLINGER_STOCK_FILE
+from utils.settings import ORDER_LOG
 from utils import helper as hp
 
 HOUR = 3600
@@ -209,6 +210,16 @@ if __name__ == '__main__':
                 EMAIL['content'],
                 html=True)
             message_list.append(message)
+
+            EMAIL['content'] = "<br/>".join(hp.read_file_content(ORDER_LOG.as_posix(), preserve_space=False))
+
+            if EMAIL['content'] != '':
+                message = create_plain_html_message(EMAIL['from'],
+                    EMAIL['to'],
+                    'ORDERS Success!!!',
+                    EMAIL['content'],
+                    html=True)
+                message_list.append(message)
 
         for message in message_list:
             message_response = send_message(service, EMAIL['from'], message)

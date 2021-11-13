@@ -18,6 +18,7 @@ from ibw.stock import Stock
 from utils import helper as hp
 from utils.helper import print_df
 from utils.settings import BOLLINGER_STREAM_LOG
+from utils.settings import ORDER_LOG
 
 MINUTE = 60 # Seconds
 NAP_SLEEP = MINUTE
@@ -67,8 +68,7 @@ def on_message(ws, message):
             order_status = stock_obj.place_order_with_bollinger_band(account_id, conid, side, current_close)
 
             with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
-                print("{current_time} {contract_id}[{symbol}] {side} took place against \
-Bollinger Upper {upper} Close {close} Lower {lower}".format(
+                print("{current_time} {contract_id}[{symbol}] {side} took place against Bollinger Upper {upper} Close {close} Lower {lower}".format(
                     current_time=hp.get_datetime_obj_in_str(),
                     side=side,
                     upper=b_upper,
@@ -79,9 +79,24 @@ Bollinger Upper {upper} Close {close} Lower {lower}".format(
                     ),
                     file=f
                 )
+
+            with open(ORDER_LOG.as_posix(), 'a') as fo:
+                print("{current_time} {contract_id}[{symbol}] <span style='color:#28a745;'><b>{side}</b></span> took place against \
+Bollinger Upper {upper} Close {close} Lower {lower}".format(
+                    current_time=hp.get_datetime_obj_in_str(),
+                    side=side,
+                    upper=b_upper,
+                    close=current_close,
+                    lower=b_lower,
+                    contract_id=conid,
+                    symbol=symbol
+                    ),
+                    file=fo
+                )
+
         else:
             with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
-                print("{current_time} {contract_id}[{symbol}] Current Close for contract id  does not cross \
+                print("{current_time} {contract_id}[{symbol}] Current Close does not cross \
 Bollinger Upper {upper} Close {close} Lower {lower}".format(
                     current_time=hp.get_datetime_obj_in_str(),
                     upper=b_upper,
