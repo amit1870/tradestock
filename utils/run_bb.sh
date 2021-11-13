@@ -35,10 +35,10 @@ for (( i = 0; i < ${#conids[@]}; i++ )); do
 
     if [[ $i -eq 0 ]]; then
         nohup python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[i]}" --account-id "${accounts[i]}" \
-               --passkey "${password}" --conid "${conids[i]}" & >> ${LOG_FILE} 2>&1
+               --passkey "${password}" --conid "${conids[i]}" & >> ${OTHER_LOG_FILE} 2>&1
     else
         nohup python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[i]}" --account-id "${accounts[i]}" \
-        --conid "${conids[i]}"  & >> ${LOG_FILE} 2>&1
+        --conid "${conids[i]}"  & >> ${OTHER_LOG_FILE} 2>&1
     fi
 
     echo "Going to nap for ${NAP_SECONDS}sec.."

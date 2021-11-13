@@ -34,7 +34,7 @@ def on_message(ws, message):
 
     with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
 
-        print('{current_time} Current market data snapshot {snapshot_data} for contract id {contract_id}({symbol}).'.format(
+        print('{current_time} {contract_id}({symbol}) Current market data snapshot {snapshot_data}.'.format(
             current_time=hp.get_datetime_obj_in_str(),
             snapshot_data=message_dict,
             contract_id=conid,
@@ -67,7 +67,7 @@ def on_message(ws, message):
             order_status = stock_obj.place_order_with_bollinger_band(account_id, conid, side, current_close)
 
             with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
-                print("{current_time} {side} took place for contract id {contract_id}({symbol}) against \
+                print("{current_time} {contract_id}({symbol}) {side} took place against \
 Bollinger Upper {upper} Close {close} Lower {lower}".format(
                     current_time=hp.get_datetime_obj_in_str(),
                     side=side,
@@ -81,7 +81,7 @@ Bollinger Upper {upper} Close {close} Lower {lower}".format(
                 )
         else:
             with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
-                print("{current_time} Current Close for contract id {contract_id}({symbol}) does not cross \
+                print("{current_time} {contract_id}({symbol}) Current Close for contract id  does not cross \
 Bollinger Upper {upper} Close {close} Lower {lower}".format(
                     current_time=hp.get_datetime_obj_in_str(),
                     upper=b_upper,
