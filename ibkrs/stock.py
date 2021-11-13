@@ -158,7 +158,7 @@ class Stock(object):
 
         search_result = self.ib_client.contract_details(contract_id)
 
-        return search_result
+        return search_result.get('symbol', 'XXX')
 
 
 

@@ -49,6 +49,7 @@ def main(ib_client, args):
 
     conid = args.conid
     account_id = args.account_id
+    symbol = stock_obj.ib_client.get_symbol_by_contract_id(conid)
 
     market_data_list = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
 
@@ -91,7 +92,7 @@ def main(ib_client, args):
                         market_data_list = market_data_list[:-1]
                         market_data_list.append(snapshot_data_dict)
 
-                    bolinger_frame = hp.get_bollinger_band(market_data_list, args.period, args.upper, args.lower, plot=False)
+                    bolinger_frame = hp.get_bollinger_band(market_data_list, args.period, args.upper, args.lower, plot=False, symbol=symbol)
                     side = hp.get_signal_for_last_frame(bolinger_frame, current_close)
 
                     b_upper = bolinger_frame['Upper'].iloc[-1]

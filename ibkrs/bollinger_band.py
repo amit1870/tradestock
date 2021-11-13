@@ -74,7 +74,7 @@ def main(ib_client, args):
 
         if data_list:
 
-            bolinger_frame = hp.get_bollinger_band(data_list, period, upper, lower, plot=True)
+            bolinger_frame = hp.get_bollinger_band(data_list, period, upper, lower, plot=True, symbol=symbols[idx])
 
             if args.conid:
                 print_df(bolinger_frame)

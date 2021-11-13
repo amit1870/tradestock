@@ -15,7 +15,7 @@ from datetime import datetime, timedelta, timezone
 from requests.exceptions import HTTPError
 
 from .auto_mode import auto_mode_on_accounts
-from utils.settings import ACCOUNTS, BASE_DIR
+from utils.settings import ACCOUNTS, RESOURCE_DIR
 from utils.lsr_opr import get_context, decrypt_lsr
 
 NEW_LINE_CHAR = '\n'
@@ -92,7 +92,7 @@ def get_signal_for_last_frame(df, close_price):
 
     return "NAN"
 
-def get_bollinger_band(data_list, period, upper, lower, plot=False):
+def get_bollinger_band(data_list, period, upper, lower, plot=False, symbol='XXX'):
 
     df = pd.DataFrame(data_list)
 
@@ -116,11 +116,11 @@ def get_bollinger_band(data_list, period, upper, lower, plot=False):
 
         df[column_list].plot(figsize=(12.2,6.4))
 
-        plt.title('Bollinger Bands')
+        plt.title('Bollinger Bands({})'.format(symbol))
 
         plt.ylabel('USD Price ($)')
 
-        figure = "{}/fig1.jpg".format(BASE_DIR.as_posix())
+        figure = "{}/{}1.jpg".format(RESOURCE_DIR.as_posix(), symbol)
         plt.savefig("{}".format(figure))
         plt.close(figure)
 
@@ -142,13 +142,13 @@ def get_bollinger_band(data_list, period, upper, lower, plot=False):
         ax.plot(x_axis, df['SMA'], color='blue', lw=3, label = 'Simple Moving Average')
 
         # Set the Title & Show the Image
-        ax.set_title('Bollinger Bands')
+        ax.set_title('Bollinger Bands({})'.format(symbol))
         ax.set_xlabel('Date')
         ax.set_ylabel('USD Price ($)')
         plt.xticks(rotation = 45)
         ax.legend()
 
-        figure = "{}/fig2.jpg".format(BASE_DIR.as_posix())
+        figure = "{}/{}2.jpg".format(RESOURCE_DIR.as_posix(), symbol)
         plt.savefig("{}".format(figure))
         plt.close(figure)
 
@@ -171,13 +171,13 @@ def get_bollinger_band(data_list, period, upper, lower, plot=False):
         ax.scatter(x_axis, new_df['Sell'] , color='red', lw=3, label = 'Sell',marker = 'v', alpha = 1)
 
         # set the Title and Show the Image
-        ax.set_title('Bollinger Bands')
+        ax.set_title('Bollinger Bands({})'.format(symbol))
         ax.set_xlabel('Date')
         ax.set_ylabel('USD Price ($)')
         plt.xticks(rotation = 45)
         ax.legend()
 
-        figure = "{}/fig3.jpg".format(BASE_DIR.as_posix())
+        figure = "{}/{}3.jpg".format(RESOURCE_DIR.as_posix(), symbol)
         plt.savefig("{}".format(figure))
         plt.close(figure)
 

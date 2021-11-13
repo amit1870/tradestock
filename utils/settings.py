@@ -3,6 +3,8 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'pcv'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+RESOURCE_DIR = BASE_DIR.joinpath('resources').resolve()
+
 # Secret Key
 secret_key = '4$hsjhd9323j233239032jkj32320903283'
 
