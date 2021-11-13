@@ -13,6 +13,7 @@ def main(ib_client, args):
     
     if args.conid:
         pprint(stock_obj.search_stock_by_conid(args.account_id, args.conid))
+        pprint(stock_obj.get_symbol_by_contract_id(args.conid))
 
     elif args.symbol:
         pprint(stock_obj.search_stock_by_symbol(args.symbol))

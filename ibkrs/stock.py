@@ -152,3 +152,13 @@ class Stock(object):
             time.sleep(0.2)
 
         return attempt_data
+
+    def get_symbol_by_contract_id(self, contract_id):
+        ''' Return contract id given symbol.'''
+
+        search_result = self.ib_client.contract_details(contract_id)
+
+        return search_result
+
+
+
