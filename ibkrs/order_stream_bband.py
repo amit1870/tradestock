@@ -22,7 +22,7 @@ from utils import settings
 MINUTE = 60 # Seconds
 NAP_SLEEP = MINUTE / 5
 URL = "wss://localhost:5000/v1/api/ws"
-first_add_flag = True
+ADD_ONCE = True
 
 def on_message(ws, message):
     global stock_obj
@@ -31,14 +31,21 @@ def on_message(ws, message):
     global period, upper, lower
 
     message_dict = json.loads(message.decode('utf-8'))
-    current_close = message.get('31', 0)
+
+    print('{current_time} Current market data snapshot {snapshot_data}'.format(
+        current_time=hp.get_datetime_obj_in_str(),
+        snapshot_data=message_dict
+        )
+    )
+
+    current_close = message_dict.get('31', 0)
 
     if current_close:
 
         snapshot_data_dict = hp.update_current_market_data(message_dict)
-        if first_add_flag:
+        if ADD_ONCE:
             market_data_list.append(snapshot_data_dict)
-            first_add_flag = False
+            ADD_ONCE = False
         else:
             market_data_list = market_data_list[:-1]
             market_data_list.append(snapshot_data_dict)
@@ -89,8 +96,8 @@ def on_close(ws, close_status_code, close_msg):
 
 def on_open(ws):
     def run(*args):
-        current_price_cmd = 'smd+{}+{{"fields":["31","70","71"]}}'.format(conid)
 
+        current_price_cmd = 'smd+{}+{{"fields":["31","70","71"]}}'.format(conid)
         while True:
             ws.send(current_price_cmd)
             print('{current_time} Going to take nap for {nap}s....'.format(
