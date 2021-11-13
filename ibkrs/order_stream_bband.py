@@ -26,7 +26,7 @@ ADD_ONCE = True
 
 def on_message(ws, message):
     global stock_obj
-    global market_data_list, conid
+    global market_data_list, conid, symbol
     global period, lower, upper
     global ADD_ONCE, NAP_SLEEP
 
@@ -34,10 +34,11 @@ def on_message(ws, message):
 
     with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
 
-        print('{current_time} Current market data snapshot {snapshot_data} for contract id {contract_id}.'.format(
+        print('{current_time} Current market data snapshot {snapshot_data} for contract id {contract_id}({symbol}).'.format(
             current_time=hp.get_datetime_obj_in_str(),
             snapshot_data=message_dict,
-            contract_id=conid
+            contract_id=conid,
+            symbol=symbol
             ),
             file=f
         )
@@ -66,26 +67,28 @@ def on_message(ws, message):
             order_status = stock_obj.place_order_with_bollinger_band(account_id, conid, side, current_close)
 
             with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
-                print("{current_time} {side} took place for contract id {contract_id} against \
+                print("{current_time} {side} took place for contract id {contract_id}({symbol}) against \
 Bollinger Upper {upper} Close {close} Lower {lower}".format(
                     current_time=hp.get_datetime_obj_in_str(),
                     side=side,
                     upper=b_upper,
                     close=current_close,
                     lower=b_lower,
-                    contract_id=conid
+                    contract_id=conid,
+                    symbol=symbol
                     ),
                     file=f
                 )
         else:
             with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
-                print("{current_time} Current Close for contract id {contract_id} does not cross \
+                print("{current_time} Current Close for contract id {contract_id}({symbol}) does not cross \
 Bollinger Upper {upper} Close {close} Lower {lower}".format(
                     current_time=hp.get_datetime_obj_in_str(),
                     upper=b_upper,
                     close=current_close,
                     lower=b_lower,
-                    contract_id=conid
+                    contract_id=conid,
+                    symbol=symbol
                     ),
                     file=f
                 )
@@ -163,6 +166,7 @@ if __name__ == "__main__":
     
     stock_obj = Stock(ib_client)
     market_data_list = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
+    symbol = stock_obj.get_symbol_by_conid(conid)
 
     if market_data_list:
 
