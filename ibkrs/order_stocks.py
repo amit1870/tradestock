@@ -14,7 +14,12 @@ def main(ib_client, args):
     print("Review Order Details: {}".format(order_list))
 
     stock_obj = Stock(ib_client)
-    order_status = stock_obj.place_order_stock(args.account_id, order_list, confirm=args.confirm)
+
+    confirm = True
+    if args.confirm == 'False':
+        confirm = False
+
+    order_status = stock_obj.place_order_stock(args.account_id, order_list, confirm=confirm)
 
     print("Order has taken place with message {}".format(order_status))
 
