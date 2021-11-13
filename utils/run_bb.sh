@@ -5,6 +5,7 @@ BASE_DIR="$HOME/virenv"
 CODE_DIR="$BASE_DIR/pcv"
 RESOURCE_DIR="$CODE_DIR/resources"
 BOLLINGER_STREAM_LOG="$RESOURCE_DIR/bbstream.log"
+OTHER_LOG_FILE="$RESOURCE_DIR/bbstream-other.log"
 NAP_SECONDS=10 # Seconds
 NEW_LINE=$'\n'
 
@@ -24,19 +25,20 @@ alias python='$BASE_DIR/bin/python'
 
 # Remove $BOLLINGER_STREAM_LOG if already found.
 if [ -f "$BOLLINGER_STREAM_LOG" ]; then
-    rm -f ${BOLLINGER_STREAM_LOG}
+    rm -f ${BOLLINGER_STREAM_LOG} ${OTHER_LOG_FILE}
 fi
 
 # Add new $BOLLINGER_STREAM_LOG
-touch ${BOLLINGER_STREAM_LOG}
+touch ${BOLLINGER_STREAM_LOG} ${OTHER_LOG_FILE}
 
 for (( i = 0; i < ${#conids[@]}; i++ )); do
 
     if [[ $i -eq 0 ]]; then
-        python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[i]}" --account-id "${accounts[i]}" \
-               --passkey "${password}" --conid "${conids[i]}"
+        nohup python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[i]}" --account-id "${accounts[i]}" \
+               --passkey "${password}" --conid "${conids[i]}" & >> ${LOG_FILE} 2>&1
     else
-        python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[i]}" --account-id "${accounts[i]}" --conid "${conids[i]}"
+        nohup python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[i]}" --account-id "${accounts[i]}" \
+        --conid "${conids[i]}"  & >> ${LOG_FILE} 2>&1
     fi
 
     echo "Going to nap for ${NAP_SECONDS}sec.."
