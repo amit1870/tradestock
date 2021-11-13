@@ -153,7 +153,7 @@ class Stock(object):
 
         return attempt_data
 
-    def get_symbol_by_contract_id(self, contract_id):
+    def get_symbol_by_conid(self, contract_id):
         ''' Return contract id given symbol.'''
 
         search_result = self.ib_client.contract_details(contract_id)

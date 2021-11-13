@@ -17,7 +17,8 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google.oauth2 import service_account
 
-from utils.settings import EMAIL, API, LOG_FILE_PATH, BOLLINGER_STOCK_FILE
+from utils.settings import EMAIL, API, LOG_FILE_PATH
+from utils.settings import RESOURCE_DIR, BOLLINGER_STOCK_FILE
 from utils import helper as hp
 
 HOUR = 3600
@@ -117,8 +118,10 @@ def create_service(client_secrets_file_path, api_name, api_version, scopes):
     creds = None
     service = None
 
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    token_pickle_file_path = RESOURCE_DIR.as_posix() + 'token.pickle'
+
+    if os.path.exists(token_pickle_file_path):
+        with open(token_pickle_file_path, 'rb') as token:
             creds = pickle.load(token)
 
     # if no valid credentials available, let the user log in.
@@ -130,7 +133,7 @@ def create_service(client_secrets_file_path, api_name, api_version, scopes):
             creds = flow.run_local_server(port=8080)
 
         # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
+        with open(token_pickle_file_path, 'wb') as token:
             pickle.dump(creds, token)
 
     try:

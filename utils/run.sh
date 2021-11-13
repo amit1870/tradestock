@@ -3,14 +3,11 @@ echo "Running....."
 
 BASE_DIR="$HOME/virenv"
 CODE_DIR="$BASE_DIR/pcv"
-SERVER_DIR="$BASE_DIR/pcv/clientportal"
-LOG_FILE="$CODE_DIR/stocks.log"
-BOLLINGER_LOG_FILE="$CODE_DIR/bbstock.log"
-TOKEN_FILE_PATH="$HOME/virenv/token.json"
+RESOURCE_DIR="$BASE_DIR/resources"
+LOG_FILE="$RESOURCE_DIR/stocks.log"
+BOLLINGER_LOG_FILE="$RESOURCE_DIR/bbstock.log"
 NAP_SECONDS=10 # Seconds
-PF_STOCK=1
-LS_STOCK=-1
-AL_STOCK=0
+ALL_STOCK=0
 NEW_LINE=$'\n'
 
 declare -a usernames=("peace77t7" "peace77t6" "peace77t4" "peace77t3")
@@ -38,7 +35,7 @@ echo "$DATE" >> ${LOG_FILE}
 
 for (( i = 0; i < ${#passwords[@]}; i++ )); do
     python "${CODE_DIR}/ibkrs/all_stocks.py" --username "${usernames[i]}" --passkey "${passwords[i]}"  \
-           --account-id "${accounts[i]}" --stock-type "${AL_STOCK}" >> ${LOG_FILE} 2>&1
+           --account-id "${accounts[i]}" --stock-type "${ALL_STOCK}" >> ${LOG_FILE} 2>&1
     echo "$NEW_LINE" >> ${LOG_FILE}
 
     ((j=i+1))
