@@ -11,6 +11,7 @@ NEW_LINE=$'\n'
 declare -a usernames=("peace77t3")
 declare -a accounts=("U7242803")
 declare -a password=$1
+shift
 declare -a conids=("$@")
 
 # Activate vitural env and export PYTHONPATH
@@ -40,8 +41,7 @@ for (( i = 0; i < ${#conids[@]}; i++ )); do
 
     echo "Going to nap for ${NAP_SECONDS}sec.."
     sleep ${NAP_SECONDS}
+
 done
-
-
 
 echo "Finished!!"
