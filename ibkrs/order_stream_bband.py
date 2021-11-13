@@ -25,10 +25,6 @@ URL = "wss://localhost:5000/v1/api/ws"
 ADD_ONCE = True
 
 def on_message(ws, message):
-    global stock_obj
-    global market_data_list
-    global first_add_flag
-    global period, upper, lower
 
     message_dict = json.loads(message.decode('utf-8'))
 
