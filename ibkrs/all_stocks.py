@@ -1,16 +1,12 @@
 import sys
 import argparse
-import logging
+
 from requests.exceptions import HTTPError
+
 from ibw.client import IBClient
 from stock import Stock
 from utils import helper as hp
 
-logging.basicConfig(
-    filename='app.log',
-    format='%(levelname)s - %(name)s - %(message)s',
-    level=logging.DEBUG
-)
 
 HEADERS     = ['Username', 'AccountID', 'STOCKS', 'ContractID', 'PNL', 'PF/LS', 'Position', 'Balance', 'Currency']
 BUFFER      = 15
