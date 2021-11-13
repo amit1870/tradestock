@@ -156,4 +156,26 @@ class Stock(object):
         return search_result.get('symbol', 'XXX')
 
 
+    def place_order_with_bollinger_band(self, account_id, conid, side, current_close):
+        if side == 'SELL':
+            stock_postion_dict = self.search_stock_by_conid(account_id, conid)
+            quantity = stock_postion_dict.get('position', 0)
 
+        else:
+            # get balance and calculate number of position to buy
+            balance_type = 'AVB'
+            account_balance_dict = stock_obj.get_account_balance(account_id, balance_type)
+            account_balance = account_balance_dict.get('amount', 0)
+            quantity = account_balance // current_close
+
+        order_dict = {
+            'account_id': account_id,
+            'conid': conid,
+            'side': side,
+            'quantity': quantity
+        }
+
+        orders = hp.prepare_order_dict_from_args(order_dict)
+        order_status = self.place_order_stock(account_id, orders)
+
+        return order_status
