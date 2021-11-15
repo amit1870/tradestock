@@ -5,7 +5,6 @@ BASE_DIR="$HOME/virenv"
 CODE_DIR="$BASE_DIR/pcv"
 RESOURCE_DIR="$CODE_DIR/resources"
 BOLLINGER_STREAM_LOG="$RESOURCE_DIR/bbstream.log"
-OTHER_LOG_FILE="$RESOURCE_DIR/bbstream-other.log"
 NAP_SECONDS=10 # Seconds
 NEW_LINE=$'\n'
 
@@ -35,14 +34,15 @@ for (( i = 0; i < ${#conids[@]}; i++ )); do
 
     if [[ $i -eq 0 ]]; then
         nohup python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[i]}" --account-id "${accounts[i]}" \
-               --passkey "${password}" --conid "${conids[i]}" & >> ${OTHER_LOG_FILE} 2>&1
+               --passkey "${password}" --conid "${conids[i]}" &
+
+        echo "Going to nap for ${NAP_SECONDS}sec.."
+        sleep ${NAP_SECONDS}
+
     else
         nohup python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[i]}" --account-id "${accounts[i]}" \
-        --conid "${conids[i]}"  & >> ${OTHER_LOG_FILE} 2>&1
+        --conid "${conids[i]}"  &
     fi
-
-    echo "Going to nap for ${NAP_SECONDS}sec.."
-    sleep ${NAP_SECONDS}
 
 done
 
