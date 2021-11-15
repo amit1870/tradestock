@@ -181,10 +181,21 @@ if __name__ == "__main__":
 
     
     stock_obj = Stock(ib_client)
-    market_data_list = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
-    symbol = stock_obj.get_symbol_by_conid(conid)
+
+    attempt = 3
+
+    while attempt:
+
+        market_data_list = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
+        time.sleep(2)
+
+        if market_data_list:
+            attempt = 0
+        attempt -= 1
 
     if market_data_list:
+
+        symbol = stock_obj.get_symbol_by_conid(conid)
 
         stock_obj.ib_client.unsubscribe_all_market_data_history()
 
