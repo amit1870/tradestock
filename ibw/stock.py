@@ -121,7 +121,7 @@ class Stock(object):
 
         return data_list
 
-    def get_current_market_data_snapshot(self, conid, attempt=10):
+    def get_current_market_data_snapshot(self, conids, attempt=10):
         ''' Get market snapshot current data.'''
 
         # Below must be called once to receive market data snapshot
@@ -130,7 +130,7 @@ class Stock(object):
 
         current_time_stamp_ms = int(time.time() * 1000)
 
-        str_conid = '{}'.format(conid)
+        str_conid = '{}'.format(conids)
         conids = [str_conid]
         fields = ['30', '70', '71']
 

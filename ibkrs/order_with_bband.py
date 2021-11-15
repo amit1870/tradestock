@@ -10,7 +10,7 @@ from ibw.client import IBClient
 from ibw.stock import Stock
 from utils import helper as hp
 from utils.helper import print_df
-from utils import settings
+from utils.settings import BOLLINGER_STREAM_LOG, ORDER_LOG
 
 MINUTE = 60 # Seconds
 NAP_SLEEP = MINUTE / 5
@@ -19,92 +19,105 @@ def main(ib_client, args):
 
     stock_obj = Stock(ib_client)
 
-    conid = args.conid
+    conids = args.conids.split(',')
     account_id = args.account_id
-    symbol = stock_obj.get_symbol_by_conid(conid)
+    market_data_dict = {}
+    symbols = {}
 
-    market_data_list = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
-
-    if market_data_list:
-
+    for conid in conids:
+        symbol = stock_obj.get_symbol_by_conid(conid)
+        symbols[conid] = symbol
+        market_data_dict[conid] = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
+    else:
         stock_obj.ib_client.unsubscribe_all_market_data_history()
 
-        first_add_flag = True
+    if 
 
-        current_market_data = stock_obj.get_current_market_data_snapshot(conid)
+    first_add_flag = True
 
-        while current_market_data:
+    current_market_data = stock_obj.get_current_market_data_snapshot(args.conids)
 
-            snapshot_data = current_market_data[0]
+    while current_market_data:
 
-            print('{current_time} Current market data snapshot {snapshot_data}'.format(
+        snapshot_data = current_market_data[0]
+
+        with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
+            print('{current_time} {contract_id}[{symbol}] Current market data snapshot {snapshot_data}.'.format(
                 current_time=hp.get_datetime_obj_in_str(),
-                snapshot_data=snapshot_data
-                )
+                snapshot_data=snapshot_data,
+                contract_id=conid,
+                symbol=symbol
+                ),
+                file=f
             )
 
-            if '31' in  snapshot_data or '71' in snapshot_data:
+        if '31' in  snapshot_data or '71' in snapshot_data:
 
-                current_close = hp.convert_str_into_number(snapshot_data.get('31', snapshot_data.get('71')))
+            current_close = hp.convert_str_into_number(snapshot_data.get('31', snapshot_data.get('71')))
 
-                if current_close > 0:
+            if current_close > 0:
 
-                    snapshot_data_dict = hp.update_current_market_data(snapshot_data)
+                snapshot_data_dict = hp.update_current_market_data(snapshot_data)
 
-                    print('{current_time} Running Bollinger with close price {current_close}.....'.format(
+                with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
+                    print("{current_time} {contract_id}[{symbol}] {side} Running Bollinger with close price {close}.....".format(
                         current_time=hp.get_datetime_obj_in_str(),
-                        current_close=current_close
+                        side=side,
+                        close=current_close,
+                        contract_id=conid,
+                        symbol=symbol
+                        ),
+                        file=f
+                    )
+
+                if first_add_flag:
+                    market_data_list.append(snapshot_data_dict)
+                    first_add_flag = False
+                else:
+                    market_data_list = market_data_list[:-1]
+                    market_data_list.append(snapshot_data_dict)
+
+                bolinger_frame = hp.get_bollinger_band(market_data_list, args.period, args.upper, args.lower, plot=False, symbol=symbol)
+                side = hp.get_signal_for_last_frame(bolinger_frame, current_close)
+
+                b_upper = bolinger_frame['Upper'].iloc[-1]
+                b_lower = bolinger_frame['Lower'].iloc[-1]
+
+                if side != 'NAN':
+                    order_status = stock_obj.place_order_with_bollinger_band(account_id, conid, side, current_close)
+
+                    print("{current_time} {side} took place against with Bollinger Upper {upper} Close {close} Lower {lower}".format(
+                        current_time=hp.get_datetime_obj_in_str(),
+                        side=side,
+                        upper=b_upper,
+                        close=current_close,
+                        lower=b_lower
+                        )
+                    )
+                else:
+                    print("{current_time} Current Close does not cross Bollinger Upper {upper} Close {close} Lower {lower}".format(
+                        current_time=hp.get_datetime_obj_in_str(),
+                        upper=b_upper,
+                        close=current_close,
+                        lower=b_lower
                         )
                     )
 
-                    if first_add_flag:
-                        market_data_list.append(snapshot_data_dict)
-                        first_add_flag = False
-                    else:
-                        market_data_list = market_data_list[:-1]
-                        market_data_list.append(snapshot_data_dict)
-
-                    bolinger_frame = hp.get_bollinger_band(market_data_list, args.period, args.upper, args.lower, plot=False, symbol=symbol)
-                    side = hp.get_signal_for_last_frame(bolinger_frame, current_close)
-
-                    b_upper = bolinger_frame['Upper'].iloc[-1]
-                    b_lower = bolinger_frame['Lower'].iloc[-1]
-
-                    if side != 'NAN':
-                        order_status = stock_obj.place_order_with_bollinger_band(account_id, conid, side, current_close)
-
-                        print("{current_time} {side} took place against with Bollinger Upper {upper} Close {close} Lower {lower}".format(
-                            current_time=hp.get_datetime_obj_in_str(),
-                            side=side,
-                            upper=b_upper,
-                            close=current_close,
-                            lower=b_lower
-                            )
-                        )
-                    else:
-                        print("{current_time} Current Close does not cross Bollinger Upper {upper} Close {close} Lower {lower}".format(
-                            current_time=hp.get_datetime_obj_in_str(),
-                            upper=b_upper,
-                            close=current_close,
-                            lower=b_lower
-                            )
-                        )
-
-            tickle_response = stock_obj.ib_client.tickle()
-            print('{current_time} Tickling server to keep session active with response : {tickle_response}'.format(
-                current_time=hp.get_datetime_obj_in_str(),
-                tickle_response=tickle_response
-                )
+        tickle_response = stock_obj.ib_client.tickle()
+        print('{current_time} Tickling server to keep session active with response : {tickle_response}'.format(
+            current_time=hp.get_datetime_obj_in_str(),
+            tickle_response=tickle_response
             )
+        )
 
-            print('{current_time} Going to take nap for {nap}s....'.format(
-                current_time=hp.get_datetime_obj_in_str(),
-                nap=NAP_SLEEP
-                )
+        print('{current_time} Going to take nap for {nap}s....'.format(
+            current_time=hp.get_datetime_obj_in_str(),
+            nap=NAP_SLEEP
             )
-            time.sleep(NAP_SLEEP)
+        )
+        time.sleep(NAP_SLEEP)
 
-            current_market_data = stock_obj.get_current_market_data_snapshot(conid)
+        current_market_data = stock_obj.get_current_market_data_snapshot(conid)
 
     else:
         print('{current_time} Market data snapshot history empty.'.format(
@@ -116,7 +129,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Buy or Sell stock with Interactive Brokers.')
     parser.add_argument('--username', required=True, help='YOUR_USERNAME')
     parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
-    parser.add_argument('--conid', required=True, type=int, help='STOCK_CONTRACT_ID')
+    parser.add_argument('--conids', required=True, type=int, help='STOCK_CONTRACT_ID1 , STOCK_CONTRACT_ID2')
     parser.add_argument('--passkey', help='YOUR_PASSWORD')
     parser.add_argument('--time-period', default='93d', help='Time period for Market Data')
     parser.add_argument('--period', default=12, type=int, help='Moving Average number')
