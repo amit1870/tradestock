@@ -184,7 +184,7 @@ if __name__ == "__main__":
 
     attempt = 3
 
-    while attempt:
+    while attempt > 0:
 
         market_data_list = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
         time.sleep(2)
