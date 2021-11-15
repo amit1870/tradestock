@@ -33,14 +33,14 @@ touch ${BOLLINGER_STREAM_LOG} ${OTHER_LOG_FILE}
 for (( i = 0; i < ${#conids[@]}; i++ )); do
 
     if [[ $i -eq 0 ]]; then
-        nohup python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[i]}" --account-id "${accounts[i]}" \
+        nohup python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[0]}" --account-id "${accounts[0]}" \
                --passkey "${password}" --conid "${conids[i]}" &
 
         echo "Going to nap for ${NAP_SECONDS}sec.."
         sleep ${NAP_SECONDS}
 
     else
-        nohup python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[i]}" --account-id "${accounts[i]}" \
+        nohup python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[0]}" --account-id "${accounts[0]}" \
         --conid "${conids[i]}"  &
     fi
 
