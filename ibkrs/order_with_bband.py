@@ -27,6 +27,7 @@ def run_bollinger_on_conid(stock_obj, market_data_list, conid, current_close, pe
 def main(ib_client, args):
 
     stock_obj = Stock(ib_client)
+    stock_obj.ib_client.server_accounts()
 
     conids = args.conids.split(',')
     account_id = args.account_id

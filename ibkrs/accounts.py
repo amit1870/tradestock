@@ -23,12 +23,14 @@ def main(ib_client, args):
     print('AccountID ',args.account_id, end=' | ')
     print('Balance ', balance, end=' | \n')
 
+    selected_account = stock_obj.ib_client.server_accounts()
+    print(selected_account)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get stock details with Interactive Brokers.')
     parser.add_argument('--username', required=True, help='YOUR_USERNAME')
     parser.add_argument('--passkey', help='YOUR_PASSWORD')
     parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
-    parser.add_argument('--conid-or-symbol', help='Give contract id or symbol')
     args = parser.parse_args()
 
     # Create a new session of the IB Web API.

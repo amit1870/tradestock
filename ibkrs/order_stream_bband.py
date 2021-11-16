@@ -178,9 +178,9 @@ if __name__ == "__main__":
     auth_status = False
     if args.passkey:
         ib_client, auth_status = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey], hard=True)
-
     
     stock_obj = Stock(ib_client)
+    stock_obj.ib_client.get_selected_account()
 
     attempt = 3
 
