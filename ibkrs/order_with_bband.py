@@ -32,7 +32,7 @@ def main(ib_client, args):
     if args.conids:
         conids = args.conids.split(',')
     else:
-        conids = stock_obj.get_all_conids_by_account_id(account_id)
+        conids = stock_obj.get_all_conids_by_account_id(args.account_id)
         conids = list(map(str , conids))
 
     account_id = args.account_id
