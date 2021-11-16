@@ -363,11 +363,8 @@ def get_current_time_in_ms():
 
 
 def update_current_market_data(data):
-    if '31' in data:
-        current_open = convert_str_into_number(data.pop('31'))
-    elif '71' in data:
-        current_open = convert_str_into_number(data.pop('71'))
-
+    
+    current_open = convert_str_into_number(data.pop('31'))
     current_high = convert_str_into_number(data.pop('70',current_open))
     current_low = convert_str_into_number(data.pop('71',current_open))
 

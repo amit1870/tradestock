@@ -47,7 +47,7 @@ def on_message(ws, message):
     current_close = message_dict.get('31', 0)
     current_close = hp.convert_str_into_number(current_close)
 
-    if current_close:
+    if current_close > 0:
 
         snapshot_data_dict = hp.update_current_market_data(message_dict)
 
@@ -207,3 +207,13 @@ if __name__ == "__main__":
                                   on_close=on_close)
 
         ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+
+    else:
+        with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
+            print('{current_time} Market data history is empty {market_data_list}'.format(
+                current_time=hp.get_datetime_obj_in_str(),
+                market_data_list=market_data_list
+                ),
+                file=f
+            )
+
