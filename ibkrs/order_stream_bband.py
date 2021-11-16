@@ -23,15 +23,19 @@ from utils.settings import ORDER_LOG
 MINUTE = 60 # Seconds
 NAP_SLEEP = MINUTE
 URL = "wss://localhost:5000/v1/api/ws"
-ADD_ONCE = True
 
 def on_message(ws, message):
     global stock_obj
-    global market_data_list, conid, symbol
+    global market_data_dict, conids, symbols, add_data_once
     global period, lower, upper
-    global ADD_ONCE, NAP_SLEEP
+    global NAP_SLEEP
 
     message_dict = json.loads(message.decode('utf-8'))
+    conid = str(message_dict.get('conid',''))
+    symbol = symbols.get(conid)
+    market_data_list = market_data_dict.get(conid)
+    current_close = message_dict.get('31', 0)
+    current_close = hp.convert_str_into_number(current_close)
 
     with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
 
@@ -44,16 +48,15 @@ def on_message(ws, message):
             file=f
         )
 
-    current_close = message_dict.get('31', 0)
-    current_close = hp.convert_str_into_number(current_close)
+    
 
     if current_close > 0:
 
         snapshot_data_dict = hp.update_current_market_data(message_dict)
 
-        if ADD_ONCE:
+        if add_data_once[conid]:
             market_data_list.append(snapshot_data_dict)
-            ADD_ONCE = False
+            add_data_once[conid] = False
         else:
             market_data_list = market_data_list[:-1]
             market_data_list.append(snapshot_data_dict)
@@ -120,12 +123,13 @@ def on_close(ws, close_status_code, close_msg):
 def on_open(ws):
     def run(*args):
 
-        current_price_cmd = 'smd+{}+{{"fields":["31","70","71"]}}'.format(conid)
-
+        global conids
         while True:
-            for i in range(3):
-                ws.send(current_price_cmd)
-                time.sleep(1)
+            for conid in conids:
+                current_price_cmd = 'smd+{}+{{"fields":["31","70","71"]}}'.format(int(conid))
+                for i in range(3):
+                    ws.send(current_price_cmd)
+                    time.sleep(1)
 
             tickle_response = stock_obj.ib_client.tickle()
 
@@ -153,7 +157,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Buy or Sell stock with Interactive Brokers.')
     parser.add_argument('--username', required=True, help='YOUR_USERNAME')
     parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
-    parser.add_argument('--conid', required=True, type=int, help='STOCK_CONTRACT_ID')
+    parser.add_argument('--conids', required=True, help='STOCK_CONTRACT_ID1,STOCK_CONTRACT_ID2')
     parser.add_argument('--passkey', help='YOUR_PASSWORD')
     parser.add_argument('--time-period', default='93d', help='Time period for Market Data')
     parser.add_argument('--period', default=12, type=int, help='Moving Average number')
@@ -163,7 +167,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    conid = args.conid
     account_id = args.account_id
     period = args.period
     upper = args.upper
@@ -180,24 +183,30 @@ if __name__ == "__main__":
         ib_client, auth_status = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey], hard=True)
     
     stock_obj = Stock(ib_client)
-    stock_obj.ib_client.get_selected_account()
+    stock_obj.ib_client.server_accounts()
 
-    attempt = 3
+    conids = args.conids.split(',')
+    market_data_dict = {}
+    symbols = {}
+    add_data_once = {}
 
-    while attempt > 0:
-
-        market_data_list = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
-        time.sleep(2)
-
-        if market_data_list:
-            attempt = 0
-        attempt -= 1
-
-    if market_data_list:
-
+    for conid in conids:
         symbol = stock_obj.get_symbol_by_conid(conid)
+        symbols[conid] = symbol
+        add_data_once[conid] = True
 
+        attempt = 3
+        while attempt > 0:
+            market_data_list = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
+            if market_data_list:
+                market_data_dict[conid] = market_data_list
+                attempt = 0
+            attempt -= 1
+            time.sleep(1)
+    else:
         stock_obj.ib_client.unsubscribe_all_market_data_history()
+
+    if any(market_data_list != [] for market_data_list in market_data_dict.values()):
 
         websocket.enableTrace(True)
         ws = websocket.WebSocketApp(URL,
@@ -210,9 +219,9 @@ if __name__ == "__main__":
 
     else:
         with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
-            print('{current_time} Market data history is empty {market_data_list}'.format(
+            print('{current_time} Market data history is empty {market_data_dict}'.format(
                 current_time=hp.get_datetime_obj_in_str(),
-                market_data_list=market_data_list
+                market_data_dict=market_data_dict
                 ),
                 file=f
             )
