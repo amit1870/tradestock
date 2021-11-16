@@ -29,7 +29,12 @@ def main(ib_client, args):
     stock_obj = Stock(ib_client)
     stock_obj.ib_client.server_accounts()
 
-    conids = args.conids.split(',')
+    if args.conids:
+        conids = args.conids.split(',')
+    else:
+        conids = stock_obj.get_all_conids_by_account_id(account_id)
+        conids = list(map(str , conids))
+
     account_id = args.account_id
     market_data_dict = {}
     symbols = {}
@@ -177,7 +182,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Buy or Sell stock with Interactive Brokers.')
     parser.add_argument('--username', required=True, help='YOUR_USERNAME')
     parser.add_argument('--account-id', required=True, help='YOUR_ACCOUNT_NUMBER')
-    parser.add_argument('--conids', required=True, help='STOCK_CONTRACT_ID1 , STOCK_CONTRACT_ID2')
+    parser.add_argument('--conids', help='STOCK_CONTRACT_ID1 , STOCK_CONTRACT_ID2')
     parser.add_argument('--passkey', help='YOUR_PASSWORD')
     parser.add_argument('--time-period', default='93d', help='Time period for Market Data')
     parser.add_argument('--period', default=12, type=int, help='Moving Average number')

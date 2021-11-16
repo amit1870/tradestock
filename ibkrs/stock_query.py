@@ -18,8 +18,11 @@ def main(ib_client, args):
         pprint(stock_obj.search_stock_by_symbol(args.symbol))
 
     else:
-        pprint(stock_obj.ib_client.portfolio_account_info(args.account_id))
-        for i in range(10):
+        # pprint(stock_obj.ib_client.portfolio_account_info(args.account_id))
+        # pprint(stock_obj.ib_client.portfolio_account_summary(args.account_id))
+        pprint(stock_obj.get_all_conids_by_account_id(args.account_id))
+
+        for i in range(1):
             pprint(stock_obj.ib_client.get_live_orders())
 
 

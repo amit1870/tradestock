@@ -179,3 +179,14 @@ class Stock(object):
         order_status = self.place_order_stock(account_id, orders)
 
         return order_status
+
+    def get_all_conids_by_account_id(self, account_id):
+        account_positions = self.get_account_positions_by_page_id(account_id, page_id=0)
+
+        conids = []
+        for row in account_positions:
+            for key, val in row.items():
+                if key == 'conid':
+                    conids.append(val)
+
+        return conids
