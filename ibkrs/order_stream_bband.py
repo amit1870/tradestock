@@ -167,11 +167,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    account_id = args.account_id
-    period = args.period
-    upper = args.upper
-    lower = args.lower
-
     # Create a new session of the IB Web API.
     ib_client = IBClient(
         username=args.username,
@@ -182,6 +177,13 @@ if __name__ == "__main__":
     if args.passkey:
         ib_client, auth_status = hp.authenticate_ib_client(ib_client, [args.username], [args.passkey], hard=True)
     
+    account_id = args.account_id
+    period = args.period
+    upper = args.upper
+    lower = args.lower
+    time_period = args.time_period
+    bar = args.bar
+
     stock_obj = Stock(ib_client)
     stock_obj.ib_client.server_accounts()
 
@@ -202,7 +204,7 @@ if __name__ == "__main__":
 
         attempt = 3
         while attempt > 0:
-            market_data_list = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
+            market_data_list = stock_obj.get_market_data_history_list(conid, time_period, bar)
             if market_data_list:
                 market_data_dict[conid] = market_data_list
                 attempt = 0

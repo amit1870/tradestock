@@ -29,28 +29,34 @@ def main(ib_client, args):
     stock_obj = Stock(ib_client)
     stock_obj.ib_client.server_accounts()
 
-    if args.conids:
+    time_period = args.time_period
+    bar = args.bar
+    account_id = args.account_id
+    conids = args.conids
+
+    if conids:
         conids = args.conids.split(',')
     else:
-        conids = stock_obj.get_all_conids_by_account_id(args.account_id)
+        conids = stock_obj.get_all_conids_by_account_id(account_id)
         conids = list(map(str , conids))
 
-    account_id = args.account_id
+    
     market_data_dict = {}
     symbols = {}
     add_data_once = {}
+    str_conids = ','.join(conids)
 
     for conid in conids:
         symbol = stock_obj.get_symbol_by_conid(conid)
         symbols[conid] = symbol
         add_data_once[conid] = True
-        market_data_dict[conid] = stock_obj.get_market_data_history_list(conid, args.time_period, args.bar)
+        market_data_dict[conid] = stock_obj.get_market_data_history_list(conid, time_period, bar)
     else:
         stock_obj.ib_client.unsubscribe_all_market_data_history()
 
     if any(market_data_list != [] for market_data_list in market_data_dict.values()):
 
-        current_market_data = stock_obj.get_current_market_data_snapshot(args.conids)
+        current_market_data = stock_obj.get_current_market_data_snapshot(str_conids)
 
         while current_market_data:
 
@@ -166,7 +172,7 @@ Bollinger Upper {upper} Close {close} Lower {lower}".format(
                 )
             time.sleep(NAP_SLEEP)
 
-            current_market_data = stock_obj.get_current_market_data_snapshot(args.conids)
+            current_market_data = stock_obj.get_current_market_data_snapshot(str_conids)
 
     else:
         with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
