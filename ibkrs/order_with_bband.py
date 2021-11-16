@@ -13,7 +13,7 @@ from utils.helper import print_df
 from utils.settings import BOLLINGER_STREAM_LOG, ORDER_LOG
 
 MINUTE = 60 # Seconds
-NAP_SLEEP = MINUTE / 5
+NAP_SLEEP = MINUTE
 
 def run_bollinger_on_conid(stock_obj, market_data_list, conid, current_close, period, upper, lower, symbol, plot=False):
     bolinger_frame = hp.get_bollinger_band(market_data_list, period, upper, lower, plot=plot, symbol=symbol)
