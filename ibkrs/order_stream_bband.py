@@ -48,8 +48,6 @@ def on_message(ws, message):
             file=f
         )
 
-    
-
     if current_close > 0:
 
         snapshot_data_dict = hp.update_current_market_data(message_dict)
@@ -68,6 +66,7 @@ def on_message(ws, message):
         b_lower = bolinger_frame['Lower'].iloc[-1]
 
         if side != 'NAN':
+
             order_status = stock_obj.place_order_with_bollinger_band(account_id, conid, side, current_close)
 
             with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
@@ -124,12 +123,26 @@ def on_open(ws):
     def run(*args):
 
         global conids
+        global market_data_dict
+        global symbols
+
         while True:
             for conid in conids:
-                current_price_cmd = 'smd+{}+{{"fields":["31","70","71"]}}'.format(int(conid))
-                for i in range(3):
-                    ws.send(current_price_cmd)
-                    time.sleep(1)
+                if market_data_dict.get(conid, []):
+
+                    current_price_cmd = 'smd+{}+{{"fields":["31","70","71"]}}'.format(int(conid))
+                    for i in range(3):
+                        ws.send(current_price_cmd)
+                        time.sleep(1)
+                else:
+                    with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
+                        print('{current_time} {contract_id}[{symbol}] Market Data is empty for the conid.'.format(
+                            current_time=hp.get_datetime_obj_in_str(),
+                            contract_id=conid,
+                            symbol=symbols.get(conid,'')
+                            ),
+                            file=f
+                        )
 
             tickle_response = stock_obj.ib_client.tickle()
 
