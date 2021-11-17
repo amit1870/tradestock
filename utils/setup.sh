@@ -46,4 +46,22 @@ export PYTHONPATH="${CODE_DIR}"
 export DISPLAY="localhost:1"
 alias python='$BASE_DIR/bin/python'
 
+# Run email program if not running
+email_pid=$(ps aux | grep "[s]end_email.py" | awk '{print $2}')
+if ! [ -n "${email_pid}" -a "$email_pid" -ge 0 ];then
+    cd ${CODE_DIR} || exit
+    echo "${RUN_TIME} Starting Email program..." >> ${SETUP_LOG} 2>&1
+    nohup python "${CODE_DIR}/utils/send_email.py --schedule H3" >/dev/null 2>&1 &
+    sleep 5
+
+    email_pid=$(ps aux | grep "[s]end_email.py" | awk '{print $2}')
+    if [ -n "${email_pid}" -a "$email_pid" -ge 0 ];then
+        echo "${RUN_TIME} Email program is running with pid ${email_pid}." >> ${SETUP_LOG} 2>&1
+    else
+        echo "${RUN_TIME} Email program is not started. Please check with admin." >> ${SETUP_LOG} 2>&1
+    fi
+else
+    echo "${RUN_TIME} Email program is running with pid ${email_pid}." >> ${SETUP_LOG} 2>&1
+fi
+
 echo "Finished!!" >> ${SETUP_LOG} 2>&1
