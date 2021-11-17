@@ -21,14 +21,14 @@ echo "Running....." >> ${SETUP_LOG} 2>&1
 RUN_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 
 # Run IBKR gateway if not running
-java_pid=$(pidof java)
+java_pid=$(ps aux | grep "[j]ava" | awk '{print $2}')
 if ! [ -n "${java_pid}" -a "$java_pid" -ge 0 ];then
     cd ${SERVER_DIR} || exit
     echo "${RUN_TIME} Starting IBKR gateway..." >> ${SETUP_LOG} 2>&1
     nohup ./bin/run.sh root/conf.yaml >/dev/null 2>&1 &
     sleep 5
 
-    java_pid=$(pidof java)
+    java_pid=$(ps aux | grep "[j]ava" | awk '{print $2}')
     if [ -n "${java_pid}" -a "$java_pid" -ge 0 ];then
         echo "${RUN_TIME} IBKR gateway is running with pid ${java_pid}." >> ${SETUP_LOG} 2>&1
     else
