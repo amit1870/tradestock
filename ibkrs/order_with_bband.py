@@ -15,7 +15,7 @@ from utils.settings import BOLLINGER_STREAM_LOG, ORDER_LOG
 MINUTE = 60 # Seconds
 NAP_SLEEP = MINUTE
 
-def run_bollinger_on_conid(stock_obj, market_data_list, conid, current_close, period, upper, lower, symbol, plot=False):
+def run_bollinger_on_conid(stock_obj, market_data_list, current_close, period, upper, lower, symbol='XXX', plot=False):
     bolinger_frame = hp.get_bollinger_band(market_data_list, period, upper, lower, plot=plot, symbol=symbol)
     side = hp.get_signal_for_last_frame(bolinger_frame, current_close)
 
@@ -102,7 +102,6 @@ def main(ib_client, args):
                         side, b_upper, b_lower = run_bollinger_on_conid(
                             stock_obj,
                             market_data_list,
-                            loop_conid,
                             current_close,
                             period,
                             upper,
@@ -112,7 +111,7 @@ def main(ib_client, args):
                         )
 
                         if side != 'NAN':
-                            order_status = stock_obj.place_order_with_bollinger_band(account_id, loop_conid, side, current_close)
+                            order_status = stock_obj.place_order_with_bollinger_band(account_id, int(loop_conid), side, current_close)
 
                             with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
                                 print("{current_time} {contract_id}[{symbol}] {side} took place against \
