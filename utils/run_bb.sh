@@ -5,7 +5,7 @@ BASE_DIR="$HOME/virenv"
 CODE_DIR="$BASE_DIR/pcv"
 RESOURCE_DIR="$CODE_DIR/resources"
 BOLLINGER_STREAM_LOG="$RESOURCE_DIR/bbstream.log"
-LONG_SLEEP=1800 # Seconds
+LONG_SLEEP=900 # Seconds
 
 declare -a usernames=("peace77t6" "peace77t4" "peace77t3")
 declare -a accounts=("U6092014" "U6498436" "U7242803")
