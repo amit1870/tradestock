@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Running setup....."
+# This script will setup basic configuration needed to run IBKR Gateway.
 
 BASE_DIR="$HOME/virenv"
 CODE_DIR="$BASE_DIR/pcv"
@@ -15,6 +15,8 @@ if ! [ -f "$SETUP_LOG" ]; then
     touch ${SETUP_LOG}
 fi
 
+echo "Running....." >> ${SETUP_LOG} 2>&1
+
 # put current date as yyyy-mm-dd HH:MM:SS in $date
 RUN_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 
@@ -28,20 +30,20 @@ if ! [ -n "${java_pid}" -a "$java_pid" -ge 0 ];then
 
     java_pid=$(pidof java)
     if [ -n "${java_pid}" -a "$java_pid" -ge 0 ];then
-        echo "${RUN_TIME} IBKR gateway is running with pid ${java_pid}."
+        echo "${RUN_TIME} IBKR gateway is running with pid ${java_pid}." >> ${SETUP_LOG} 2>&1
     else
-        echo "${RUN_TIME} IBKR gateway is not started. Please check with admin."
+        echo "${RUN_TIME} IBKR gateway is not started. Please check with admin." >> ${SETUP_LOG} 2>&1
     fi
 else
-    echo "${RUN_TIME} IBKR gateway is running with pid ${java_pid}."
+    echo "${RUN_TIME} IBKR gateway is running with pid ${java_pid}." >> ${SETUP_LOG} 2>&1
 fi
 
 # Activate vitural env and export PYTHONPATH
-echo "${RUN_TIME} Activating virenv environment..."
+echo "${RUN_TIME} Activating virenv environment..." >> ${SETUP_LOG} 2>&1
 cd ${BASE_DIR} || exit
 source bin/activate
 export PYTHONPATH="${CODE_DIR}"
 export DISPLAY="localhost:1"
 alias python='$BASE_DIR/bin/python'
 
-echo "Finished!!"
+echo "Finished!!" >> ${SETUP_LOG} 2>&1
