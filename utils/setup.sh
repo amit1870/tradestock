@@ -51,7 +51,7 @@ email_pid=$(ps aux | grep "[s]end_email.py" | awk '{print $2}')
 if ! [ -n "${email_pid}" -a "$email_pid" -ge 0 ];then
     cd ${CODE_DIR} || exit
     echo "${RUN_TIME} Starting Email program..." >> ${SETUP_LOG} 2>&1
-    nohup python "${CODE_DIR}/utils/send_email.py --schedule H3" >/dev/null 2>&1 &
+    nohup python "${CODE_DIR}/utils/send_email.py" --schedule H3 >/dev/null 2>&1 &
     sleep 5
 
     email_pid=$(ps aux | grep "[s]end_email.py" | awk '{print $2}')
