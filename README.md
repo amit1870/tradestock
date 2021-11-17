@@ -37,14 +37,14 @@ rm -rf ${OPR}
 
 
 # Run IBKR gateway if not running
-java_server_id=$(pidof java)
+java_server_id=$(ps aux | grep "[j]ava" | awk '{print $2}')
 echo $java_server_id
 BASE_DIR="$HOME/virenv"
 SERVER_DIR="$BASE_DIR/pcv/clientportal"
 cd ${SERVER_DIR} || exit
-nohup ./bin/run.sh root/conf.yaml & >> /dev/null
+nohup ./bin/run.sh root/conf.yaml > /dev/null 2>&1 & 
 sleep 3
-java_server_id=$(pidof java)
+java_server_id=$(ps aux | grep "[j]ava" | awk '{print $2}')
 echo $java_server_id
 
 # Run Chrome Browser

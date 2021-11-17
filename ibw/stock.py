@@ -3,6 +3,8 @@ import time
 from datetime import datetime, timezone
 from requests.exceptions import HTTPError
 
+from utils import helper as hp
+
 class Stock(object):
     def __init__(self, ib_client):
         self.ib_client = ib_client
@@ -75,7 +77,6 @@ class Stock(object):
 
         if confirm and user_input == 'N':
             return order_status
-
 
         order_response = self.ib_client.place_orders(
             account_id=account_id,
@@ -158,9 +159,12 @@ class Stock(object):
 
     def place_order_with_bollinger_band(self, account_id, conid, side, current_close):
         if side == 'SELL':
-            stock_postion_dict = self.search_stock_by_conid(account_id, conid)
-            quantity = stock_postion_dict.get('position', 0)
-
+            stock_postion_summary = self.search_stock_by_conid(account_id, conid)
+            quantity = 0
+            if stock_postion_summary:
+                stock_postion_dict = stock_postion_summary[0]
+                quantity = stock_postion_dict.get('position', 0)
+                quantity = int(quantity)
         else:
             # get balance and calculate number of position to buy
             balance_type = 'AVB'
@@ -176,6 +180,7 @@ class Stock(object):
         }
 
         orders = hp.prepare_order_dict_from_args(order_dict)
+
         order_status = self.place_order_stock(account_id, orders)
 
         return order_status

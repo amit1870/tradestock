@@ -66,8 +66,7 @@ def on_message(ws, message):
         b_lower = bolinger_frame['Lower'].iloc[-1]
 
         if side != 'NAN':
-
-            order_status = stock_obj.place_order_with_bollinger_band(account_id, conid, side, current_close)
+            order_status = stock_obj.place_order_with_bollinger_band(account_id, int(conid), side, current_close)
 
             with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
                 print("{current_time} {contract_id}[{symbol}] {side} took place against Bollinger Upper {upper} Close {close} Lower {lower}".format(
