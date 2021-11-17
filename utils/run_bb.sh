@@ -32,15 +32,26 @@ ARRAY_LEN=${#usernames[@]}
 
 while :
 do
+    echo "Check if order_stream_bband.py is alredy running ..."
+    py_pid=$(ps aux | grep "[o]rder_stream_bband.py" | awk '{print $2}')
+
+    if [ -n "${py_pid}" -a "$py_pid" -ge 0 ];then
+        kill ${py_pid}
+        echo "Already running order_stream_bband.py killed with pid ${py_pid}."
+        sleep 1
+    fi
+
+    echo "Starting order_stream_bband.py..."
     python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[i]}" --passkey "${passwords[i]}"  \
            --account-id "${accounts[i]}" & >> /dev/null 2>&1
 
-    echo "Going to long sleep for ${LONG_SLEEP}sec.."
-    sleep ${LONG_SLEEP}
+    py_pid=$(ps aux | grep "[o]rder_stream_bband.py" | awk '{print $2}')
 
-    echo "Going to kill above python process ..."
-    kill $(ps aux | grep "[o]rder_stream_bband.py" | awk '{print $2}')
-    echo "Killed !"
+    if [ -n "${py_pid}" -a "$py_pid" -ge 0 ];then
+        echo "Script order_stream_bband.py is running with pid ${py_pid}."
+        echo "Going to sleep for ${LONG_SLEEP}sec.."
+        sleep ${LONG_SLEEP}
+    fi
 
     ((i=i+1))
 
