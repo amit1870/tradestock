@@ -6,6 +6,7 @@ CODE_DIR="$BASE_DIR/pcv"
 RESOURCE_DIR="$CODE_DIR/resources"
 BOLLINGER_STREAM_LOG="$RESOURCE_DIR/bbstream.log"
 LONG_SLEEP=900 # Seconds
+LOG_SIZE=200000 # 5MB
 
 declare -a usernames=("peace77t6" "peace77t4" "peace77t3")
 declare -a accounts=("U6092014" "U6498436" "U7242803")
@@ -32,6 +33,17 @@ ARRAY_LEN=${#usernames[@]}
 
 while :
 do
+    # Check log file size and mv $BOLLINGER_STREAM_LOG when size is $LOG_SIZE
+    if [ -f "$BOLLINGER_STREAM_LOG" ]; then
+        CURRENT_LOG_SIZE=$(stat -c%s $BOLLINGER_STREAM_LOG)
+        if (( CURRENT_LOG_SIZE > LOG_SIZE )); then
+            mv $BOLLINGER_STREAM_LOG "$BOLLINGER_STREAM_LOG.$i"
+            touch $BOLLINGER_STREAM_LOG
+        fi
+    else
+        touch $LOG_FILE
+    fi
+
     echo "Check if order_stream_bband.py is alredy running ..."
     py_pid=$(ps aux | grep "[o]rder_stream_bband.py" | awk '{print $2}')
 
