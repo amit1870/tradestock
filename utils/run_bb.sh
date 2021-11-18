@@ -4,7 +4,8 @@ echo "Running....."
 BASE_DIR="$HOME/virenv"
 CODE_DIR="$BASE_DIR/pcv"
 RESOURCE_DIR="$CODE_DIR/resources"
-BOLLINGER_STREAM_LOG="$RESOURCE_DIR/bbstream.log"
+BOLLINGER_STREAM_LOG=="$RESOURCE_DIR/bbstream.log"
+OLD_BOLLINGER_STREAM_LOG="$RESOURCE_DIR/bbstream.old.log"
 LONG_SLEEP=900 # Seconds
 LOG_SIZE=200000 # 2MB
 
@@ -37,7 +38,7 @@ do
     if [ -f "$BOLLINGER_STREAM_LOG" ]; then
         CURRENT_LOG_SIZE=$(stat -c%s $BOLLINGER_STREAM_LOG)
         if (( CURRENT_LOG_SIZE > LOG_SIZE )); then
-            mv $BOLLINGER_STREAM_LOG "$BOLLINGER_STREAM_LOG.$i"
+            mv $BOLLINGER_STREAM_LOG $OLD_BOLLINGER_STREAM_LOG
             touch $BOLLINGER_STREAM_LOG
         fi
     else
