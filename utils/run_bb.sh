@@ -6,7 +6,7 @@ CODE_DIR="$BASE_DIR/pcv"
 RESOURCE_DIR="$CODE_DIR/resources"
 BOLLINGER_STREAM_LOG="$RESOURCE_DIR/bbstream.log"
 LONG_SLEEP=900 # Seconds
-LOG_SIZE=200000 # 5MB
+LOG_SIZE=200000 # 2MB
 
 declare -a usernames=("peace77t6" "peace77t4" "peace77t3")
 declare -a accounts=("U6092014" "U6498436" "U7242803")
@@ -41,7 +41,7 @@ do
             touch $BOLLINGER_STREAM_LOG
         fi
     else
-        touch $LOG_FILE
+        touch $BOLLINGER_STREAM_LOG
     fi
 
     echo "Check if order_stream_bband.py is alredy running ..."
