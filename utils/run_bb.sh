@@ -4,7 +4,7 @@ echo "Running....."
 BASE_DIR="$HOME/virenv"
 CODE_DIR="$BASE_DIR/pcv"
 RESOURCE_DIR="$CODE_DIR/resources"
-BOLLINGER_STREAM_LOG=="$RESOURCE_DIR/bbstream.log"
+BOLLINGER_STREAM_LOG="$RESOURCE_DIR/bbstream.log"
 OLD_BOLLINGER_STREAM_LOG="$RESOURCE_DIR/bbstream.old.log"
 LONG_SLEEP=900 # Seconds
 LOG_SIZE=200000 # 2MB
