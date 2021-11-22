@@ -175,7 +175,7 @@ class Stock(object):
             account_balance = account_balance_dict.get('amount', 0)
             quantity = account_balance // current_close
 
-        if quantity:
+        if quantity > 0:
 
             order_dict = {
                 'account_id': account_id,
