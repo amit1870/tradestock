@@ -6,7 +6,8 @@ CODE_DIR="$BASE_DIR/pcv"
 RESOURCE_DIR="$CODE_DIR/resources"
 BOLLINGER_STREAM_LOG="$RESOURCE_DIR/bbstream.log"
 OLD_BOLLINGER_STREAM_LOG="$RESOURCE_DIR/bbstream.old.log"
-LONG_SLEEP=900 # Seconds
+SCRIPT_LOG="$RESOURCE_DIR/script.log"
+LONG_SLEEP=600 # Seconds
 LOG_SIZE=200000 # 2MB
 
 declare -a usernames=("peace77t6" "peace77t4" "peace77t3")
@@ -23,11 +24,11 @@ alias python='$BASE_DIR/bin/python'
 
 # Remove $BOLLINGER_STREAM_LOG if already found.
 if [ -f "$BOLLINGER_STREAM_LOG" ]; then
-    rm -f ${BOLLINGER_STREAM_LOG}
+    rm -f ${BOLLINGER_STREAM_LOG} ${SCRIPT_LOG}
 fi
 
 # Add new $BOLLINGER_STREAM_LOG
-touch ${BOLLINGER_STREAM_LOG}
+touch ${BOLLINGER_STREAM_LOG} ${SCRIPT_LOG}
 
 i=0
 ARRAY_LEN=${#usernames[@]}
@@ -38,6 +39,10 @@ do
     if [ -f "$BOLLINGER_STREAM_LOG" ]; then
         CURRENT_LOG_SIZE=$(stat -c%s $BOLLINGER_STREAM_LOG)
         if (( CURRENT_LOG_SIZE > LOG_SIZE )); then
+
+            RUN_TIME=$(date '+%Y-%m-%d %H:%M:%S')
+            echo "$RUN_TIME Moving log to new log file" >> ${SCRIPT_LOG}
+
             mv $BOLLINGER_STREAM_LOG $OLD_BOLLINGER_STREAM_LOG
             touch $BOLLINGER_STREAM_LOG
         fi
@@ -45,24 +50,35 @@ do
         touch $BOLLINGER_STREAM_LOG
     fi
 
-    echo "Check if order_stream_bband.py is alredy running ..."
+    RUN_TIME=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "$RUN_TIME Check if order_stream_bband.py is alredy running ..." >> ${SCRIPT_LOG}
+
     py_pid=$(ps aux | grep "[o]rder_stream_bband.py" | awk '{print $2}')
 
     if ! [ -z "${py_pid}" ];then
+
         kill ${py_pid}
-        echo "Already running order_stream_bband.py killed with pid ${py_pid}."
+
+        RUN_TIME=$(date '+%Y-%m-%d %H:%M:%S')
+        echo "$RUN_TIME Already running order_stream_bband.py killed with pid ${py_pid}." >> ${SCRIPT_LOG}
+
         sleep 1
     fi
 
-    echo "Starting order_stream_bband.py..."
+    RUN_TIME=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "$RUN_TIME Starting order_stream_bband.py..." >> ${SCRIPT_LOG}
+
     python "${CODE_DIR}/ibkrs/order_stream_bband.py" --username "${usernames[i]}" --passkey "${passwords[i]}"  \
            --account-id "${accounts[i]}" & >> /dev/null 2>&1
 
     py_pid=$(ps aux | grep "[o]rder_stream_bband.py" | awk '{print $2}')
 
     if ! [ -z "${py_pid}" ];then
-        echo "Script order_stream_bband.py is running with pid ${py_pid}."
-        echo "Going to sleep for ${LONG_SLEEP}sec.."
+
+        RUN_TIME=$(date '+%Y-%m-%d %H:%M:%S')
+        echo "$RUN_TIME Script order_stream_bband.py is running with pid ${py_pid}." >> ${SCRIPT_LOG}
+        echo "$RUN_TIME Going to sleep for ${LONG_SLEEP}sec.." >> ${SCRIPT_LOG}
+
         sleep ${LONG_SLEEP}
     fi
 
