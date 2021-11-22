@@ -45,6 +45,7 @@ def main(ib_client, args):
     symbols = {}
     add_data_once = {}
     str_conids = ','.join(conids)
+    EXECUTED_ORDERS = []
 
     for conid in conids:
         symbol = stock_obj.get_symbol_by_conid(conid)
@@ -114,7 +115,7 @@ def main(ib_client, args):
                             order_status = stock_obj.place_order_with_bollinger_band(account_id, int(loop_conid), side, current_close)
 
                             with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
-                                print("{current_time} {contract_id}[{symbol}] {side} took place against \
+                                print("{current_time} {contract_id}[{symbol}] {side} with order status {order_status} took place against \
 Bollinger Upper {upper} Close {close} Lower {lower}".format(
                                     current_time=hp.get_datetime_obj_in_str(),
                                     side=side,
@@ -122,24 +123,33 @@ Bollinger Upper {upper} Close {close} Lower {lower}".format(
                                     close=current_close,
                                     lower=b_lower,
                                     contract_id=loop_conid,
-                                    symbol=loop_symbol
+                                    symbol=loop_symbol,
+                                    order_status=order_status
                                     ),
                                     file=f
                                 )
 
-                            with open(ORDER_LOG.as_posix(), 'a') as fo:
-                                print("{current_time} {contract_id}[{symbol}] <span style='color:#28a745;'><b>{side}</b></span> took place against \
-Bollinger Upper {upper} Close {close} Lower {lower}".format(
-                                    current_time=hp.get_datetime_obj_in_str(),
-                                    side=side,
-                                    upper=b_upper,
-                                    close=current_close,
-                                    lower=b_lower,
-                                    contract_id=loop_conid,
-                                    symbol=loop_symbol
-                                    ),
-                                    file=fo
-                                )
+                            if isinstance(order_status, list):
+                                order_status_details = order_status[0]
+
+                                local_order_id = order_status_details.get('local_order_id')
+                                local_order_status = order_status_details.get('order_status')
+
+                                if local_order_id and local_order_id not in EXECUTED_ORDERS:
+                                    with open(ORDER_LOG.as_posix(), 'a') as fo:
+                                        print("{current_time} || {contract_id}[{symbol}] || {local_order_id} || \
+<span style='color:#28a745;'><b>{side}</b></span> || {local_order_status} ||".format(
+                                            current_time=hp.get_datetime_obj_in_str(),
+                                            side=side,
+                                            local_order_id=local_order_id,
+                                            contract_id=loop_conid,
+                                            symbol=loop_symbol,
+                                            local_order_status=local_order_status
+                                            ),
+                                            file=fo
+                                        )
+                                elif local_order_id is not None:
+                                    EXECUTED_ORDERS.append(local_order_id)
 
                         else:
                             with open(BOLLINGER_STREAM_LOG.as_posix(), 'a') as f:
