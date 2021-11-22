@@ -48,7 +48,7 @@ do
     echo "Check if order_stream_bband.py is alredy running ..."
     py_pid=$(ps aux | grep "[o]rder_stream_bband.py" | awk '{print $2}')
 
-    if [ -n "${py_pid}" -a "$py_pid" -ge 0 ];then
+    if ! [ -z "${py_pid}" ];then
         kill ${py_pid}
         echo "Already running order_stream_bband.py killed with pid ${py_pid}."
         sleep 1
@@ -60,7 +60,7 @@ do
 
     py_pid=$(ps aux | grep "[o]rder_stream_bband.py" | awk '{print $2}')
 
-    if [ -n "${py_pid}" -a "$py_pid" -ge 0 ];then
+    if ! [ -z "${py_pid}" ];then
         echo "Script order_stream_bband.py is running with pid ${py_pid}."
         echo "Going to sleep for ${LONG_SLEEP}sec.."
         sleep ${LONG_SLEEP}

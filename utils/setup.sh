@@ -22,14 +22,14 @@ RUN_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 
 # Run IBKR gateway if not running
 java_pid=$(ps aux | grep "[j]ava" | awk '{print $2}')
-if ! [ -n "${java_pid}" -a "$java_pid" -ge 0 ];then
+if [ -z "${java_pid}" ];then
     cd ${SERVER_DIR} || exit
     echo "${RUN_TIME} Starting IBKR gateway..." >> ${SETUP_LOG} 2>&1
     nohup ./bin/run.sh root/conf.yaml >/dev/null 2>&1 &
     sleep 5
 
     java_pid=$(ps aux | grep "[j]ava" | awk '{print $2}')
-    if [ -n "${java_pid}" -a "$java_pid" -ge 0 ];then
+    if ! [ -z "${java_pid}" ];then
         echo "${RUN_TIME} IBKR gateway is running with pid ${java_pid}." >> ${SETUP_LOG} 2>&1
     else
         echo "${RUN_TIME} IBKR gateway is not started. Please check with admin." >> ${SETUP_LOG} 2>&1
@@ -48,14 +48,14 @@ alias python='$BASE_DIR/bin/python'
 
 # Run email program if not running
 email_pid=$(ps aux | grep "[s]end_email.py" | awk '{print $2}')
-if ! [ -n "${email_pid}" -a "$email_pid" -ge 0 ];then
+if [ -z "${email_pid}" ];then
     cd ${CODE_DIR} || exit
     echo "${RUN_TIME} Starting Email program..." >> ${SETUP_LOG} 2>&1
     nohup python "${CODE_DIR}/utils/send_email.py" --schedule H3 >/dev/null 2>&1 &
     sleep 5
 
     email_pid=$(ps aux | grep "[s]end_email.py" | awk '{print $2}')
-    if [ -n "${email_pid}" -a "$email_pid" -ge 0 ];then
+    if ! [ -z "${email_pid}" ];then
         echo "${RUN_TIME} Email program is running with pid ${email_pid}." >> ${SETUP_LOG} 2>&1
     else
         echo "${RUN_TIME} Email program is not started. Please check with admin." >> ${SETUP_LOG} 2>&1
