@@ -76,7 +76,7 @@ do
     if ! [ -z "${py_pid}" ];then
 
         RUN_TIME=$(date '+%Y-%m-%d %H:%M:%S')
-        echo "$RUN_TIME Script order_stream_bband.py is running with pid ${py_pid}." >> ${SCRIPT_LOG}
+        echo "$RUN_TIME Script order_stream_bband.py is running for ${usernames[i]} || ${accounts[i]} with pid ${py_pid}." >> ${SCRIPT_LOG}
         echo "$RUN_TIME Going to sleep for ${LONG_SLEEP}sec.." >> ${SCRIPT_LOG}
 
         sleep ${LONG_SLEEP}
