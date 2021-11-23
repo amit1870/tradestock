@@ -21,7 +21,7 @@ from utils.settings import BOLLINGER_STREAM_LOG
 from utils.settings import ORDER_LOG
 
 MINUTE = 60 # Seconds
-NAP_SLEEP = MINUTE
+NAP_SLEEP = MINUTE / 2
 URL = "wss://localhost:5000/v1/api/ws"
 EXECUTED_ORDERS = []
 
